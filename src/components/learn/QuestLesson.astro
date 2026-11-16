@@ -1,0 +1,57 @@
+---
+// Grade 2 mission page: story header, scene, worked example, two challenges,
+// and the epilogue after the last mission. Story texts can name the chosen
+// hero ({name}), so they render through HeroText.
+import type { Locale } from '../../math/core/types';
+import { GRADE_TWO_LESSONS, GRADE_TWO_PROJECT } from '../../content/grade2';
+import { getGradeTwoHints } from '../../content/grade2/hints';
+import { GRADE_TWO_ASSESSMENTS } from '../../content/grade2/assessments';
+import { QUEST_MISSIONS, QUEST_CHAPTERS } from '../../content/grade2/wizardQuest';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import QuestStage from './QuestStage.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+import GradeTwoLab from './GradeTwoLab.astro';
+import HeroText from '../shared/HeroText.astro';
+const { locale, lessonId } = Astro.props as { locale: Locale; lessonId: string };
+const es = locale === 'es-AR';
+const index = GRADE_TWO_LESSONS.findIndex(l => l.id === lessonId);
+const lesson = GRADE_TWO_LESSONS[index], mission = QUEST_MISSIONS[index];
+if (!lesson || mission.id !== lessonId) throw new Error(`Missing quest mission: ${lessonId}`);
+const hints = getGradeTwoHints(lessonId);
+const next = GRADE_TWO_LESSONS[index + 1];
+const chapter = QUEST_CHAPTERS.find(c => index >= c.start && index < c.end)!;
+const lastInPackage = !next || next.packageId !== lesson.packageId;
+const epilogue = es
+ ? 'El bastón del mago ahora es un palo común. «Ganaron…», suspira Embrollo. {name} se acerca: «¿Venís con nosotros a la fiesta?». El mago sonríe por primera vez. Chispa enciende los faroles y todos van juntos a la Fiesta de los Faroles.'
+ : 'The wizard’s staff is now just a plain stick. “You won…” Embrollo sighs. {name} comes closer: “Will you come to the festival with us?” The wizard smiles for the first time. Chispa lights the lanterns, and everyone goes to the Lantern Festival together.';
+---
+<article class="road-trip road-lesson" data-quest-lesson data-locale={locale} data-mission-index={index}>
+ <nav class="road-top"><a href={`${buildGradeUrl(locale, 'grade-2')}#quest-${chapter.id}`}>← {es ? 'Mapa de la aventura' : 'Adventure map'}</a><span>{es ? 'MISIÓN' : 'MISSION'} {index + 1} / {QUEST_MISSIONS.length}</span></nav>
+ <header class="road-heading"><p class="road-eyebrow">{chapter.icon} {chapter.title[locale]}</p><h1>{mission.title[locale]}</h1><p><HeroText text={mission.introduction[locale]} /></p></header>
+ <QuestStage locale={locale} index={index} />
+ <section class="road-workbook" aria-label={es ? 'Ejemplo paso a paso' : 'Step-by-step example'}><h2>{es ? 'Miremos un ejemplo' : 'Let’s try an example'}</h2><div class="road-workbook-body"><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><figure class="road-example" data-scene><div class="road-example-items" data-scene-items>{lesson.scene.items.map((item, i) => <button type="button" data-scene-item aria-pressed="false" aria-label={`${es ? 'Tarjeta' : 'Card'} ${i + 1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="road-secondary" data-scene-reset>{es ? 'Borrar marcas' : 'Clear marks'}</button></figure><ol>{lesson.steps.map(step => <li>{step[locale]}</li>)}</ol><p>{lesson.misconception[locale]}</p><GradeTwoLab locale={locale} packageId={lesson.packageId} /></div></section>
+ <section class="road-challenge">
+  <p>{es ? 'Ahora te toca. Leé la pregunta y probá.' : 'Now it’s your turn. Read the question and try it.'}</p>
+  {lesson.packageId === 'G02-10' && <figure class="road-question-map"><figcaption>{es ? 'Plano para estos desafíos. ★: salida. ■: lugar bloqueado. 🦌 o 🏁: la meta. Un paso por casilla, sin diagonales.' : 'Map for these challenges. ★: start. ■: blocked square. 🦌 or 🏁: the goal. One square per step, no diagonal moves.'}</figcaption><table aria-label={es ? 'Plano del recorrido' : 'Route map'}><tbody>{lesson.scene.items.slice(0, 3).map(row => <tr>{row.split(' ').map(cell => <td>{cell}</td>)}</tr>)}</tbody></table></figure>}
+  {lesson.checks.map((check, i) => <div data-quest-question={i} data-answer={check.answer} hidden={i !== 0}><p class="road-eyebrow">{es ? 'DESAFÍO' : 'CHALLENGE'} {i + 1} / {lesson.checks.length}</p><h2 tabindex="-1" data-quest-question-title>{check.prompt[locale]}</h2>
+   {index === 0 && <div class="road-place-model"><p>{es ? 'Tocá una cifra para ver cuánto vale.' : 'Tap a digit to see its value.'}</p><div class="road-place-columns">{(i === 0 ? [4, 6, 1] : [2, 2, 2]).map((digit, j) => {
+    const unit = [100, 10, 1][j];
+    const label = (es ? ['Cajas de 100', 'Bolsitas de 10', 'Sueltas'] : ['Boxes of 100', 'Bags of 10', 'Loose'])[j];
+    return <button type="button" data-quest-place-value={`${digit} × ${unit} = ${digit * unit}`} aria-pressed="false" aria-label={`${label}: ${digit}`}><span>{label}</span><strong>{digit}</strong><span class="road-place-blocks" aria-hidden="true">{Array.from({ length: digit }, () => <i>{unit}</i>)}</span></button>;
+   })}</div><p class="road-place-value" data-quest-place-result role="status" aria-live="polite"></p></div>}
+   <div class="road-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option, j) => <button type="button" data-quest-answer={j}>{option[locale]}</button>)}</div><p class="road-hint" data-quest-hint hidden><span aria-hidden="true">🦊 </span>{hints[i][locale]}</p><p class="road-hint" data-quest-explanation hidden>{check.explanation[locale]}</p><div data-quest-reward-source hidden><HeroText text={mission.rewards[i][locale]} /></div></div>)}
+  <p class="road-feedback" data-quest-feedback role="status" aria-live="polite"></p>
+  <div class="road-controls"><button type="button" class="road-secondary" data-quest-help>{es ? 'Una pista de Átomo' : 'A hint from Átomo'}</button><button type="button" class="road-secondary" data-quest-reset>{es ? 'Volver a jugar' : 'Play again'}</button><button type="button" class="road-primary" data-quest-next hidden>{es ? 'Siguiente desafío' : 'Next challenge'} →</button><a class="road-primary" data-quest-finish hidden href={next ? buildSchoolLessonUrl(locale, 'grade-2', next.id) : '#quest-epilogue'}>{next ? (es ? 'Siguiente misión' : 'Next mission') : (es ? 'Ver el final' : 'See the ending')} →</a></div>
+ </section>
+ {lastInPackage && <details class="road-workbook" id="package-check"><summary>{es ? 'Una prueba más: cinco preguntas' : 'One more test: five questions'}</summary><div class="road-workbook-body"><GradeOneChecks locale={locale} checks={GRADE_TWO_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-road-check`} assessment /></div></details>}
+ <details class="road-workbook"><summary>{es ? 'Para explorar con un adulto' : 'Explore with a grown-up'}</summary><div class="road-workbook-body"><p>{lesson.warmup[locale]}</p><p>{lesson.exit[locale]}</p><p>{es ? 'Revisen juntos el dibujo y la explicación. La aventura se puede repetir; las respuestas no se guardan ni suman puntos de dominio. Al abrir una misión, la escena muestra esa parte de la historia.' : 'Review the drawing and explanation together. Replay any adventure; answers are not saved and do not award mastery points. Each mission opens the scene at that part of the story.'}</p></div></details>
+ {!next && <section class="road-postcard" id="quest-epilogue" data-quest-epilogue hidden><p class="road-eyebrow">{es ? 'FIN DE LA AVENTURA' : 'THE END OF THE ADVENTURE'}</p><span class="road-postcard-icon" aria-hidden="true">🏮 🐿️ 🦫 🦉 🐾 🦌 🐉 🧙 🏮</span><h2>{es ? '¡La Fiesta de los Faroles!' : 'The Lantern Festival!'}</h2><p><HeroText text={epilogue} /></p><a class="road-primary" href={buildGradeUrl(locale, 'grade-2')}>{es ? 'Elegir otra misión' : 'Choose another mission'} →</a><details><summary>{es ? 'Proyecto en familia' : 'Family project'}</summary><p>{GRADE_TWO_PROJECT.introduction[locale]}</p><ol>{GRADE_TWO_PROJECT.tasks.map(task => <li>{task[locale]}</li>)}</ol><ul>{GRADE_TWO_PROJECT.rubric.map(item => <li>{item[locale]}</li>)}</ul></details></section>}
+ <noscript><p>{es ? 'Activá JavaScript para jugar la aventura. El ejemplo se puede leer sin activarlo.' : 'Enable JavaScript to play the adventure. You can read the example without it.'}</p></noscript>
+</article>
+<script>import '../../scripts/wizardQuest';</script>
+
+<style>
+ .road-question-map { margin: 0 0 1.5rem; }
+ .road-question-map table { border-collapse: collapse; margin: .75rem auto; }
+ .road-question-map td { border: 2px solid currentColor; width: 3rem; height: 3rem; text-align: center; font-size: 1.5rem; }
+</style>

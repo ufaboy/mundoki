@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TomiCharacter from '../../../components/learn/TomiCharacter.astro';
-import RoadTripCar from '../../../components/learn/RoadTripCar.astro';
 import { buildCatalogUrl, buildGradeUrl, buildLearnTopicUrl, buildPlayUrl, normalizeUrlLocale } from '../../../i18n/routes';
 import { GRADES_CATALOG } from '../../../math/curriculum';
 import { TOPICS_CATALOG } from '../../../math/topics/generators';
@@ -15,7 +14,7 @@ const primary=GRADES_CATALOG.filter(g=>g.gradeNumber<=7);
 const secondary=GRADES_CATALOG.filter(g=>g.gradeNumber>=8);
 const names=[
  ['Un día con Tomi','A day with Tomi'],
- ['Mi garaje de aventuras','My adventure garage'],
+ ['Seis amigos y un mago','Six friends and a wizard'],
  ['Construí tu ciudad','Build your city'],
  ['La isla de los inventores','Island of Inventors'],
  ['Expedición lunar','Moon Expedition'],
@@ -24,7 +23,7 @@ const names=[
 ];
 const descriptions=[
  ['Salí a jugar y ayudá a Tomi.','Go out to play and help Tomi.'],
- ['Repará tu auto y subí al ferry.','Fix your car and board the ferry.'],
+ ['Resolvé desafíos y liberá a tus amigos.','Solve challenges and free your friends.'],
  ['Creá un barrio y ayudá a sus vecinos.','Create a neighborhood and help its people.'],
  ['Construí una base y explorá la isla.','Build a base and explore the island.'],
  ['Construí tu cohete y viajá a la Luna.','Build your rocket and fly to the Moon.'],
@@ -40,7 +39,7 @@ const symbols=['','','🏘','🏝','🚀','🤿','🎡'];
    <nav class="math-grade-shortcuts" aria-label={es?'Abrir mi grado':'Open my grade'}>{primary.map(grade=><a href={buildGradeUrl(locale,grade.id)} aria-label={es?`Abrir ${grade.gradeNumber}.º grado`:`Open Grade ${grade.gradeNumber}`} data-math-shortcut={grade.id}>{grade.gradeNumber}</a>)}</nav>
    <div class="math-grade-cards">{primary.map((grade,i)=><a href={buildGradeUrl(locale,grade.id)} class:list={['math-grade-card',`math-grade-${i+1}`,{'math-grade-featured':i<2}]} data-math-grade={grade.id}>
     <div class="math-grade-card-top"><span class="math-grade-number">{grade.gradeNumber}</span><span>{es?`${grade.gradeNumber}.º grado`:`Grade ${grade.gradeNumber}`}</span>{i<7 && <span class="math-adventure-label">{es?'Aventura':'Adventure'}</span>}</div>
-    {i<2 ? <div class="math-grade-art" aria-hidden="true">{i===0?<><span class="math-tomi-sun"></span><span class="math-tomi-tree">🌳</span><TomiCharacter/><span class="math-tomi-ball">⚽</span></>:<><span class="math-car-waves"></span><span class="math-car-island">🏝</span><RoadTripCar complete/></>}</div>:<div class="math-grade-symbol" aria-hidden="true">{symbols[i]}<span>✦</span></div>}
+    {i<2 ? <div class="math-grade-art" aria-hidden="true">{i===0?<><span class="math-tomi-sun"></span><span class="math-tomi-tree">🌳</span><TomiCharacter/><span class="math-tomi-ball">⚽</span></>:<><span class="math-quest-tower">🏰</span><span class="math-quest-wizard">🧙</span><span class="math-quest-friends">🐿️ 🦫 🦉 🐾 🦌 🐉</span></>}</div>:<div class="math-grade-symbol" aria-hidden="true">{symbols[i]}<span>✦</span></div>}
     <h3>{names[i][es?0:1]}</h3><p>{descriptions[i][es?0:1]}</p><span class="math-grade-open">{i<7?(es?'¡Vamos a jugar!':'Let’s play!'):(es?'Explorar':'Explore')} <span aria-hidden="true">→</span></span>
    </a>)}</div>
    <p class="math-welcome-note">{es?'Podés volver a un grado anterior para practicar. Aprendé a tu ritmo.':'You can revisit an earlier grade to practice. Learn at your own pace.'}</p>

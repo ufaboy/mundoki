@@ -6,7 +6,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import SchoolCourseCatalog from '../../../../components/learn/SchoolCourseCatalog.astro';
 import IslandMap from '../../../../components/learn/IslandMap.astro';
 import CityMap from '../../../../components/learn/CityMap.astro';
-import RoadTripMap from '../../../../components/learn/RoadTripMap.astro';
+import QuestMap from '../../../../components/learn/QuestMap.astro';
 import DayMap from '../../../../components/learn/DayMap.astro';
 import GradeHub from '../../../../components/learn/GradeHub.astro';
 import MascotSvg from '../../../../components/play/MascotSvg.astro';
@@ -87,7 +87,7 @@ const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentG
   switchLocaleHref={switchHref}
   system={onSystem}
 >
-  {n === 1 ? <DayMap locale={locale} /> : n === 2 ? <RoadTripMap locale={locale} /> : n === 3 ? <CityMap locale={locale} /> : n === 4 ? <IslandMap locale={locale} /> : n === 5 ? <MoonMap locale={locale} /> : n === 6 ? <OceanMap locale={locale} /> : n === 7 ? <ParkMap locale={locale} /> : course ? <SchoolCourseCatalog locale={locale} course={course} /> : (
+  {n === 1 ? <DayMap locale={locale} /> : n === 2 ? <QuestMap locale={locale} /> : n === 3 ? <CityMap locale={locale} /> : n === 4 ? <IslandMap locale={locale} /> : n === 5 ? <MoonMap locale={locale} /> : n === 6 ? <OceanMap locale={locale} /> : n === 7 ? <ParkMap locale={locale} /> : course ? <SchoolCourseCatalog locale={locale} course={course} /> : (
     <GradeHub
       locale={locale}
       gradeId={currentGrade.id}

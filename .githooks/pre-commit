@@ -8,7 +8,10 @@ fi
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 if [ "$BRANCH" = "main" ]; then
   if ! node scripts/bump-version.mjs --check-staged >/dev/null 2>&1; then
-    node scripts/bump-version.mjs --patch
-    git add package.json
+    echo "[pre-commit] Stage a package.json version bump before committing to main:" >&2
+    echo "  npm run version:bump                       # patch: fixes and small changes" >&2
+    echo "  npm run version:bump -- --minor            # substantial content changes" >&2
+    echo "  git add package.json" >&2
+    exit 1
   fi
 fi

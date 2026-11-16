@@ -25,7 +25,7 @@ Each lesson is split across two layers that are rendered on the same page:
 |---|---|---|
 | Curriculum lesson: `story` (worked example context), `steps`, `scene`, `misconception`, `checks[i].prompt/options/explanation` | `src/content/grade2/numbers.ts`, `operations.ts`, `groups.ts`, `world.ts` | `src/content/gradeN/*.ts` built with `createLessonFactory` (`src/content/lessonModel.ts`) or `author.ts` |
 | Hints per challenge | `src/content/grade2/hints.ts` (`hints[lessonId][i]`) | `src/content/gradeN/hints.ts` |
-| Game layer: mission `title`, `introduction`, `rewards[i]`, chapters, scene state | `src/content/grade2/roadTrip.ts` | grade1 `adventures.ts`, grade3 `cityAdventure.ts`, grade4 `islandAdventure.ts`, grade5 `moonAdventure.ts`, grade6 `oceanAdventure.ts`, grade7 `parkAdventure.ts` |
+| Game layer: mission `title`, `introduction`, `rewards[i]`, chapters, scene state | `src/content/grade2/wizardQuest.ts` | grade1 `adventures.ts`, grade3 `cityAdventure.ts`, grade4 `islandAdventure.ts`, grade5 `moonAdventure.ts`, grade6 `oceanAdventure.ts`, grade7 `parkAdventure.ts` |
 | Package checks (separate practice) | `src/content/gradeN/assessments.ts` | same |
 
 `rewards[i]` (or adventure `steps[i]`) is shown right after `checks[i]` is solved; `hints[i]` belongs to `checks[i]`. Treat **mission intro + check i + hint i + explanation i + reward i** as one unit and rewrite them together.
@@ -86,14 +86,14 @@ Read the learner-facing sequence: mission header → worked example → each cha
 - mathematics, number range, or difficulty drifted from the objective;
 - es-AR and en-US differ in quantities, assumptions, or outcome.
 
-## Example: place value in a car showroom (G02-01-L01)
+## Example: place value at the gem market (G02-01-L01)
 
-Disconnected (current): mission "We are looking for our first car… read the shop labels"; worked example about 243 school pencils; check "What is the value of 6 in 461?"; reward "First label checked." Nothing in the answer chooses or affects a car.
+Disconnected (an earlier version): mission "We are looking for our first car… read the shop labels"; worked example about 243 school pencils; check "What is the value of 6 in 461?"; reward "First label checked." Nothing in the answer chooses or affects anything in the story.
 
-Connected (the full Grade 2 map is in `.agents/skills/grade-2-lesson-authoring/SKILL.md`):
+Connected (as implemented; the full Grade 2 map is in `.agents/skills/grade-2-lesson-authoring/SKILL.md`):
 
-- Intro: "Each car tag shows its price in play coins: boxes of 100, packs of 10, and loose coins. {name} copies every price onto the shopping card."
-- Worked example: the red car's tag shows 2 boxes, 4 packs, 3 loose coins → 243 coins; steps decompose it.
-- Check 1: "The blue car's tag says 461. How much is the 6 worth?" → 60 / 6. Reward: "The blue car goes on the card: 400 + 60 + 1 coins."
-- Check 2: "The green car costs 222. Why is one 2 worth 200, another 20, and another 2?" → positions. Reward: "Green car added. The card is ready to compare prices." — leading to G02-01-L03, where the learner compares and chooses.
-- Hint 1: "Find the 6 on the blue tag. Is it in the boxes, the packs, or the loose coins?"
+- Intro: "Wizard Embrollo locked Pipa the squirrel in a cage at the market. He also turned the prices into piles of gems. {name} writes each price with numbers."
+- Worked example: the lantern costs 2 boxes, 4 bags, and 3 loose gems → 243; steps decompose it.
+- Check 1: "The rope costs 461 gems. What is the 6 worth?" → 60 / 6. Reward: "The rope’s price shows again: 400 + 60 + 1."
+- Check 2: "The map costs 222 gems. Why is one 2 worth 200, another 20, and another 2?" → the digit’s place. Reward: "The stalls shine again. Pipa waves from the cage!" — leading to G02-01-L02, where prices are read aloud.
+- Hint 1: "Find the column with the 6. Does it count boxes, bags, or loose gems?"

@@ -14,6 +14,7 @@ This file defines mandatory rules for working on the **Mundoki** codebase (a bil
 ## 1. Stack & Architectural Constraints
 
 - **Lesson authoring:** For creating, rewriting, adapting, or reviewing lesson content and game narrative, use [`.agents/skills/lesson-authoring/SKILL.md`](.agents/skills/lesson-authoring/SKILL.md) together with the matching grade skill when one exists. For Grade 1 use [`.agents/skills/grade-1-lesson-authoring/SKILL.md`](.agents/skills/grade-1-lesson-authoring/SKILL.md); for Grade 2 use [`.agents/skills/grade-2-lesson-authoring/SKILL.md`](.agents/skills/grade-2-lesson-authoring/SKILL.md), which also holds the Grade 2 story map. Preserve the learning objective and connect contextual exercises causally to the story; explanations, exercise wording, and story dialogue may differ if their mathematics and assumptions agree.
+- **Language of project-authored materials:** Write project documentation, lesson plans, scenarios, design notes, and other authored reference materials in English by default. This applies to repository content, not conversation: communicate with the user in the language they use or request. Keep learner-facing `es-AR` and `en-US` lesson text in their respective locales.
 
 - **Framework:** Astro (`output: 'server'`) in `astro.config.mjs`.
   - When `CLOUDFLARE_DEPLOY=true` (via `scripts/cf-cli.mjs`), `@astrojs/cloudflare` v14 is used.
@@ -77,8 +78,9 @@ Before finishing any code change, always run `npm run lint` and `npm test` (and 
 
 ## 6. Versioning, Release & Deployment Workflow
 
-- **Commit to `main`:** Every commit on `main` must bump the `package.json` version (automated via `.githooks/pre-commit`, which runs `node scripts/bump-version.mjs --patch` if `package.json` version was not already bumped).
-- **Pull Requests to `main`:** Before creating a PR targeting `main` from any branch, bump `package.json` version (`npm run version:bump`, or `--minor` / `--major`) and commit it. `.githooks/pre-push` verifies that the branch's `package.json` version is greater than `origin/main` before pushing.
+- **Version bump policy:** Bug fixes and small changes use a **patch** bump. Substantial content additions or rewrites use a **minor** bump. Only the user chooses and applies a **major** bump; agents must not make major bumps. When a change set mixes categories, use the highest applicable bump (patch or minor).
+- **Commits to `main`:** Every commit on `main` must include a staged `package.json` version increase. `.githooks/pre-commit` checks this and stops the commit with guidance if it is missing; it does not guess the change size or bump automatically. Choose patch or minor according to the policy above, then stage `package.json` before committing.
+- **Pull Requests to `main`:** Before creating a PR targeting `main` from any branch, bump `package.json` and commit it. Use `npm run version:bump` for patch or `npm run version:bump -- --minor` for substantial content changes. `.githooks/pre-push` verifies that the branch version is greater than `origin/main`. Do not use `--major`; major bumps are reserved for the user.
 - **Release & Wrangler Deploy (Mandatory after `main` updates):** After any commit to `main` or merge into `main`, always create a release and deploy with Wrangler:
   - Update `CHANGELOG.md` with a `## [<version>] - YYYY-MM-DD` section containing a **product-level explanation** of changes (not raw commit logs). Never include secrets, keys, tokens, credentials, or sensitive operational details in `CHANGELOG.md`.
   - Run `npm run release` (extracts and secret-checks the `CHANGELOG.md` entry, creates git tag `v<version>`, pushes `main` and the tag, creates a GitHub Release via `gh release create`, and runs `npm run deploy`).
