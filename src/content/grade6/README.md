@@ -19,3 +19,5 @@ The inherited package threshold (four of five including application and reasonin
 Validation: `npm run lint`, `npm test`, `npm run build:worker`. The Grade 6 suite checks coverage, translations, IDs, fresh prompts, prerequisite graph, routes, divisor/proportion/percentage/area/scale invariants and mean boundaries.
 
 Local catalogs: http://localhost:3333/es-ar/matematicas/grado/6-grado/ and http://localhost:3333/en-us/mathematics/grade/grade-6/.
+
+Readability revision: worked examples are visible before the challenges. All 78 lesson questions have separate bilingual action hints; answer explanations appear after success. Letters and coordinate pairs are introduced in context, divisibility includes the missing decomposition, and project questions restate their data. Fraction multiplication/division use separate strip and cup diagrams; the truncated-axis lesson compares two labeled charts of the same values. These are editorial improvements, not a classroom usability validation.

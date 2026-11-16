@@ -11,7 +11,7 @@ const kind=['G06-02','G06-03'].includes(packageId)?'divisors':['G06-06','G06-07'
   {['A','B'].map((name,i)=><label>{es?'Número':'Number'} {name}<input data-value type="range" min="1" max="60" step="1" value={i===0?12:18}/></label>)}
  </>}
  {kind==='proportion'&&<>
-  <p>{es?'En el costo directo cada metro cuesta 3; en el reparto se conservan 24 L; el tercer modelo agrega un cargo fijo de 5. Cada punto corresponde a una fila de la tabla.':'In direct cost each meter costs 3; sharing preserves 24 L; the third model adds a fixed charge of 5. Each point corresponds to a table row.'}</p>
+  <p>{es?'En el costo directo cada metro cuesta 3; en el reparto se conservan 24 L; el tercer modelo agrega un cargo fijo de 5. En los modelos de costo, x son metros e y es el costo. En el reparto, x es la cantidad de recipientes e y los litros por recipiente. 3x significa 3 × x; 24/x significa 24 ÷ x. Cada punto corresponde a una fila de la tabla.':'In direct cost each meter costs 3; sharing preserves 24 L; the third model adds a fixed charge of 5. In the cost models, x is meters and y is cost. In sharing, x is the number of containers and y is liters per container. 3x means 3 × x; 24/x means 24 ÷ x. Each point corresponds to a table row.'}</p>
   <label>{es?'Relación':'Relationship'}<select data-mode><option value="direct">{es?'Costo: y = 3x':'Cost: y = 3x'}</option><option value="inverse" selected={packageId==='G06-07'}>{es?'Reparto: y = 24/x':'Sharing: y = 24/x'}</option><option value="fixed">{es?'Costo con cargo fijo: y = 3x + 5':'Cost with fixed charge: y = 3x + 5'}</option></select></label>
   <label>{es?'Valor de x':'Value of x'}<select data-x>{[1,2,3,4,6,8,12].map(x=><option value={x} selected={x===4}>{x}</option>)}</select></label>
  </>}

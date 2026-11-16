@@ -1,0 +1,146 @@
+---
+// The one frame for every grade page: back link, world card (picture, title,
+// one main button), optional "make it yours" block, the list of missions or
+// topics, optional finale, and a closed block for the family.
+// A world keeps its own picture (slot "art") and one accent colour.
+//
+// Slots:
+//   art          the world's picture
+//   style        "make it yours" controls (name, colour) — optional
+//   list-title   heading of the list (defaults to "Topics")
+//   (default)    list content when `chapters` is not used
+//   families     notes for adults, inside a closed <details>
+import type { GradeId, Locale } from '../../math/core/types';
+import { t } from '../../i18n/translations';
+import { buildHomeUrl } from '../../i18n/routes';
+import { GRADE_STORAGE_KEY } from '../../content/savedGrade';
+
+interface Mission {
+  id: string;
+  title: string;
+  href: string;
+}
+
+interface Chapter {
+  id: string;
+  icon: string;
+  title: string;
+  missions: Mission[];
+}
+
+interface Props {
+  locale: Locale;
+  gradeId: GradeId;
+  gradeLabel: string;
+  /** The world's own colour (any CSS colour). */
+  accent: string;
+  title: string;
+  intro: string;
+  startHref: string;
+  startLabel: string;
+  /** Stretch the picture to the card edge (scenes) instead of centring it (characters). */
+  artFill?: boolean;
+  chapters?: Chapter[];
+  /** Attribute each mission link carries for the world's own script, e.g. "data-city-mission-link". */
+  missionAttr?: string;
+  /** Hooks the world's own script needs on the root element. */
+  rootAttrs?: Record<string, string>;
+  finale?: { icon: string; title: string; text: string };
+}
+
+const {
+  locale,
+  gradeId,
+  gradeLabel,
+  accent,
+  title,
+  intro,
+  startHref,
+  startLabel,
+  artFill = false,
+  chapters = [],
+  missionAttr,
+  rootAttrs = {},
+  finale,
+} = Astro.props;
+
+let missionNumber = 0;
+const numbered = chapters.map((chapter) => ({
+  ...chapter,
+  missions: chapter.missions.map((mission) => ({ ...mission, number: ++missionNumber })),
+}));
+const boot = { key: GRADE_STORAGE_KEY, gradeId };
+---
+
+<div class="mk-stack mk-stack--loose" style={`--world:${accent};`} {...rootAttrs}>
+  <nav class="mk-crumb" aria-label={t(locale, 'gradeAllGrades')}>
+    <a class="mk-back" href={`${buildHomeUrl(locale)}#home-grades`}>
+      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+      {t(locale, 'gradeAllGrades')}
+    </a>
+    {gradeLabel !== title && <span class="mk-chip mk-chip--sky">{gradeLabel}</span>}
+  </nav>
+
+  <header class="mk-world">
+    <div class="mk-world__body">
+      <h1 class="mk-display">{title}</h1>
+      <p class="mk-text">{intro}</p>
+      <a class="mk-btn mk-btn--primary" href={startHref}>
+        <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+        {startLabel}
+      </a>
+    </div>
+    <div class:list={['mk-world__art', { 'mk-world__art--fill': artFill }]}><slot name="art" /></div>
+  </header>
+
+  <slot name="style" />
+
+  <section class="mk-stack" aria-labelledby="grade-list">
+    <h2 class="mk-title" id="grade-list"><slot name="list-title">{t(locale, 'gradeTopics')}</slot></h2>
+    {numbered.map((chapter, index) => (
+      <details class="mk-chapter" id={chapter.id} open={index === 0}>
+        <summary>
+          <span class="mk-chapter__icon" aria-hidden="true">{chapter.icon}</span>
+          <span class="mk-chapter__title">
+            <span class="mk-label">{t(locale, 'gradeChapter')} {index + 1}</span>
+            <span class="mk-heading">{chapter.title}</span>
+          </span>
+          <svg class="mk-icon mk-chapter__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </summary>
+        <ol class="mk-missions">
+          {chapter.missions.map((mission) => (
+            <li>
+              <a class="mk-mission" href={mission.href} {...(missionAttr ? { [missionAttr]: mission.id } : {})}>
+                <span class="mk-mission__num" aria-hidden="true">{mission.number}</span>
+                <span class="mk-mission__title">{mission.title}</span>
+                <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    ))}
+    <slot />
+  </section>
+
+  {finale && (
+    <aside class="mk-card mk-card--sun mk-finale">
+      <span class="mk-finale__icon" aria-hidden="true">{finale.icon}</span>
+      <div class="mk-stack mk-stack--tight">
+        <h2 class="mk-heading">{finale.title}</h2>
+        <p class="mk-text">{finale.text}</p>
+      </div>
+    </aside>
+  )}
+
+  <slot name="families" />
+</div>
+
+<script is:inline define:vars={{ boot }}>
+  // Remember this grade so the home page can offer "continue".
+  try {
+    localStorage.setItem(boot.key, boot.gradeId);
+  } catch (error) {
+    // Storage blocked: nothing to remember.
+  }
+</script>

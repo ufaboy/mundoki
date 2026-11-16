@@ -5,7 +5,7 @@ import { buildGradeOneLessonUrl } from '../i18n/routes';
 import { getGradeById } from '../math/curriculum';
 import { GRADE_ONE_ADVENTURES } from '../content/grade1/adventures';
 import { getGradeOneHints } from '../content/grade1/hints';
-import { moveOnStoryMap } from '../scripts/tomiStoryMovement';
+import { moveOnMap } from '../lib/storyScene';
 
 export function runGradeOneTests() {
   const counts = [3, 3, 3, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2];
@@ -46,7 +46,25 @@ export function runGradeOneTests() {
   visit(GRADE_ONE_LESSONS);
   visit(GRADE_ONE_ASSESSMENTS);
   visit(GRADE_ONE_ADVENTURES);
-  assert.deepEqual(GRADE_ONE_ADVENTURES.map(a => a.id), GRADE_ONE_LESSONS.slice(5).map(l => l.id), 'Every remaining lesson has exactly one ordered story');
+  assert.deepEqual(GRADE_ONE_ADVENTURES.map(a => a.id), GRADE_ONE_LESSONS.map(l => l.id), 'Every lesson has exactly one ordered story');
+  for (const adventure of GRADE_ONE_ADVENTURES) {
+    const id = adventure.id;
+    assert(adventure.intro, `${id}: every mission says what the hero needs`);
+    for (const step of adventure.steps) {
+      if (step.kind === 'track') {
+        assert(step.track, `${id}: a page track needs its start and target`);
+        const { start, target, direction } = step.track!;
+        assert((target - start) * direction > 0, `${id}: the marker moves towards its target`);
+        assert(target >= 0 && target < step.rows[0].items.length);
+      }
+      if (step.spread) assert(step.after, `${id}: spreading out needs the spread arrangement`);
+      if (step.kind === 'route') {
+        assert(step.route, `${id}: a map needs its start and goal`);
+        assert.equal(step.rows[0].items[step.route!.start]['en-US'], '🏠', `${id}: the walk starts at the house`);
+      }
+      if (step.kind === 'calendar') assert(step.track, `${id}: a calendar walk needs its start and target`);
+    }
+  }
   for (const adventure of GRADE_ONE_ADVENTURES) {
     const hints = getGradeOneHints(adventure.id);
     assert.equal(hints.length, adventure.steps.length, 'Each story question needs an action hint');
@@ -73,11 +91,11 @@ export function runGradeOneTests() {
     }
   }
   for (const route of [['up','up','right','right'], ['right','right','up','up']]) {
-    assert.equal(route.reduce(moveOnStoryMap, 6), 2, 'Both routes reach the same garden');
+    assert.equal(route.reduce(moveOnMap, 6), 2, 'Both routes reach the same garden');
   }
   for (let position = 0; position < 9; position++) {
     for (const direction of ['up','down','left','right']) {
-      const next = moveOnStoryMap(position, direction);
+      const next = moveOnMap(position, direction);
       assert(next >= 0 && next < 9);
       assert(Math.abs(Math.floor(next / 3) - Math.floor(position / 3)) + Math.abs(next % 3 - position % 3) <= 1, 'No wrapping across map edges');
     }

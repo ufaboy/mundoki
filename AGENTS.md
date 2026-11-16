@@ -13,6 +13,8 @@ This file defines mandatory rules for working on the **Mundoki** codebase (a bil
 
 ## 1. Stack & Architectural Constraints
 
+- **Lesson authoring:** For creating, rewriting, adapting, or reviewing lesson content and game narrative, use [`.agents/skills/lesson-authoring/SKILL.md`](.agents/skills/lesson-authoring/SKILL.md) together with the matching grade skill when one exists. For Grade 1 use [`.agents/skills/grade-1-lesson-authoring/SKILL.md`](.agents/skills/grade-1-lesson-authoring/SKILL.md); for Grade 2 use [`.agents/skills/grade-2-lesson-authoring/SKILL.md`](.agents/skills/grade-2-lesson-authoring/SKILL.md), which also holds the Grade 2 story map. Preserve the learning objective and connect contextual exercises causally to the story; explanations, exercise wording, and story dialogue may differ if their mathematics and assumptions agree.
+
 - **Framework:** Astro (`output: 'server'`) in `astro.config.mjs`.
   - When `CLOUDFLARE_DEPLOY=true` (via `scripts/cf-cli.mjs`), `@astrojs/cloudflare` v14 is used.
   - Standard `npm run dev` and `npm run build` use `src/lib/server/workerEntrypoint.ts` without an external `workerd` daemon.

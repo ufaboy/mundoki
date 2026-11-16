@@ -1,0 +1,108 @@
+---
+// Grade 1 world: "A day with {name}". Uses the shared grade frame (GradeHub):
+// five places of the day, each with its missions.
+import type { Locale } from '../../math/core/types';
+import { GRADE_ONE_LESSONS, GRADE_ONE_PACKAGES, GRADE_ONE_PROJECT } from '../../content/grade1';
+import { DAY_MISSION_ICONS, DAY_PLACES, dayMissionTitle } from '../../content/grade1/day';
+import { buildGradeOneLessonUrl } from '../../i18n/routes';
+import { t } from '../../i18n/translations';
+import { personalize } from '../../content/heroes';
+import GradeHub from './GradeHub.astro';
+import HeroCharacter from '../shared/HeroCharacter.astro';
+import HeroText from '../shared/HeroText.astro';
+
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+
+const chapters = DAY_PLACES.map((place) => ({
+  id: place.id,
+  icon: place.icon,
+  title: place.name[locale],
+  missions: GRADE_ONE_LESSONS.slice(...place.range).map((lesson, offset) => {
+    const index = place.range[0] + offset;
+    // Mission titles never name the hero, so the default hero's wording is safe here.
+    return {
+      id: lesson.id,
+      title: `${DAY_MISSION_ICONS[index]} ${personalize(dayMissionTitle(index)[locale], 'tomi')}`,
+      href: buildGradeOneLessonUrl(locale, lesson.id),
+    };
+  }),
+}));
+---
+
+<GradeHub
+  locale={locale}
+  gradeId="grade-1"
+  gradeLabel={es ? '1.º grado' : 'Grade 1'}
+  accent="#5E8C4A"
+  title={es ? 'Un día de aventura' : 'A day of adventure'}
+  intro={es ? 'Contamos lo que llevamos, jugamos con amigos y volvemos con todo.' : 'We count what we take, play with friends, and bring everything back.'}
+  startHref={buildGradeOneLessonUrl(locale, GRADE_ONE_LESSONS[0].id)}
+  startLabel={es ? '¡Vamos!' : 'Let’s go!'}
+  chapters={chapters}
+  rootAttrs={{ 'data-day-map': '' }}
+  finale={{
+    icon: '📖',
+    title: es ? 'El álbum del día' : 'The day’s album',
+    text: es ? 'Al final revisamos que todo vuelva a casa.' : 'At the end we check that everything comes back home.',
+  }}
+>
+  <div slot="art" class="mk-day-map__art">
+    <svg viewBox="0 0 440 330" aria-hidden="true">
+      <circle cx="350" cy="62" r="35" fill="#f2cc70" />
+      <path d="M0 240Q140 160 275 235T440 210V330H0" fill="#b9d3a2" />
+      <path d="M25 330Q280 260 395 330" fill="none" stroke="#f8e5b3" stroke-width="55" />
+      <path d="M40 135 115 70l75 65v115H40z" fill="#efd6a6" />
+      <path d="m28 137 87-77 87 77" fill="none" stroke="#be8166" stroke-width="17" stroke-linecap="round" />
+      <rect x="99" y="182" width="35" height="68" rx="14" fill="#8a9b72" />
+      <rect x="58" y="151" width="28" height="31" rx="5" fill="#fdf7dd" />
+      <path d="M366 240V130" stroke="#b09162" stroke-width="14" />
+      <circle cx="368" cy="126" r="49" fill="#8caf7b" />
+      <circle cx="339" cy="145" r="30" fill="#a2c18e" />
+    </svg>
+    <div class="mk-day-map__hero"><HeroCharacter /></div>
+  </div>
+
+  <span slot="list-title"><HeroText text={es ? 'El día de {name}' : '{name}’s day'} /></span>
+
+  <details class="mk-details" id="day-families" slot="families">
+    <summary>{t(locale, 'homeFamilyTitle')}</summary>
+    <div class="mk-card mk-stack">
+      <p class="mk-text">{es
+        ? '35 misiones con dos desafíos cada una. Contamos, comparamos, sumamos y restamos; exploramos formas, medidas y datos. Cada desafío es un paso de la historia: lo que el chico o la chica responde cambia lo que pasa.'
+        : '35 missions with two challenges each. We count, compare, add, and subtract; explore shapes, measurement, and data. Each challenge is a step of the story: the child’s answer changes what happens.'}</p>
+      <p class="mk-text">{es
+        ? 'Las respuestas correctas suman estrellas. Al final de cada unidad hay cinco preguntas más. Los dibujos y las explicaciones se revisan conversando con un adulto.'
+        : 'Right answers add stars. Each unit ends with five more questions. Review drawings and explanations together with a grown-up.'}</p>
+      <ul class="mk-list">
+        {GRADE_ONE_PACKAGES.map((pack) => (
+          <li id={pack.id.toLowerCase()}><a href={buildGradeOneLessonUrl(locale, GRADE_ONE_LESSONS.find((lesson) => lesson.packageId === pack.id)!.id)}>{pack.title[locale]}</a></li>
+        ))}
+      </ul>
+      <section class="mk-stack" id="project">
+        <h2 class="mk-heading">{es ? 'Proyecto en familia' : 'Family project'}</h2>
+        <p class="mk-text">{GRADE_ONE_PROJECT.introduction[locale]}</p>
+        <ol class="mk-list">{GRADE_ONE_PROJECT.tasks.map((task) => <li>{task[locale]}</li>)}</ol>
+        <details class="mk-details">
+          <summary>{es ? 'Cómo acompañar' : 'How to help'}</summary>
+          <ul class="mk-list">{GRADE_ONE_PROJECT.rubric.map((item) => <li>{item[locale]}</li>)}</ul>
+        </details>
+      </section>
+    </div>
+  </details>
+</GradeHub>
+
+<script>
+  // Open the place (or the family notes) a link points to, e.g. "#park" from a mission page.
+  function revealDayAnchor() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const target = id ? document.getElementById(id) : null;
+    if (!target?.closest('[data-day-map]')) return;
+    for (let node: HTMLElement | null = target; node; node = node.parentElement) {
+      if (node instanceof HTMLDetailsElement) node.open = true;
+    }
+    requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+  }
+  revealDayAnchor();
+  window.addEventListener('hashchange', revealDayAnchor);
+</script>

@@ -16,6 +16,8 @@ interface Props {
   locale: Locale;
   activeNav?: SiteNavId;
   switchLocaleHref?: string;
+  /** The page content is built on the design system (it may still use legacy scene art). */
+  system?: boolean;
 }
 
 const {
@@ -26,6 +28,7 @@ const {
     : 'Mundoki — Plataforma de matemática visual y aventura espacial para Escuela Primaria y Secundaria.',
   activeNav = 'home',
   switchLocaleHref,
+  system = false,
 } = Astro.props;
 ---
 
@@ -42,11 +45,11 @@ const {
     <meta name="twitter:card" content="summary_large_image" />
     <DesignHead />
   </head>
-  <body>
+  <body class:list={[{ 'mk-body': system }]}>
     <a href="#main-content" class="mk-skip">{t(locale, 'skipToContent')}</a>
     <SiteHeader locale={locale} activeNav={activeNav} />
 
-    <main id="main-content" class="main-container">
+    <main id="main-content" class={system ? 'mk-page mk-ui' : 'main-container'}>
       <slot />
     </main>
 

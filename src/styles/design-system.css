@@ -696,6 +696,27 @@ a.mk-tile:active {
   display: block;
 }
 
+/* Long answers (expressions, phrases): text size, one per row */
+.mk-choices--stack {
+  grid-template-columns: 1fr;
+}
+
+.mk-choice--text {
+  min-height: var(--mk-control);
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-strong);
+}
+
+/* "New numbers" button and the star count inside a mission question */
+.mk-new-numbers {
+  margin-top: var(--mk-s4);
+}
+
+.mk-mission-stars {
+  float: right;
+  margin-left: var(--mk-s3);
+}
+
 .mk-feedback {
   display: flex;
   align-items: center;
@@ -746,7 +767,7 @@ a.mk-tile:active {
 .mk-bubble::before {
   content: '';
   position: absolute;
-  left: -calc(0.6 * var(--mk-rem));
+  left: calc(-0.6 * var(--mk-rem));
   top: 50%;
   width: calc(1 * var(--mk-rem));
   height: calc(1 * var(--mk-rem));
@@ -1355,6 +1376,246 @@ body:has(.mk-nav--dock) {
 }
 
 /* ==========================================================================
+   Grade page — one frame for all twelve grades
+   ==========================================================================
+   Each world sets its own colour in --world (see GradeHub.astro). */
+
+.mk-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-s3);
+}
+
+.mk-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-s2);
+  min-height: calc(2.75 * var(--mk-rem));
+  padding: 0 var(--mk-s3);
+  margin-left: calc(-1 * var(--mk-s3));
+  border-radius: var(--mk-radius-sm);
+  color: var(--mk-sky-deep);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  text-decoration: none;
+}
+
+/* World card: picture first on a phone, beside the words from tablet up */
+.mk-world {
+  display: grid;
+  overflow: hidden;
+  border: var(--mk-border) solid color-mix(in srgb, var(--world, var(--mk-sky)) 40%, #FFFFFF);
+  border-radius: var(--mk-radius);
+  background: color-mix(in srgb, var(--world, var(--mk-sky)) 16%, #FFFFFF);
+}
+
+.mk-world__art {
+  order: -1;
+  display: grid;
+  place-items: center;
+  padding: var(--mk-s4);
+}
+
+.mk-world__art--fill {
+  display: block;
+  padding: 0;
+}
+
+.mk-world__art--fill > * {
+  display: block;
+  width: 100%;
+}
+
+.mk-world__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--mk-s4);
+  padding: var(--mk-pad);
+}
+
+@media (min-width: 48rem) {
+  .mk-world {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .mk-world__art {
+    order: 0;
+  }
+
+  .mk-world__body {
+    padding: var(--mk-s6);
+  }
+}
+
+/* Chapter: a row you open to see its missions */
+.mk-chapter {
+  border: var(--mk-border) solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+  overflow: hidden;
+}
+
+.mk-chapter > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s3);
+  min-height: calc(4.5 * var(--mk-rem));
+  padding: var(--mk-s3) var(--mk-s4);
+  list-style: none;
+}
+
+.mk-chapter > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mk-chapter__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(3.5 * var(--mk-rem));
+  height: calc(3.5 * var(--mk-rem));
+  border-radius: var(--mk-radius-sm);
+  background: color-mix(in srgb, var(--world, var(--mk-sky)) 18%, #FFFFFF);
+  font-size: calc(1.75 * var(--mk-rem));
+  line-height: 1;
+}
+
+.mk-chapter__title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mk-chapter__arrow {
+  color: var(--mk-ink-soft);
+  transition: transform var(--mk-fast) var(--mk-ease);
+}
+
+.mk-chapter[open] .mk-chapter__arrow {
+  transform: rotate(180deg);
+}
+
+.mk-missions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(17 * var(--mk-rem))), 1fr));
+  gap: var(--mk-s3);
+  list-style: none;
+  margin: 0;
+  padding: var(--mk-s2) var(--mk-s4) var(--mk-s4);
+}
+
+.mk-mission {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s3);
+  height: 100%;
+  min-height: var(--mk-control);
+  padding: var(--mk-s2) var(--mk-s3);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  font-weight: var(--mk-weight-strong);
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--mk-line-strong);
+  transition: transform var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+  touch-action: manipulation;
+}
+
+.mk-mission:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.mk-mission__num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(2.5 * var(--mk-rem));
+  height: calc(2.5 * var(--mk-rem));
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-sunk);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-mission__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.mk-mission > .mk-icon {
+  color: var(--mk-ink-soft);
+}
+
+/* Topic card (secundaria): a number, a title, two actions */
+.mk-unit {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--mk-s3) var(--mk-s4);
+}
+
+.mk-unit__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-s3);
+}
+
+@media (min-width: 48rem) {
+  .mk-unit {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .mk-unit__actions {
+    grid-column: auto;
+  }
+}
+
+.mk-finale {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s4);
+}
+
+.mk-finale__icon {
+  flex: none;
+  font-size: calc(2.5 * var(--mk-rem));
+  line-height: 1;
+}
+
+.mk-dot {
+  display: inline-block;
+  width: calc(1.25 * var(--mk-rem));
+  height: calc(1.25 * var(--mk-rem));
+  margin-right: var(--mk-s2);
+  border-radius: var(--mk-radius-pill);
+  border: var(--mk-border) solid rgba(28, 36, 67, 0.25);
+  vertical-align: -0.2em;
+}
+
+.mk-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(2.75 * var(--mk-rem));
+}
+
+.mk-list {
+  margin: 0;
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s2);
+  max-width: 34em;
+}
+
+/* ==========================================================================
    Hover — everything you can press answers the pointer
    ==========================================================================
    One rule of thumb:
@@ -1374,7 +1635,7 @@ body:has(.mk-nav--dock) {
 }
 
 /* Legacy global.css underlines every hovered link; keep our controls clean. */
-.mk-ui a:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile, .mk-grade):hover,
+.mk-ui a:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile, .mk-grade, .mk-mission, .mk-back):hover,
 a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
   text-decoration: none;
 }
@@ -1451,6 +1712,21 @@ a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
     box-shadow: 0 0 0 0.2em var(--mk-sky-tint);
   }
 
+  :where(.mk-mission):hover {
+    background: var(--mk-sky-tint);
+    border-color: var(--mk-sky);
+    box-shadow: 0 5px 0 var(--mk-sky);
+    transform: translateY(-2px);
+  }
+
+  :where(.mk-back):hover {
+    background: var(--mk-sky-tint);
+  }
+
+  .mk-chapter > summary:hover {
+    color: inherit;
+  }
+
   .mk-ui :where(summary):hover {
     color: var(--mk-sky);
     background: var(--mk-sky-tint);
@@ -1475,6 +1751,414 @@ a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
 .mk-tabs button {
   transition: transform var(--mk-fast) var(--mk-ease), background-color var(--mk-fast) var(--mk-ease),
     border-color var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+}
+
+/* ==========================================================================
+   Story scene: the picture a young child counts (src/lib/storyScene.ts)
+   ========================================================================== */
+
+.mk-scene {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s4);
+  padding: var(--mk-s4);
+  border-radius: var(--mk-radius);
+  background: var(--mk-sunk);
+  border: var(--mk-border) solid var(--mk-line);
+}
+
+.mk-scene__view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s4);
+}
+
+.mk-scene__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s2);
+}
+
+.mk-scene__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-s2);
+}
+
+/* Spread out: the same objects with wide gaps (moving does not change how many). */
+.mk-scene__view--spread .mk-scene__items {
+  gap: var(--mk-s2) var(--mk-s7);
+}
+
+.mk-scene__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(3.5 * var(--mk-rem));
+  min-height: calc(3.5 * var(--mk-rem));
+  padding: var(--mk-s1) var(--mk-s2);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  font: inherit;
+  font-size: calc(1.75 * var(--mk-rem));
+  font-weight: var(--mk-weight-display);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background var(--mk-fast) var(--mk-ease), border-color var(--mk-fast) var(--mk-ease), transform var(--mk-fast) var(--mk-ease);
+}
+
+.mk-scene__item:hover {
+  border-color: var(--mk-sky);
+  background: var(--mk-sky-tint);
+}
+
+.mk-scene__item:active {
+  transform: scale(0.95);
+}
+
+.mk-scene__mark {
+  position: absolute;
+  top: calc(-0.5 * var(--mk-rem));
+  right: calc(-0.5 * var(--mk-rem));
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(1.5 * var(--mk-rem));
+  height: calc(1.5 * var(--mk-rem));
+  border-radius: 50%;
+  background: var(--mk-leaf);
+  color: #fff;
+  font-size: calc(0.9 * var(--mk-rem));
+}
+
+/* Marked while counting: colour + tick (never colour alone). */
+.mk-scene__item[aria-pressed='true'] {
+  border-color: var(--mk-leaf);
+  background: var(--mk-leaf-tint);
+}
+
+.mk-scene__item[aria-pressed='true'] .mk-scene__mark {
+  display: inline-flex;
+}
+
+/* A full sheet / group of ten: ten dots in two rows, then "10". */
+.mk-scene__item--ten {
+  gap: var(--mk-s2);
+  font-size: var(--mk-text-body);
+}
+
+.mk-scene__ten {
+  display: grid;
+  grid-template-columns: repeat(5, calc(0.6 * var(--mk-rem)));
+  gap: calc(0.2 * var(--mk-rem));
+}
+
+.mk-scene__ten i {
+  width: calc(0.6 * var(--mk-rem));
+  height: calc(0.6 * var(--mk-rem));
+  border-radius: 50%;
+  background: var(--mk-sun-deep);
+}
+
+.mk-scene__empty {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(3.5 * var(--mk-rem));
+  padding: 0 var(--mk-s4);
+  border: var(--mk-border) dashed var(--mk-line-strong);
+  border-radius: var(--mk-radius-sm);
+  color: var(--mk-ink-soft);
+  font-weight: var(--mk-weight-strong);
+}
+
+/* Page track: the marker sits on one page. */
+.mk-scene--track .mk-scene__items,
+.mk-scene--cards .mk-scene__items {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.mk-scene__item.is-position {
+  border-color: var(--mk-sun-deep);
+  background: var(--mk-sun-tint);
+  box-shadow: 0 0 0 4px var(--mk-sun);
+}
+
+.mk-scene__item.is-position::after {
+  content: '📍';
+  position: absolute;
+  top: calc(-1.1 * var(--mk-rem));
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: calc(1.1 * var(--mk-rem));
+}
+
+.mk-scene__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-s3);
+}
+
+.mk-scene__status {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--mk-ink-soft);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+}
+
+/* Names and words (friends in a line, days, steps of a plan): text-sized cards. */
+.mk-scene__item--word {
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-strong);
+  padding: var(--mk-s2) var(--mk-s3);
+}
+
+/* Strips of equal blocks: ribbons and measuring units, starting at one edge. */
+.mk-scene--bars .mk-scene__items {
+  flex-wrap: nowrap;
+  gap: 0;
+  border-left: 4px solid var(--mk-ink);
+  padding-left: 0;
+}
+
+.mk-scene__unit {
+  position: relative;
+  flex: none;
+  width: calc(2.25 * var(--mk-rem));
+  height: calc(2.25 * var(--mk-rem));
+  border: var(--mk-border) solid var(--mk-sky-deep);
+  border-left-width: 1px;
+  border-right-width: 1px;
+  background: var(--mk-sky-tint);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.mk-scene__unit:hover {
+  background: var(--mk-sky);
+}
+
+.mk-scene__unit[aria-pressed='true'] {
+  background: var(--mk-leaf-tint);
+  border-color: var(--mk-leaf);
+}
+
+.mk-scene__unit[aria-pressed='true'] .mk-scene__mark {
+  display: inline-flex;
+}
+
+.mk-scene__gap {
+  flex: none;
+  width: calc(1 * var(--mk-rem));
+}
+
+/* 3 × 3 map with a walker and arrow buttons. */
+.mk-scene__map {
+  display: grid;
+  grid-template-columns: repeat(3, calc(4 * var(--mk-rem)));
+  grid-auto-rows: calc(4 * var(--mk-rem));
+  gap: var(--mk-s1);
+}
+
+.mk-scene__cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-surface);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  font-size: calc(1.75 * var(--mk-rem));
+}
+
+.mk-scene__cell.is-visited {
+  background: var(--mk-sun-tint);
+}
+
+.mk-scene__cell.is-position::after {
+  content: '🙂';
+  position: absolute;
+  inset: auto 4px 2px auto;
+  font-size: calc(1.25 * var(--mk-rem));
+}
+
+.mk-scene__cell.is-position {
+  border-color: var(--mk-sun-deep);
+  box-shadow: 0 0 0 4px var(--mk-sun);
+}
+
+.mk-scene__arrows {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: start;
+  gap: var(--mk-s2);
+}
+
+/* ==========================================================================
+   Grade 1 mission page ("A day with {name}", DayLesson.astro)
+   ========================================================================== */
+
+.mk-day__story {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--mk-s3);
+}
+
+.mk-day__hero {
+  flex: none;
+  width: calc(5.5 * var(--mk-rem));
+}
+
+.mk-day__hero .hero-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Phone: the listen button sits under the bubble so the words get the full width. */
+.mk-day__say {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--mk-s2);
+}
+
+.mk-day__say .mk-bubble {
+  align-self: stretch;
+  margin: 0;
+}
+
+@media (min-width: 48em) {
+  .mk-day__say {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .mk-day__say .mk-bubble {
+    flex: 1;
+    margin-bottom: var(--mk-s4);
+  }
+}
+
+.mk-day__example-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-s2);
+}
+
+.mk-day__example-items > span {
+  padding: var(--mk-s2) var(--mk-s3);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-sky-tint);
+  font-size: calc(1.5 * var(--mk-rem));
+  font-weight: var(--mk-weight-display);
+}
+
+.mk-day__steps {
+  margin: 0;
+}
+
+.mk-day__careful {
+  padding-left: var(--mk-s4);
+  border-left: 4px solid var(--mk-sun);
+}
+
+.mk-day__progress {
+  flex: 1;
+  max-width: calc(10 * var(--mk-rem));
+}
+
+.mk-day__instruction {
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-day__ask {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s3);
+}
+
+/* Phone: questions can be a full sentence, so they use the (large) body size. */
+.mk-day__ask .mk-heading {
+  flex: 1;
+  font-size: calc(var(--mk-text-body) * 1.1);
+  line-height: 1.3;
+}
+
+@media (min-width: 48em) {
+  .mk-day__ask .mk-heading {
+    font-size: var(--mk-text-title);
+    line-height: 1.25;
+  }
+}
+
+.mk-day__fox {
+  flex: none;
+  display: inline-flex;
+}
+
+.mk-day__controls {
+  justify-content: space-between;
+}
+
+/* Grade 1 world picture: the house, the path, and the chosen hero in front. */
+.mk-day-map__art {
+  position: relative;
+  width: 100%;
+  max-width: calc(24 * var(--mk-rem));
+  margin: 0 auto;
+}
+
+.mk-day-map__art > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mk-day-map__hero {
+  position: absolute;
+  right: 28%;
+  bottom: 4%;
+  width: 24%;
+}
+
+.mk-day-map__hero .hero-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mk-day__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (min-width: 48em) {
+  .mk-day__hero {
+    width: calc(8 * var(--mk-rem));
+  }
+
+  .mk-scene {
+    padding: var(--mk-s5);
+  }
+
+  .mk-scene__item {
+    min-width: calc(4.25 * var(--mk-rem));
+    min-height: calc(4.25 * var(--mk-rem));
+    font-size: calc(2.25 * var(--mk-rem));
+  }
 }
 
 /* ==========================================================================

@@ -1,20 +1,99 @@
 ---
+// Grade 3 world: "Build your city". Uses the shared grade frame (GradeHub);
+// the city's own script (cityAdventure) still drives the name and colour.
 import type { Locale } from '../../math/core/types';
 import { CITY_CHAPTERS, CITY_MISSIONS } from '../../content/grade3/cityAdventure';
 import { GRADE_THREE_LESSONS, GRADE_THREE_PROJECT } from '../../content/grade3';
-import { buildCatalogUrl,buildSchoolLessonUrl } from '../../i18n/routes';
+import { buildSchoolLessonUrl } from '../../i18n/routes';
+import { t } from '../../i18n/translations';
+import GradeHub from './GradeHub.astro';
 import CityScene from './CityScene.astro';
-import CityChoices from './CityChoices.astro';
-const {locale}=Astro.props as {locale:Locale};const es=locale==='es-AR';
+
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+
+const chapters = CITY_CHAPTERS.map((chapter) => ({
+  id: chapter.id.toLowerCase(),
+  icon: chapter.icon,
+  title: chapter.title[locale],
+  missions: chapter.missions.map((mission) => ({
+    id: mission.id,
+    title: mission.title[locale],
+    href: buildSchoolLessonUrl(locale, 'grade-3', mission.id),
+  })),
+}));
+
+const colours = [
+  { id: 'terracotta', label: es ? 'Terracota' : 'Terracotta', paint: '#ce9879' },
+  { id: 'sage', label: es ? 'Verde' : 'Green', paint: '#a4b58a' },
+  { id: 'blue', label: es ? 'Azul' : 'Blue', paint: '#8eb1bb' },
+];
 ---
-<div class="city-adventure city-map" data-city-root data-city-map data-locale={locale}>
- <nav class="city-top"><a href={buildCatalogUrl(locale)}>← {es?'Todos los grados':'All grades'}</a><span>{es?'3.º GRADO':'GRADE 3'}</span><a href="#city-families">{es?'Para familias':'For families'}</a></nav>
- <header class="city-map-hero"><div><p class="city-kicker">{es?'UN LUGAR LLENO DE TUS IDEAS':'A PLACE FULL OF YOUR IDEAS'}</p><h1>{es?'¡Construí tu ciudad!':'Build your own city!'}</h1><p>{es?'Casas, una panadería y un parque. Cada desafío hace crecer la historia.':'Homes, a bakery, and a park. Every challenge grows the story.'}</p><a class="city-primary" href={buildSchoolLessonUrl(locale,'grade-3',CITY_MISSIONS[0].id)}>{es?'Construir mi primera casa':'Build my first house'} →</a><a class="city-pick" href="#city-missions">{es?'O elegí una misión ↓':'Or choose a mission ↓'}</a></div><div class="city-map-preview"><span>{es?'Imaginá lo que podemos crear':'Imagine what we can create'}</span><CityScene preview/></div></header>
- <CityChoices locale={locale}/>
- <section id="city-missions"><div class="city-map-section"><h2><span data-city-name-display>{es?'Mi ciudad':'My city'}</span></h2><span>{es?'41 misiones · todas disponibles':'41 missions · all available'}</span></div>
-  {CITY_CHAPTERS.map((chapter,i)=><details class="city-district" id={chapter.id.toLowerCase()} open={i===0}><summary><span class="city-district-icon" aria-hidden="true">{chapter.icon}</span><span><span class="city-kicker">{es?'ETAPA':'CHAPTER'} {i+1}</span><strong>{chapter.title[locale]}</strong></span><span class="city-district-arrow" aria-hidden="true">⌄</span></summary><ol class="city-mission-list" start={i*3+1}>{chapter.missions.map((mission,j)=><li><a data-city-mission-link={mission.id} href={buildSchoolLessonUrl(locale,'grade-3',mission.id)}><span class="city-mission-number">{i*3+j+1}</span><strong>{mission.title[locale]}</strong><span class="city-mission-play">{es?'Jugar':'Play'} →</span></a></li>)}</ol></details>)}
- </section>
- <aside class="city-map-finale"><span aria-hidden="true">🎈 🏘 🎉</span><div><h2>{es?'¡Todos a la inauguración!':'Everyone to the grand opening!'}</h2><p>{es?'La última misión termina con una fiesta en la plaza.':'The last mission ends with a celebration in the square.'}</p></div></aside>
- <details class="city-notebook" id="city-families"><summary>{es?'Para familias: qué aprendemos':'For families: what we learn'}</summary><div><p>{es?'41 misiones con dos desafíos cada una. Practicamos números hasta diez mil, las cuatro operaciones, geometría, medidas, tiempo y datos. Cada misión conserva el ejemplo guiado y sus modelos.':'41 missions with two challenges each. Practice numbers up to ten thousand, the four operations, geometry, measurement, time, and data. Each mission keeps its worked example and models.'}</p><p>{es?'Podés abrir cualquier misión. La ciudad muestra la etapa de esa historia; las respuestas no se guardan ni otorgan puntos de dominio. Solo el nombre y el color se recuerdan en este navegador. Al final de cada unidad hay cinco preguntas adicionales.':'Open any mission. The city shows that story’s stage; answers are not saved and do not award mastery points. Only the name and color are remembered in this browser. Each unit ends with five additional questions.'}</p><ul>{CITY_CHAPTERS.map(chapter=><li><a href={buildSchoolLessonUrl(locale,'grade-3',chapter.missions[0].id)}>{GRADE_THREE_LESSONS.find(l=>l.packageId===chapter.id)!.title[locale]}</a></li>)}</ul><section id="project"><h2>{GRADE_THREE_PROJECT.title[locale]}</h2><p>{GRADE_THREE_PROJECT.introduction[locale]}</p><ol>{GRADE_THREE_PROJECT.tasks.map(task=><li>{task[locale]}</li>)}</ol><details><summary>{es?'Cómo acompañar':'How to help'}</summary><ul>{GRADE_THREE_PROJECT.rubric.map(item=><li>{item[locale]}</li>)}</ul></details></section></div></details>
-</div>
-<script>import '../../scripts/cityAdventure';</script>
+
+<GradeHub
+  locale={locale}
+  gradeId="grade-3"
+  gradeLabel={es ? '3.º grado' : 'Grade 3'}
+  accent="#6F8F5A"
+  title={es ? '¡Construí tu ciudad!' : 'Build your own city!'}
+  intro={es ? 'Casas, una panadería y un parque.' : 'Homes, a bakery and a park.'}
+  startHref={buildSchoolLessonUrl(locale, 'grade-3', CITY_MISSIONS[0].id)}
+  startLabel={es ? 'Construir' : 'Build'}
+  artFill
+  chapters={chapters}
+  missionAttr="data-city-mission-link"
+  rootAttrs={{ 'data-city-root': '', 'data-city-map': '', 'data-locale': locale }}
+  finale={{
+    icon: '🎉',
+    title: es ? '¡Todos a la inauguración!' : 'Everyone to the grand opening!',
+    text: es ? 'La última misión termina con una fiesta.' : 'The last mission ends with a party.',
+  }}
+>
+  <CityScene slot="art" preview />
+
+  <details class="mk-details" slot="style">
+    <summary>{es ? 'Dale tu estilo a la ciudad' : 'Make the city yours'}</summary>
+    <div class="mk-card mk-stack">
+      <div class="mk-field">
+        <label for="city-name">{es ? 'Nombre de la ciudad' : 'City name'}</label>
+        <input class="mk-input" id="city-name" type="text" maxlength="24" data-city-name placeholder={es ? 'Mi ciudad' : 'My city'} autocomplete="off" />
+      </div>
+      <div class="mk-tabs" role="group" aria-label={es ? 'Color de los edificios' : 'Building colour'}>
+        {colours.map((colour) => (
+          <button type="button" data-city-color={colour.id} aria-pressed={colour.id === 'terracotta' ? 'true' : 'false'}>
+            <span class="mk-dot" style={`background:${colour.paint};`} aria-hidden="true"></span>
+            {colour.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </details>
+
+  <span slot="list-title" data-city-name-display>{es ? 'Mi ciudad' : 'My city'}</span>
+
+  <details class="mk-details" id="city-families" slot="families">
+    <summary>{t(locale, 'homeFamilyTitle')}</summary>
+    <div class="mk-card mk-stack">
+      <p class="mk-text">{es ? '41 misiones con dos desafíos cada una. Practicamos números hasta diez mil, las cuatro operaciones, geometría, medidas, tiempo y datos. Cada misión conserva el ejemplo guiado y sus modelos.' : '41 missions with two challenges each. Practice numbers up to ten thousand, the four operations, geometry, measurement, time, and data. Each mission keeps its worked example and models.'}</p>
+      <p class="mk-text">{es ? 'Podés abrir cualquier misión. La ciudad muestra la etapa de esa historia; las respuestas no se guardan ni otorgan puntos de dominio. Solo el nombre y el color se recuerdan en este navegador. Al final de cada unidad hay cinco preguntas adicionales.' : 'Open any mission. The city shows that story’s stage; answers are not saved and do not award mastery points. Only the name and color are remembered in this browser. Each unit ends with five additional questions.'}</p>
+      <ul class="mk-list">
+        {CITY_CHAPTERS.map((chapter) => (
+          <li><a href={buildSchoolLessonUrl(locale, 'grade-3', chapter.missions[0].id)}>{GRADE_THREE_LESSONS.find((lesson) => lesson.packageId === chapter.id)!.title[locale]}</a></li>
+        ))}
+      </ul>
+      <section class="mk-stack" id="project">
+        <h2 class="mk-heading">{GRADE_THREE_PROJECT.title[locale]}</h2>
+        <p class="mk-text">{GRADE_THREE_PROJECT.introduction[locale]}</p>
+        <ol class="mk-list">{GRADE_THREE_PROJECT.tasks.map((task) => <li>{task[locale]}</li>)}</ol>
+        <details class="mk-details">
+          <summary>{es ? 'Cómo acompañar' : 'How to help'}</summary>
+          <ul class="mk-list">{GRADE_THREE_PROJECT.rubric.map((item) => <li>{item[locale]}</li>)}</ul>
+        </details>
+      </section>
+    </div>
+  </details>
+</GradeHub>
+
+<script>
+  import '../../scripts/cityAdventure';
+</script>

@@ -1,5 +1,7 @@
 # Grade 1 lesson content
 
+**"A day with {name}" (design system).** The Grade 1 page (`DayMap.astro`) and all 35 missions run on the design system through `DayLesson.astro`. Each challenge is a story step for the chosen hero (Tomi or Lola): the hero says what they need, the child solves it on a picture they can touch, and the reward shows what the answer made possible. Right answers add stars and are re-checked on the server; 32 missions have "new numbers" for their first challenge that redraw the picture too (`g1-*` in `src/math/practice/generators.ts`). Story map and rules: `.agents/skills/grade-1-lesson-authoring/SKILL.md`. Notes below about the earlier episode pages are historical.
+
 The 30 shared Tomi story episodes show a worked example before the game. `hints.ts` provides two bilingual action hints per episode; these are separate from the answer explanations shown after success. Child-facing prompts use concrete actions and objects; adult guidance remains in expandable sections.
 
 Implements the 14 Grade 1 packages from `lesson-creation-plan.md`: 35 lessons, each with es-AR and en-US content. `numbers.ts` covers packages 01–04, `operations.ts` covers 05–08, and `world.ts` covers 09–14. `index.ts` assembles the catalog, prerequisites, and final project. Astro's `gradeOneLessons` collection validates the content and builds 70 localized lesson pages.
