@@ -1,0 +1,46 @@
+---
+// Grade 2 adventure map: Wizard Embrollo holds six friends; each chapter frees one.
+import type { Locale } from '../../math/core/types';
+import { QUEST_MISSIONS, QUEST_CHAPTERS } from '../../content/grade2/wizardQuest';
+import { GRADE_TWO_LESSONS, GRADE_TWO_PACKAGES, GRADE_TWO_PROJECT } from '../../content/grade2';
+import { buildCatalogUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import HeroCharacter from '../shared/HeroCharacter.astro';
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+---
+<div class="road-trip road-map" data-quest-map>
+ <nav class="road-top"><a href={buildCatalogUrl(locale)}>← {es ? 'Todos los grados' : 'All grades'}</a><span>{es ? '2.º GRADO' : 'GRADE 2'}</span><a href="#quest-grownups">{es ? 'Para familias' : 'For grown-ups'}</a></nav>
+ <header class="road-map-hero"><div class="road-map-copy"><p class="road-eyebrow">{es ? 'TU PRÓXIMA GRAN AVENTURA' : 'YOUR NEXT BIG ADVENTURE'}</p><h1>{es ? '¡Liberá a tus amigos!' : 'Free your friends!'}</h1><p>{es ? 'El mago Embrollo encerró a seis amigos. Resolvé desafíos y desatá sus hechizos.' : 'Wizard Embrollo has locked up six friends. Solve challenges and untie his spells.'}</p><a class="road-primary" href={buildSchoolLessonUrl(locale, 'grade-2', QUEST_MISSIONS[0].id)}><span aria-hidden="true">✨</span> {es ? 'Empezar la aventura' : 'Start the adventure'} →</a><a class="road-map-pick" href="#quest-missions">{es ? 'O elegí una misión ↓' : 'Or choose a mission ↓'}</a></div><div class="road-map-art quest-map-art" aria-hidden="true"><div class="road-map-stamp">{es ? 'FIESTA DE LOS FAROLES' : 'LANTERN FESTIVAL'} <span>🏮</span></div><div class="quest-map-hero"><HeroCharacter /></div><span class="quest-map-tower">🏰</span><span class="quest-map-wizard">🧙</span><span class="quest-map-friends">{QUEST_CHAPTERS.map(c => c.friend.emoji).join(' ')}</span></div></header>
+ <div class="road-map-instructions"><span><b>1</b> {es ? 'Resolvé' : 'Solve'}</span><span><b>2</b> {es ? 'Desatá un nudo' : 'Untie a knot'}</span><span><b>3</b> {es ? '¡Liberá a un amigo!' : 'Free a friend!'}</span></div>
+ <section id="quest-missions"><div class="road-map-section-heading"><h2>{es ? 'Tu camino' : 'Your path'}</h2><span>{es ? `${QUEST_MISSIONS.length} misiones · todas abiertas` : `${QUEST_MISSIONS.length} missions · all open`}</span></div>
+ {QUEST_CHAPTERS.map((chapter, i) => <details class="road-chapter" id={`quest-${chapter.id}`} open={i === 0}><summary><span class="road-chapter-number">{String(i + 1).padStart(2, '0')}</span><span class="road-chapter-label"><span class="road-eyebrow">{chapter.place[locale]} · {es ? 'MISIONES' : 'MISSIONS'} {chapter.start + 1}–{chapter.end}</span><strong>{chapter.title[locale]}</strong></span><span class="road-chapter-icon" aria-hidden="true">{chapter.friend.emoji}</span><span class="road-chapter-toggle" aria-hidden="true">⌄</span></summary><ol class="road-mission-grid" start={chapter.start + 1}>{QUEST_MISSIONS.slice(chapter.start, chapter.end).map((mission, offset) => {
+  const n = chapter.start + offset;
+  const lesson = GRADE_TWO_LESSONS[n];
+  return <li id={GRADE_TWO_LESSONS[n - 1]?.packageId !== lesson.packageId ? lesson.packageId.toLowerCase() : undefined}><a data-quest-mission-link={mission.id} href={buildSchoolLessonUrl(locale, 'grade-2', mission.id)}><span class="road-mission-number">{n + 1}</span><span class="road-mission-symbol" aria-hidden="true">{chapter.icon}</span><strong>{mission.title[locale]}</strong><span class="road-mission-play">{es ? 'Jugar' : 'Play'} →</span></a></li>;
+ })}</ol></details>)}
+ </section>
+ <aside class="road-map-destination"><span aria-hidden="true">🏮 🎉</span><div><h2>{es ? 'Al final: la Fiesta de los Faroles' : 'At the end: the Lantern Festival'}</h2><p>{es ? 'Liberá a los seis amigos y deshacé el último hechizo del mago.' : 'Free all six friends and undo the wizard’s last spell.'}</p></div></aside>
+ <details class="road-workbook" id="quest-grownups"><summary>{es ? 'Para familias: el aprendizaje detrás del juego' : 'For grown-ups: the learning behind the game'}</summary><div class="road-workbook-body"><p>{es ? 'Cada misión tiene dos desafíos. Cada respuesta correcta desata un nudo del hechizo; con doce nudos, el niño libera a un amigo. El mago no es violento: se lo vence ordenando los números. Se puede abrir cualquier misión. Las respuestas no se guardan entre visitas.' : 'Each mission has two challenges. Each correct answer unties one knot of the spell; after twelve knots, the child frees a friend. The wizard is not violent: he is beaten by putting the numbers right. Any mission can be opened. Answers are not saved between visits.'}</p><p>{es ? 'El cuaderno de cada misión conserva el ejemplo guiado, los modelos y las actividades para explicar. Al final de cada unidad hay cinco preguntas adicionales.' : 'Each mission’s notebook includes the worked example, models, and activities to explain your thinking. Each unit ends with five additional questions.'}</p><ul>{GRADE_TWO_PACKAGES.map(pack => <li><a href={buildSchoolLessonUrl(locale, 'grade-2', GRADE_TWO_LESSONS.find(l => l.packageId === pack.id)!.id)}>{pack.title[locale]}</a></li>)}</ul><section id="project"><h2>{GRADE_TWO_PROJECT.title[locale]}</h2><p>{GRADE_TWO_PROJECT.introduction[locale]}</p><ol>{GRADE_TWO_PROJECT.tasks.map(task => <li>{task[locale]}</li>)}</ol><details><summary>{es ? 'Cómo acompañar' : 'How to help'}</summary><ul>{GRADE_TWO_PROJECT.rubric.map(item => <li>{item[locale]}</li>)}</ul></details></section></div></details>
+</div>
+<script>
+ function revealQuestAnchor() {
+  let id: string;
+  try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+  const target = document.getElementById(id);
+  if (!target?.closest('[data-quest-map]')) return;
+  let parent: HTMLElement | null = target;
+  while (parent) { if (parent instanceof HTMLDetailsElement) parent.open = true; parent = parent.parentElement; }
+  requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+ }
+ revealQuestAnchor(); window.addEventListener('hashchange', revealQuestAnchor);
+</script>
+
+<style>
+ .road-map-art.quest-map-art { display:grid; grid-template-columns:auto auto auto; justify-content:center; align-items:end; gap:8px 16px; min-height:260px; padding:76px 16px 16px; background-color:#efe6f6; }
+ .quest-map-hero { width:110px; }
+ .quest-map-hero :global(.hero-art) { width:100%; height:auto; vertical-align:bottom; }
+ .quest-map-tower { font-size:4.5rem; line-height:1; }
+ .quest-map-wizard { font-size:2.6rem; align-self:start; }
+ .quest-map-friends { grid-column:1 / -1; text-align:center; font-size:1.5rem; letter-spacing:.2em; }
+ @media (max-width:480px) { .road-map-art.quest-map-art { min-height:0; padding:64px 12px 14px; gap:6px 10px; } .quest-map-tower { font-size:3.4rem; } .quest-map-hero { width:80px; } .quest-map-friends { font-size:1.25rem; letter-spacing:.1em; } }
+</style>

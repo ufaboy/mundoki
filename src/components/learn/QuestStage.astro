@@ -1,0 +1,77 @@
+---
+// Grade 2 story scene: the hero, the friend held by Wizard Embrollo, the spell
+// rope with 12 knots (one per challenge in the chapter), and friends already freed.
+// scripts/wizardQuest.ts updates the data attributes after each correct answer.
+import type { Locale } from '../../math/core/types';
+import { QUEST_CHAPTERS, KNOTS_PER_CHAPTER, questSceneState } from '../../content/grade2/wizardQuest';
+import HeroCharacter from '../shared/HeroCharacter.astro';
+const { locale, index } = Astro.props as { locale: Locale; index: number };
+const es = locale === 'es-AR';
+const state = questSceneState(index, 0);
+const chapter = QUEST_CHAPTERS[state.chapterIndex];
+const friend = chapter.friend;
+---
+<div class={`quest-stage quest-place-${chapter.id}`} data-quest-stage data-steps="0" data-friend-free={String(state.friendFree)} data-wizard-defeated={String(state.wizardDefeated)}>
+ <div class="quest-label">{chapter.place[locale]}</div>
+ <div class="quest-badges" aria-label={es ? 'Desafíos de la misión' : 'Mission challenges'}><span data-quest-badge="0">1</span><span aria-hidden="true">—</span><span data-quest-badge="1">2</span></div>
+ <div class="quest-reward" data-quest-reward hidden role="status" aria-live="polite"><span aria-hidden="true">✦</span><p data-quest-reward-text></p></div>
+ <div class="quest-scene" aria-hidden="true">
+  <div class="quest-hero"><HeroCharacter /><span class="quest-atomo">🦊</span></div>
+  <div class="quest-prison">
+   <span class="quest-friend">{friend.emoji}</span>
+   <span class="quest-bars"></span>
+   <span class="quest-friend-name">{friend.name}</span>
+  </div>
+  <div class="quest-wizard"><span class="quest-wizard-hat">🧙</span><span class="quest-yarn">🧶</span></div>
+ </div>
+ <div class="quest-knots" role="img" data-quest-knots aria-label={es ? `Nudos desatados: ${state.untied} de ${KNOTS_PER_CHAPTER}` : `Knots untied: ${state.untied} of ${KNOTS_PER_CHAPTER}`} data-label-es="Nudos desatados" data-label-en="Knots untied">
+  {Array.from({ length: KNOTS_PER_CHAPTER }, (_, i) => <i class:list={{ 'is-untied': i < state.untied }}></i>)}
+ </div>
+ <div class="quest-team" data-quest-team aria-label={es ? 'Amigos liberados' : 'Friends set free'}>
+  {QUEST_CHAPTERS.map((c, i) => <span data-quest-team-member={i} title={c.friend.name} hidden={i >= state.freedFriends}>{c.friend.emoji}</span>)}
+ </div>
+</div>
+
+<style>
+ .quest-stage { --quest-sky:#f4ead6; --quest-ground:#e0cfa9; position:relative; isolation:isolate; overflow:hidden; min-height:330px; padding:64px 16px 108px; border:2px solid #b8ccc8; border-radius:22px; background:linear-gradient(var(--quest-sky) 0 72%, var(--quest-ground) 72%); }
+ .quest-place-river { --quest-sky:#dcecf2; --quest-ground:#9cc7d3; }
+ .quest-place-lake { --quest-sky:#e3eef6; --quest-ground:#a9cfe0; }
+ .quest-place-mine { --quest-sky:#d9d6e4; --quest-ground:#a59fb8; }
+ .quest-place-forest { --quest-sky:#e2efd9; --quest-ground:#a9c896; }
+ .quest-place-tower { --quest-sky:#ece3f3; --quest-ground:#c7b7d8; }
+ .quest-label { position:absolute; top:16px; left:16px; max-width:62%; padding:8px 12px; border-radius:8px; background:#fffdf0e0; color:#426461; font-size:var(--font-caption); font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+ .quest-badges { position:absolute; top:14px; right:14px; display:flex; align-items:center; gap:6px; }
+ .quest-badges>span[data-quest-badge] { width:34px; height:34px; display:grid; place-items:center; border:2px solid #97b6a8; background:#fffdf4; border-radius:50%; }
+ .quest-badges>span.is-done { background:#376c64; color:#fff; }
+ .quest-scene { display:grid; grid-template-columns:1fr 1.2fr 1fr; align-items:end; gap:8px; max-width:640px; margin:auto; }
+ .quest-hero { position:relative; justify-self:center; width:min(120px,100%); }
+ .quest-hero :global(.hero-art) { width:100%; height:auto; vertical-align:bottom; }
+ .quest-atomo { position:absolute; right:-14px; bottom:0; font-size:1.8rem; }
+ .quest-prison { position:relative; justify-self:center; display:grid; place-items:center; width:min(150px,100%); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle,#fff8 0 55%,#c9a7e566 56%); border:3px dashed #9d74c4; transition:border-color .6s,background .6s; }
+ .quest-friend { font-size:clamp(2.6rem,9vw,4rem); transition:transform .6s; }
+ .quest-bars { position:absolute; inset:12%; border-radius:50%; background:repeating-linear-gradient(90deg,#7b5aa088 0 4px,transparent 4px 22px); transition:opacity .6s; }
+ .quest-friend-name { position:absolute; bottom:-30px; padding:2px 10px; border-radius:8px; background:#fffdf4; font-weight:700; font-size:var(--font-small); color:#3b4f55; }
+ .quest-wizard { justify-self:center; display:flex; align-items:flex-end; gap:2px; font-size:clamp(2.6rem,9vw,4rem); transition:transform .8s,opacity .8s; }
+ .quest-yarn { font-size:.55em; }
+ .quest-knots { position:absolute; left:50%; bottom:58px; transform:translateX(-50%); display:flex; gap:6px; padding:6px 10px; border-radius:999px; background:#fffdf4cc; }
+ .quest-knots i { width:16px; height:16px; border-radius:50%; background:#9d74c4; box-shadow:inset 0 0 0 3px #7b55a3; transition:background .4s,transform .4s; }
+ .quest-knots i.is-untied { background:#f3d77d; box-shadow:inset 0 0 0 3px #d9b24d; transform:scale(.8); }
+ .quest-team { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); display:flex; gap:8px; font-size:1.6rem; min-height:36px; }
+ .quest-reward { position:relative; display:flex; align-items:center; gap:10px; width:max-content; max-width:100%; margin:0 auto 12px; padding:10px 16px; border-radius:12px; background:#fff9e5; border:2px solid #c7b77f; color:#425e55; box-shadow:0 4px 0 #314c4c12; animation:quest-reward-in .4s ease-out; }
+ .quest-reward>span { font-size:1.333rem; }
+ .quest-reward p { margin:0; font-size:1rem; font-weight:600; line-height:1.4; }
+ .quest-stage[data-friend-free="true"] .quest-bars { opacity:0; }
+ .quest-stage[data-friend-free="true"] .quest-prison { border-color:#e2bd4f; background:radial-gradient(circle,#fff6cf 0 60%,#f7e39a 61%); }
+ .quest-stage[data-friend-free="true"] .quest-friend { transform:translateY(-10px) scale(1.12); }
+ .quest-stage[data-friend-free="true"] .quest-wizard { transform:translate(40px,-40px) scale(.7); opacity:.25; }
+ .quest-stage[data-wizard-defeated="true"] .quest-wizard { transform:none; opacity:1; filter:grayscale(.6); }
+ .quest-stage [hidden] { display:none !important; }
+ @keyframes quest-reward-in { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
+ @media (prefers-reduced-motion:reduce) { .quest-friend,.quest-bars,.quest-prison,.quest-wizard,.quest-knots i { transition:none; } .quest-reward { animation:none; } }
+ @media (max-width:480px) {
+  .quest-stage { min-height:290px; padding:84px 8px 104px; }
+  .quest-knots { gap:4px; padding:5px 8px; }
+  .quest-knots i { width:13px; height:13px; }
+  .quest-team { font-size:1.333rem; gap:4px; }
+ }
+</style>

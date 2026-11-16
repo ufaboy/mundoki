@@ -6,42 +6,40 @@ import { SCHOOL_COURSES, getCourseForPackage, getSchoolPackage } from '../conten
 import { getGradeById } from '../math/curriculum';
 import { buildSchoolLessonUrl } from '../i18n/routes';
 import { equalGroupModel, placeValueParts } from '../math/primaryModels';
-import { ROAD_MISSIONS, ROAD_CHAPTERS, roadSceneState } from '../content/grade2/roadTrip';
+import { QUEST_MISSIONS, QUEST_CHAPTERS, KNOTS_PER_CHAPTER, questSceneState } from '../content/grade2/wizardQuest';
 
 export function runGradeTwoTests() {
   const expectedCounts = [3,3,3,3,3,3,3,3,3,2,3,2,2];
   assert.equal(GRADE_TWO_LESSONS.length, 36);
-  assert.deepEqual(ROAD_MISSIONS.map(m=>m.id),GRADE_TWO_LESSONS.map(l=>l.id), 'Every lesson has one ordered road mission');
-  assert.deepEqual(ROAD_CHAPTERS.flatMap(c=>ROAD_MISSIONS.slice(c.start,c.end).map(m=>m.id)),ROAD_MISSIONS.map(m=>m.id), 'Chapters cover the full trip without gaps or repeats');
-  for(const mission of ROAD_MISSIONS) {
+  assert.deepEqual(QUEST_MISSIONS.map(m=>m.id),GRADE_TWO_LESSONS.map(l=>l.id), 'Every lesson has one ordered quest mission');
+  assert.deepEqual(QUEST_CHAPTERS.flatMap(c=>QUEST_MISSIONS.slice(c.start,c.end).map(m=>m.id)),QUEST_MISSIONS.map(m=>m.id), 'Chapters cover the whole quest without gaps or repeats');
+  assert.equal(QUEST_CHAPTERS.length,6,'One friend to free per chapter');
+  for(const mission of QUEST_MISSIONS) {
     assert.equal(mission.rewards.length,2);
     for(const value of [mission.title,mission.introduction,...mission.rewards]) {
       for(const locale of ['es-AR','en-US'] as const) assert(value[locale].trim() && !value[locale].includes('|'));
     }
+    assert(!mission.title['es-AR'].includes('{name}'),'Titles are shown outside HeroText');
   }
-  assert.equal(roadSceneState(0,0).scene,'shop');
-  assert.equal(roadSceneState(5,1).purchased,false);
-  assert.equal(roadSceneState(5,2).purchased,true);
-  assert.equal(roadSceneState(6,0).scene,'repair');
-  assert.equal(roadSceneState(12,0).scene,'upgrade');
-  assert.equal(roadSceneState(13,2).upgrades,4);
-  assert.equal(roadSceneState(21,0).scene,'ferry');
-  assert.equal(roadSceneState(21,0).ferryProgress,0);
-  assert.equal(roadSceneState(21,2).ferryProgress,33);
-  assert.equal(roadSceneState(23,2).ferryProgress,100);
-  assert.equal(roadSceneState(24,0).scene,'island');
-  assert.equal(roadSceneState(29,0).scene,'bridge');
-  assert.equal(roadSceneState(32,1).vanAvailable,false);
-  assert.equal(roadSceneState(32,2).vanAvailable,true);
-  assert.equal(roadSceneState(33,0).vanAvailable,true);
-  assert.equal(roadSceneState(17,2).parts,36,'Car is finished before departure');
-  assert.equal(roadSceneState(18,0).driving,true);
-  assert.equal(roadSceneState(35,2).distance,100,'Last answer reaches the destination');
+  for(const lesson of GRADE_TWO_LESSONS) {
+    for(const value of [lesson.story,lesson.scene.caption,lesson.misconception,...lesson.steps,...lesson.checks.flatMap(c=>[c.prompt,c.explanation,...c.options])]) {
+      for(const locale of ['es-AR','en-US'] as const) assert(!value[locale].includes('{'),`Lesson text is not personalized: ${lesson.id}`);
+    }
+  }
+  assert.equal(questSceneState(0,0).untied,0);
+  assert.equal(questSceneState(5,1).friendFree,false);
+  assert.equal(questSceneState(5,2).friendFree,true,'Sixth mission frees the chapter friend');
+  assert.equal(questSceneState(5,2).freedFriends,1);
+  assert.equal(questSceneState(6,0).chapterIndex,1);
+  assert.equal(questSceneState(6,0).untied,0,'Each friend has a fresh spell');
+  assert.equal(questSceneState(6,0).freedFriends,1);
+  assert.equal(questSceneState(35,1).wizardDefeated,false);
+  assert.equal(questSceneState(35,2).wizardDefeated,true,'Last answer breaks the last spell');
+  assert.equal(questSceneState(35,2).freedFriends,6);
   for(let i=0;i<36;i++) {
-    const a=roadSceneState(i,0),b=roadSceneState(i,1),c=roadSceneState(i,2);
-    assert(a.parts<=b.parts && b.parts<=c.parts);
-    assert(a.distance<=b.distance && b.distance<=c.distance && c.distance<=100);
-    if(i<35) assert.equal(c.distance,roadSceneState(i+1,0).distance,'Travel distance continues into the next episode');
+    const a=questSceneState(i,0),b=questSceneState(i,1),c=questSceneState(i,2);
+    assert(a.untied<b.untied && b.untied<c.untied && c.untied<=KNOTS_PER_CHAPTER);
+    if(i<35) assert.equal(c.freedFriends,questSceneState(i+1,0).freedFriends,'Freed friends carry into the next mission');
   }
   assert.equal(GRADE_TWO_PACKAGES.length, 13);
   assert.equal(getGradeById('grade-2').lessons.length, 36);
@@ -100,7 +98,7 @@ export function runGradeTwoTests() {
       assert.equal(rows.length, 3);
       assert(rows.every(row => row.length === rows[0].length), 'Question maps must be rectangular');
       assert.equal(rows.flat().filter(cell => cell === '★').length, 1, 'Each question map needs a start');
-      assert.equal(rows.flat().filter(cell => cell === '🏫' || cell === '🏁').length, 1, 'Each question map needs a goal');
+      assert.equal(rows.flat().filter(cell => cell === '🦌' || cell === '🏁').length, 1, 'Each question map needs a goal');
     }
     assert.equal(lesson.steps.length, 3); assert.equal(lesson.checks.length, 2);
     assert.equal(buildSchoolLessonUrl('es-AR', 'grade-2', lesson.id), `/es-ar/matematicas/grado/2-grado/${lesson.id.toLowerCase()}/`);
