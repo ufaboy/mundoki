@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "primary",
+  "topic": "fractions",
+  "locale": "es-AR",
+  "slug": "fracciones",
+  "title": "Fracciones: Partes Iguales de un Todo",
+  "summary": "Una fracción representa una o varias partes iguales de un entero, ya sea una pizza, una barra de energía o un grupo de objetos.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Probá cambiar el numerador (arriba) y el denominador (abajo). Compará el disco circular con la barra rectangular para ver que ambos muestran la misma proporción.",
+  "workedExampleTitle": "¿Por qué 1/4 y 2/8 valen exactamente lo mismo?",
+  "workedSteps": [
+    {
+      "title": "Paso 1: El denominador exige partes iguales",
+      "explanation": "Si cortamos una pizza o una barra en 4 partes iguales y tomamos 1, tenemos 1/4 (\"un cuarto\").",
+      "mathExpression": "\\frac{1}{4} = \\text{1 de 4 partes iguales}"
+    },
+    {
+      "title": "Paso 2: Partir cada cuarto por la mitad",
+      "explanation": "Si cortamos cada uno de los 4 trozos en 2 partes iguales, ahora hay 8 porciones más chicas, y nuestra porción ocupa 2 de esas 8.",
+      "mathExpression": "\\frac{1 \\times 2}{4 \\times 2} = \\frac{2}{8}"
+    },
+    {
+      "title": "Paso 3: Sumar fracciones del mismo tamaño",
+      "explanation": "Para hacer 1/4 + 2/4, sumamos los numeradores (1 + 2 = 3) y dejamos el denominador 4 porque el tamaño de cada cuarto no cambió.",
+      "mathExpression": "\\frac{1}{4} + \\frac{2}{4} = \\frac{3}{4}"
+    }
+  ],
+  "whyItWorks": "Multiplicar o dividir el numerador y el denominador por el mismo número equivale a multiplicar por 1: cambia la cantidad de divisiones pero no la cantidad total pintada.",
+  "commonMistake": {
+    "wrongExample": "Confusión típica: hacer 1/4 + 2/4 = 3/8 sumando también los denominadores.",
+    "correction": "El denominador indica el nombre y tamaño de la parte (\"cuartos\"). 1 cuarto más 2 cuartos son 3 cuartos (3/4), ¡no 3 octavos!"
+  },
+  "deepDiveExtra": "Cuanto más grande es el denominador, más pequeñas son las partes individuales: 1/8 de barra es la mitad de 1/4 de barra.",
+  "quickChecks": [
+    {
+      "id": "frac-q1",
+      "question": "¿Cuál de estas fracciones es equivalente a 1/2?",
+      "options": [
+        { "label": "3/6 (la mitad de 6 partes iguales)", "value": "3/6", "isCorrect": true },
+        { "label": "1/4", "value": "1/4", "isCorrect": false },
+        { "label": "2/6", "value": "2/6", "isCorrect": false }
+      ],
+      "explanation": "3 es exactamente la mitad de 6, por lo tanto 3/6 = 1/2."
+    },
+    {
+      "id": "frac-q2",
+      "question": "¿Cuánto es 2/5 + 2/5?",
+      "options": [
+        { "label": "4/5", "value": "4/5", "isCorrect": true },
+        { "label": "4/10", "value": "4/10", "isCorrect": false }
+      ],
+      "explanation": "Sumamos 2 quintos más 2 quintos = 4 quintos (4/5)."
+    }
+  ]
+}

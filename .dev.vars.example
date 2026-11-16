@@ -1,0 +1,32 @@
+# Better Auth & Session Secret (Generate with: openssl rand -base64 32)
+BETTER_AUTH_SECRET="replace-with-32-byte-secret-in-production"
+BETTER_AUTH_URL="http://localhost:3333"
+APP_URL="http://localhost:3333"
+
+# OAuth 2.0 Providers (Google, Facebook & Apple)
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+FACEBOOK_CLIENT_ID=""
+FACEBOOK_CLIENT_SECRET=""
+APPLE_CLIENT_ID=""
+APPLE_CLIENT_SECRET=""
+APPLE_APP_BUNDLE_IDENTIFIER=""
+
+# Passwordless Email Magic Link Delivery (Resend)
+RESEND_API_KEY=""
+EMAIL_FROM="Mundoki <no-reply@mundoki.app>"
+
+# Mercado Pago Recurring Subscriptions (Argentina - ARS)
+# Leave blank in local development to activate the labeled Development Mock Provider.
+MP_ACCESS_TOKEN=""
+MP_WEBHOOK_SECRET=""
+PREMIUM_MONTHLY_ARS="4500"
+
+# Cloudflare D1 Local / Remote Binding
+D1_DATABASE_ID="00000000-0000-0000-0000-000000000000"
+
+# Personal promotions: administrative access is stored in users.role, never in public configuration.
+# Can reduce the allowed duration; the code and database enforce an absolute six-month cap.
+PROMO_MAX_MONTHS="6"
+# Enable only after testing the Mercado Pago promo schedule and price transition in your account.
+PROMO_LIVE_BILLING_ENABLED="false"

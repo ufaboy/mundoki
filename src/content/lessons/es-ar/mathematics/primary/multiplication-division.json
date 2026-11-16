@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "primary",
+  "topic": "multiplication-division",
+  "locale": "es-AR",
+  "slug": "multiplicacion-y-division",
+  "title": "Multiplicación y División con Filas y Columnas",
+  "summary": "Multiplicar es sumar varios grupos iguales de forma rápida, y dividir es repartir un total en partes exactamente iguales.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Cambiá la cantidad de filas y columnas en la grilla interactiva para ver cómo 3 grupos de 4 equivalen a 4 + 4 + 4 = 12.",
+  "workedExampleTitle": "Conectando 3 × 4 = 12 con 12 ÷ 3 = 4",
+  "workedSteps": [
+    {
+      "title": "Paso 1: Armar filas iguales",
+      "explanation": "Imaginate 3 filas con 4 fichas en cada fila. En vez de contar una por una, sumamos por fila.",
+      "mathExpression": "4 + 4 + 4 = 12"
+    },
+    {
+      "title": "Paso 2: Escribir como multiplicación",
+      "explanation": "\"3 veces 4\" se escribe 3 × 4 = 12. Si girás la grilla, ves 4 filas de 3 (4 × 3 = 12).",
+      "mathExpression": "3 \\times 4 = 4 \\times 3 = 12"
+    },
+    {
+      "title": "Paso 3: La división deshace la multiplicación",
+      "explanation": "Si tenemos 12 fichas en total y las repartimos en 3 filas iguales, cada fila recibe 4 fichas.",
+      "mathExpression": "12 \\div 3 = 4"
+    }
+  ],
+  "whyItWorks": "Como el rectángulo de fichas no cambia de cantidad al girarlo, el orden de los factores no altera el producto (propiedad conmutativa).",
+  "commonMistake": {
+    "wrongExample": "Confusión típica: pensar que 3 × 4 es 3 + 4 = 7.",
+    "correction": "El signo × indica grupos repetidos: son 3 filas de 4 elementos (4 + 4 + 4 = 12)."
+  },
+  "deepDiveExtra": "Para multiplicar números más grandes como 6 × 7, podés partir el 7 en 5 + 2: hacés (6 × 5) + (6 × 2) = 30 + 12 = 42.",
+  "quickChecks": [
+    {
+      "id": "mul-q1",
+      "question": "¿Qué suma repetida representa exactamente a 4 × 5?",
+      "options": [
+        { "label": "5 + 5 + 5 + 5 = 20", "value": "20", "isCorrect": true },
+        { "label": "4 + 5 = 9", "value": "9", "isCorrect": false }
+      ],
+      "explanation": "4 grupos de 5 unidades suman 5 + 5 + 5 + 5 = 20."
+    },
+    {
+      "id": "mul-q2",
+      "question": "Si 6 × 8 = 48, ¿cuánto es 48 ÷ 6?",
+      "options": [
+        { "label": "8", "value": "8", "isCorrect": true },
+        { "label": "6", "value": "6", "isCorrect": false },
+        { "label": "42", "value": "42", "isCorrect": false }
+      ],
+      "explanation": "Si 6 filas de 8 dan 48, repartir 48 en 6 filas iguales deja 8 en cada una."
+    }
+  ]
+}

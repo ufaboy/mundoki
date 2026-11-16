@@ -1,0 +1,29 @@
+---
+import type { Locale } from '../../math/core/types';
+interface Props { locale: Locale; packageId: string }
+const { locale, packageId } = Astro.props;
+const es = locale === 'es-AR';
+const placeValue = ['G02-01', 'G02-02', 'G02-03'].includes(packageId);
+const groups = ['G02-07', 'G02-08'].includes(packageId);
+---
+{(placeValue || groups) && <section class="card stack-md g2-lab" data-g2-lab={placeValue ? 'place' : 'groups'} data-locale={locale}>
+  <h2>{es ? 'Probá y observá qué cambia' : 'Try it and observe what changes'}</h2>
+  {placeValue ? <>
+    <p>{es ? 'Construí un número. Cambiá una centena por diez decenas y observá que el total se conserva.' : 'Build a number. Exchange one hundred for ten tens and observe that the total stays the same.'}</p>
+    <label>{es ? 'Número de 0 a 1000' : 'Number from 0 to 1000'} <input type="number" min="0" max="1000" step="1" value="347" data-place-number /></label>
+    <div class="flex-row">{[-100,-10,10,100].map(step => <button type="button" class="btn btn-outline btn-sm" data-place-step={step}>{step > 0 ? '+' : '−'}{Math.abs(step)}</button>)}</div>
+    <label class="g1-option"><input type="checkbox" data-place-exchange />{es ? 'Cambiar una centena por diez decenas' : 'Exchange one hundred for ten tens'}</label>
+  </> : <>
+    <p>{es ? 'Elegí qué conocés y qué buscás. Los puntos muestran objetos; los recuadros muestran grupos.' : 'Choose what you know and what you seek. Dots show objects; boxes show groups.'}</p>
+    <label>{es ? 'Situación' : 'Situation'} <select data-group-mode>
+      <option value="multiply" selected={packageId === 'G02-07'}>{es ? 'Conozco grupos y cantidad por grupo' : 'I know groups and items per group'}</option>
+      <option value="share" selected={packageId === 'G02-08'}>{es ? 'Repartir un total entre varios grupos' : 'Share a total among several groups'}</option>
+      <option value="pack">{es ? 'Formar grupos de un tamaño conocido' : 'Make groups of a known size'}</option>
+    </select></label>
+    <label><span data-first-label>{es ? 'Primera cantidad' : 'First quantity'}</span> <input data-group-first type="number" min="0" max={packageId === 'G02-07' ? '6' : '36'} value={packageId === 'G02-07' ? '4' : '18'} step="1" /></label>
+    <label><span data-second-label>{es ? 'Segunda cantidad' : 'Second quantity'}</span> <input data-group-second type="number" min="1" max="6" value={packageId === 'G02-07' ? '6' : '3'} step="1" /></label>
+  </>}
+  <p data-lab-summary role="status" aria-live="polite"></p>
+  <div class="g2-model" data-lab-model aria-hidden="true"></div>
+  <noscript><p>{es ? 'Activá JavaScript para modificar este modelo. Podés hacer la misma exploración con objetos y los ejemplos de arriba.' : 'Enable JavaScript to change this model. You can do the same exploration with objects and the examples above.'}</p></noscript>
+</section>}

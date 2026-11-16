@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "primary",
+  "topic": "addition-subtraction",
+  "locale": "es-AR",
+  "slug": "suma-y-resta",
+  "title": "Suma y Resta Agrupando Decenas y Unidades",
+  "summary": "Sumar es juntar cantidades y restar es encontrar cuánto queda o cuánto falta para llegar de un número a otro.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Mové los deslizadores de abajo para agrupar de a 10 bloques. Cuando juntás 10 unidades sueltas, forman 1 barra de decena completa.",
+  "workedExampleTitle": "Resolvamos 27 + 15 sin hacer cuentas de memoria",
+  "workedSteps": [
+    {
+      "title": "Paso 1: Separar en barras de 10 y unidades sueltas",
+      "explanation": "El 27 tiene 2 decenas (20) y 7 unidades. El 15 tiene 1 decena (10) y 5 unidades.",
+      "mathExpression": "27 + 15 = (20 + 7) + (10 + 5)"
+    },
+    {
+      "title": "Paso 2: Juntar las decenas primero",
+      "explanation": "Sumamos 20 + 10 y obtenemos 30.",
+      "mathExpression": "20 + 10 = 30"
+    },
+    {
+      "title": "Paso 3: Formar una nueva decena con las unidades",
+      "explanation": "Sumamos 7 + 5. Como 7 necesita 3 para llegar a 10, armamos un 10 nuevo y sobran 2: 10 + 2 = 12. Finalmente 30 + 12 = 42.",
+      "mathExpression": "30 + 12 = 42"
+    }
+  ],
+  "whyItWorks": "Nuestro sistema de numeración es decimal (de base 10): el valor de cada cifra depende de su posición. Agrupar de a 10 hace que cualquier suma grande se transforme en pasos chiquitos.",
+  "commonMistake": {
+    "wrongExample": "Confusión típica: hacer 27 + 15 sumando 2+1=3 y 7+5=12 y escribir \"312\".",
+    "correction": "¡Cuidado! Esas 12 unidades valen 1 decena más 2 unidades, así que la decena se suma a las 3 decenas para dar 42, no 312."
+  },
+  "deepDiveExtra": "También podés restar pensando \"cuánto falta para llegar\". Por ejemplo, para 52 − 38: de 38 a 40 faltan 2, y de 40 a 52 faltan 12. Total: 2 + 12 = 14.",
+  "quickChecks": [
+    {
+      "id": "add-q1",
+      "question": "Si descomponés 36 + 24 en decenas y unidades, ¿qué suma obtenés?",
+      "options": [
+        { "label": "(30 + 20) + (6 + 4) = 60", "value": "60", "isCorrect": true },
+        { "label": "(3 + 2) + (6 + 4) = 15", "value": "15", "isCorrect": false },
+        { "label": "50 + 10 = 510", "value": "510", "isCorrect": false }
+      ],
+      "explanation": "30 + 20 da 50, y 6 + 4 forma otra decena completa (10). 50 + 10 = 60."
+    },
+    {
+      "id": "add-q2",
+      "question": "¿Cuánto le falta a 28 para llegar a 45?",
+      "options": [
+        { "label": "17 (2 para llegar a 30, más 15 para llegar a 45)", "value": "17", "isCorrect": true },
+        { "label": "23 (restando 8 − 5)", "value": "23", "isCorrect": false }
+      ],
+      "explanation": "Desde 28 sumás 2 para llegar a 30, y luego 15 más hasta 45: 2 + 15 = 17."
+    }
+  ]
+}

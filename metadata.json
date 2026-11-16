@@ -1,0 +1,6 @@
+{
+  "name": "Mundoki — Visual Math & Space Adventure",
+  "description": "Bilingual (es-AR / en-US) visual-first mathematics learning and space adventure platform for Primary and Middle School students.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

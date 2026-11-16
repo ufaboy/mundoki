@@ -1,0 +1,42 @@
+---
+import type { Locale } from '../../math/core/types';
+interface Props { locale: Locale; packageId: string }
+const { locale, packageId } = Astro.props;
+const es = locale === 'es-AR';
+const kind = ['G03-04','G03-05','G04-03'].includes(packageId) ? 'product'
+  : ['G03-06','G04-04'].includes(packageId) ? 'division'
+  : ['G04-06','G04-07'].includes(packageId) ? 'fraction'
+  : packageId === 'G04-08' ? 'decimal' : packageId === 'G04-10' ? 'angle' : null;
+const grade3 = packageId.startsWith('G03');
+---
+{kind && <section class="card stack-md upper-lab" data-upper-lab={kind} data-locale={locale}>
+ <h2>{es ? 'Cambiá el modelo y explicá' : 'Change the model and explain'}</h2>
+ {kind === 'fraction' && <>
+  <p>{es ? 'Las dos tiras tienen el mismo entero. Compará tu fracción con la mitad y con octavos.' : 'Both strips have the same whole. Compare your fraction with half and with eighths.'}</p>
+  <label>{es ? 'Partes iguales del entero' : 'Equal parts of the whole'} <select data-denominator><option value="2">2</option><option value="4" selected>4</option><option value="8">8</option></select></label>
+  <label>{es ? 'Partes elegidas' : 'Selected parts'} <input type="range" min="0" max="4" value="3" step="1" data-first /></label>
+ </>}
+ {kind === 'decimal' && <>
+  <p>{es ? 'El cuadrado completo es un entero. Cada casilla es un centésimo; cada fila es un décimo.' : 'The complete square is one whole. Each cell is one hundredth; each row is one tenth.'}</p>
+  <label>{es ? 'Centésimos pintados' : 'Shaded hundredths'} <input type="range" min="0" max="100" value="50" step="1" data-first /></label>
+ </>}
+ {kind === 'angle' && <>
+  <p>{es ? 'El rayo horizontal es el inicio. Cambiá el giro o el largo del otro rayo y compará qué modifica el ángulo.' : 'The horizontal ray is the start. Change the turn or the other ray’s length and compare which changes the angle.'}</p>
+  <label>{es ? 'Giro en grados' : 'Turn in degrees'} <input type="range" min="0" max="180" value="60" step="5" data-first /></label>
+  <label>{es ? 'Largo del rayo en el dibujo' : 'Drawn ray length'} <input type="range" min="60" max="140" value="120" step="10" data-second /></label>
+ </>}
+ {kind === 'product' && <>
+  <p>{es ? 'Dividí el rectángulo por decenas y unidades. Las cuatro áreas parciales reconstruyen el producto; una parte de tamaño cero desaparece.' : 'Split the rectangle into tens and ones. The four partial areas reconstruct the product; a zero-sized part disappears.'}</p>
+  <label>{es ? 'Primer factor' : 'First factor'} <input type="range" min="10" max="49" value="23" step="1" data-first /></label>
+  <label>{es ? 'Segundo factor' : 'Second factor'} <input type="range" min="2" max={grade3 ? 9 : 29} value={grade3 ? 4 : 14} step="1" data-second /></label>
+ </>}
+ {kind === 'division' && <>
+  <p>{es ? 'El total se separa en grupos completos y resto. Para guardar todo, un resto distinto de cero necesita un recipiente adicional.' : 'The total splits into complete groups and a remainder. To store everything, a nonzero remainder needs an extra container.'}</p>
+  <label>{es ? 'Total de objetos' : 'Total objects'} <input type="range" min="0" max={grade3 ? 99 : 999} value={grade3 ? 29 : 157} step="1" data-first /></label>
+  <label>{es ? 'Objetos por recipiente' : 'Objects per container'} <input type="range" min="2" max="9" value="6" step="1" data-second /></label>
+ </>}
+ <p data-upper-summary role="status" aria-live="polite"></p>
+ <div data-upper-model aria-hidden="true"></div>
+ <p>{es ? 'Predecí el resultado de un cambio, probalo y explicá qué se conserva.' : 'Predict the result of a change, try it, and explain what stays the same.'}</p>
+ <noscript>{es ? 'Para cambiar el modelo activá JavaScript; también podés reproducirlo en papel con el ejemplo del lección.' : 'Enable JavaScript to change the model; you can also recreate it on paper using the lesson example.'}</noscript>
+</section>}

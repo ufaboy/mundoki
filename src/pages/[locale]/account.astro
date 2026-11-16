@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AccountPortal from '../../components/shared/AccountPortal.astro';
+import { buildAccountUrl, normalizeUrlLocale } from '../../i18n/routes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: { locale: 'es-ar' } }, { params: { locale: 'en-us' } }];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+---
+
+<BaseLayout
+  title={locale === 'es-AR' ? 'Cuenta, OAuth, Magic Link y 2FA' : 'Account, OAuth, Magic Link & 2FA'}
+  locale={locale}
+  activeNav="account"
+  switchLocaleHref={buildAccountUrl(otherLocale)}
+>
+  <AccountPortal locale={locale} />
+</BaseLayout>

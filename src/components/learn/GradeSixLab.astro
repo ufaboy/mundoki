@@ -1,0 +1,36 @@
+---
+import type { Locale } from '../../math/core/types';
+interface Props{locale:Locale;packageId:string}
+const {locale,packageId}=Astro.props,es=locale==='es-AR';
+const kind=['G06-02','G06-03'].includes(packageId)?'divisors':['G06-06','G06-07'].includes(packageId)?'proportion':packageId==='G06-08'?'percent':['G06-09','G06-10'].includes(packageId)?'rectangle':packageId==='G06-12'?'mean':null;
+---
+{kind&&<section class="card stack-md g6-lab" data-g6-lab={kind} data-locale={locale}>
+ <h2>{es?'Probá el modelo y explicá sus límites':'Try the model and explain its limits'}</h2>
+ {kind==='divisors'&&<>
+  <p>{es?'Compará divisores para repartir y múltiplos para encontrar coincidencias. Los números son enteros positivos.':'Compare divisors for sharing and multiples for finding coincidences. Numbers are positive integers.'}</p>
+  {['A','B'].map((name,i)=><label>{es?'Número':'Number'} {name}<input data-value type="range" min="1" max="60" step="1" value={i===0?12:18}/></label>)}
+ </>}
+ {kind==='proportion'&&<>
+  <p>{es?'En el costo directo cada metro cuesta 3; en el reparto se conservan 24 L; el tercer modelo agrega un cargo fijo de 5. Cada punto corresponde a una fila de la tabla.':'In direct cost each meter costs 3; sharing preserves 24 L; the third model adds a fixed charge of 5. Each point corresponds to a table row.'}</p>
+  <label>{es?'Relación':'Relationship'}<select data-mode><option value="direct">{es?'Costo: y = 3x':'Cost: y = 3x'}</option><option value="inverse" selected={packageId==='G06-07'}>{es?'Reparto: y = 24/x':'Sharing: y = 24/x'}</option><option value="fixed">{es?'Costo con cargo fijo: y = 3x + 5':'Cost with fixed charge: y = 3x + 5'}</option></select></label>
+  <label>{es?'Valor de x':'Value of x'}<select data-x>{[1,2,3,4,6,8,12].map(x=><option value={x} selected={x===4}>{x}</option>)}</select></label>
+ </>}
+ {kind==='percent'&&<>
+  <p>{es?'El cuadrado completo siempre representa 100% del total elegido. Cambiá el total conservando el porcentaje y observá la cantidad.':'The complete square always represents 100% of the chosen total. Change the total while keeping the percentage and observe the amount.'}</p>
+  <label>{es?'Cantidad total':'Total quantity'}<input data-value type="range" min="20" max="400" step="20" value="240"/></label>
+  <label>{es?'Porcentaje':'Percentage'}<input data-value type="range" min="0" max="100" step="5" value="25"/></label>
+ </>}
+ {kind==='rectangle'&&<>
+  <p>{es?'Cada casilla representa 1 m². Compará borde y superficie. El plano en papel usaría escala 1:200; las dimensiones en centímetros se calculan, no se miden en pantalla.':'Each cell represents 1 m². Compare boundary and surface. The paper plan would use scale 1:200; centimeter dimensions are calculated, not measured on screen.'}</p>
+  <label>{es?'Ancho en metros':'Width in meters'}<input data-value type="range" min="1" max="12" step="1" value="6"/></label>
+  <label>{es?'Largo en metros':'Length in meters'}<input data-value type="range" min="1" max="12" step="1" value="4"/></label>
+ </>}
+ {kind==='mean'&&<>
+  <p>{es?'Cada barra representa una pila de fichas. Compará los datos originales con un reparto igual del mismo total; si hace falta partir fichas, interpretá las barras como cantidades medibles.':'Each bar represents a pile of counters. Compare the original data with equal shares of the same total; if counters need splitting, interpret the bars as measurable amounts.'}</p>
+  {[0,1,2,3].map(i=><label>{es?'Dato':'Value'} {i+1}<input data-value type="range" min="0" max="12" step="1" value={[2,4,6,8][i]}/></label>)}
+ </>}
+ <p data-g6-summary role="status" aria-live="polite"></p>
+ <div data-g6-model></div>
+ <p>{es?'Predecí un cambio, probalo y explicá qué se conserva.':'Predict a change, try it, and explain what stays constant.'}</p>
+ <noscript>{es?'Activá JavaScript para modificar el modelo o reproducí el ejemplo en papel.':'Enable JavaScript to change the model or reproduce the example on paper.'}</noscript>
+</section>}

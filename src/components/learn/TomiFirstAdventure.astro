@@ -1,0 +1,58 @@
+---
+import TomiCharacter from './TomiCharacter.astro';
+import type { Locale } from '../../math/core/types';
+import { buildGradeUrl, buildGradeOneLessonUrl } from '../../i18n/routes';
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+const toys = es ? ['Osito', 'Pelota', 'Autito', 'Robot', 'Barquito'] : ['Teddy bear', 'Ball', 'Toy car', 'Robot', 'Boat'];
+---
+<article class="tomi-adventure" data-tomi-adventure data-locale={locale}>
+  <nav class="tomi-topline" aria-label={es ? 'La aventura' : 'The adventure'}>
+    <a href={buildGradeUrl(locale, 'grade-1')}>← {es ? 'Volver a 1.º grado' : 'Back to Grade 1'}</a>
+    <span>{es ? 'LA GRAN PASEADA DE TOMI' : 'TOMI’S BIG DAY OUT'}</span>
+    <span class="tomi-chapter">01 / 35</span>
+  </nav>
+  <header class="tomi-heading"><div><p>{es ? 'CAPÍTULO 1 · EN CASA' : 'CHAPTER 1 · AT HOME'}</p><h1>{es ? '¡Vamos a jugar!' : 'Let’s go play!'}</h1></div><span class="tomi-skill">✦ {es ? 'Contamos hasta 5' : 'Counting to 5'}</span></header>
+  <div class="tomi-game">
+    <div class="tomi-room" role="group" aria-label={es ? 'El cuarto de Tomi. Hay cinco juguetes en el estante.' : 'Tomi’s room. There are five toys on the shelf.'}>
+      <svg class="tomi-room-art" viewBox="0 0 1100 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><pattern id="tomi-wall" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="17" cy="17" r="1.4" fill="#ccd9bf"/></pattern></defs>
+        <path fill="#edf1dd" d="M0 0h1100v430H0z"/><path fill="url(#tomi-wall)" d="M0 0h1100v318H0z"/>
+        <path fill="#e8c99e" d="M0 320h1100v110H0z"/><path stroke="#d6b78d" stroke-width="2" d="M0 362h1100M0 410h1100M150 320l-60 110m300-110-20 110m320-110 20 110m240-110 60 110"/><path stroke="#fcf7e9" stroke-width="14" d="M0 318h1100"/>
+        <rect x="56" y="40" width="170" height="190" rx="75" fill="#fff9e8"/><rect x="69" y="53" width="144" height="164" rx="65" fill="#b5dfe4"/>
+        <circle cx="174" cy="98" r="23" fill="#fff1aa"/><path d="M69 177q40-45 80-10t64-6v56H69" fill="#97bc87"/><path stroke="#fff9e8" stroke-width="9" d="M141 55v163M70 139h143"/>
+        <path d="M948 204q-35-65-20-87 40 18 20 87m12 12q10-71 43-72 6 44-43 72m-9-31q-7-78 15-92 29 48-15 92" fill="#759b6d"/><path fill="#c97858" d="M919 210h67l-10 85h-47z"/>
+        <rect x="789" y="34" width="77" height="82" rx="5" fill="#c8a779"/><rect x="797" y="42" width="61" height="66" fill="#fffbeb"/><path d="m810 87 18-29 18 29" fill="#e4b44b"/><circle cx="828" cy="92" r="7" fill="#9cab7f"/>
+        <ellipse cx="293" cy="382" rx="140" ry="27" fill="#cbbd8c" opacity=".5"/>
+      </svg>
+      <div class="tomi-speech" data-tomi-speech>{es ? '¡Hola! Quiero llevar mi autito. ¿Me ayudás a contar los juguetes?' : 'Hi! I want to take my toy car. Can you help me count the toys?'}</div>
+      <TomiCharacter />
+      <div class="tomi-shelf" aria-label={es ? 'Tocá cada juguete para marcarlo' : 'Tap each toy to mark it'}>
+        {toys.map((name, index) => <button type="button" class="tomi-toy" data-tomi-toy={index} aria-label={name} aria-pressed="false">
+          <span class="tomi-toy-mark" aria-hidden="true">✓</span>
+          <svg viewBox="0 0 100 110" aria-hidden="true">
+            {index === 0 && <g fill="#bc895d" stroke="#895f42" stroke-width="2"><circle cx="27" cy="28" r="14"/><circle cx="73" cy="28" r="14"/><ellipse cx="50" cy="74" rx="26" ry="29"/><ellipse cx="23" cy="71" rx="10" ry="17"/><ellipse cx="77" cy="71" rx="10" ry="17"/><circle cx="50" cy="42" r="29"/><ellipse cx="50" cy="52" rx="15" ry="11" fill="#e7c6a0"/><circle cx="39" cy="38" r="2" fill="#493c31"/><circle cx="61" cy="38" r="2" fill="#493c31"/><path d="m46 48 4 4 4-4z" fill="#493c31"/><ellipse cx="31" cy="96" rx="15" ry="10"/><ellipse cx="69" cy="96" rx="15" ry="10"/><path d="m35 65 15 5 15-5v15l-15-5-15 5z" fill="#7c9e8a" stroke="none"/></g>}
+            {index === 1 && <g><circle cx="50" cy="67" r="35" fill="#dc8268"/><path d="M50 32q-20 32 0 70M15 67h70" fill="none" stroke="#f9d894" stroke-width="10"/><path d="M50 32q24 28 0 70" fill="none" stroke="#f5bd73" stroke-width="8"/></g>}
+            {index === 2 && <g><path d="m24 61 12-25h31l16 26" fill="#c76e54"/><path d="m37 43-8 18h20V43m7 0v18h19L64 43" fill="#c5e3df"/><rect x="8" y="60" width="85" height="30" rx="10" fill="#e58a67"/><rect x="10" y="70" width="10" height="8" rx="2" fill="#fbe9ad"/><circle cx="29" cy="90" r="13" fill="#465a5b"/><circle cx="74" cy="90" r="13" fill="#465a5b"/><circle cx="29" cy="90" r="6" fill="#e8d8b8"/><circle cx="74" cy="90" r="6" fill="#e8d8b8"/></g>}
+            {index === 3 && <g stroke="#587d7b" stroke-width="3"><path d="M50 25V13"/><circle cx="50" cy="10" r="5" fill="#e5af56"/><rect x="23" y="25" width="54" height="39" rx="9" fill="#94b8ab"/><rect x="29" y="65" width="42" height="30" rx="5" fill="#8bab9d"/><path d="M23 72H13v20m58-20h15v20M38 96v12m25-12v12" fill="none" stroke-width="8"/><circle cx="38" cy="43" r="5" fill="#fff5d9"/><circle cx="63" cy="43" r="5" fill="#fff5d9"/><path d="M40 55h20"/><circle cx="50" cy="80" r="6" fill="#edbc62"/></g>}
+            {index === 4 && <g><path d="M50 20v66" stroke="#8c7155" stroke-width="4"/><path d="m45 24-31 48h31z" fill="#f8e8b8"/><path d="m55 36 29 36H55z" fill="#d6a44b"/><path d="M9 81h83l-17 22H27z" fill="#7c9bab"/><path d="M17 87h67" stroke="#c9dfe0" stroke-width="3"/></g>}
+          </svg><span class="tomi-toy-name">{name}</span>
+        </button>)}
+      </div>
+      <div class="tomi-room-label">⌂ {es ? 'La habitación de Tomi' : 'Tomi’s bedroom'}</div>
+      <span class="tomi-car-reward" aria-hidden="true">🚗</span>
+    </div>
+    <section class="tomi-task" aria-labelledby="tomi-question">
+      <div class="tomi-task-heading"><span class="tomi-step" data-tomi-step>1</span><div><p class="tomi-eyebrow" data-tomi-eyebrow>{es ? 'CONTÁ Y ELEGÍ' : 'COUNT AND CHOOSE'}</p><h2 id="tomi-question" data-tomi-question>{es ? '¿Cuántos juguetes hay en el estante?' : 'How many toys are on the shelf?'}</h2></div></div>
+      <p class="tomi-instruction" data-tomi-instruction>{es ? 'Tocá cada juguete una vez. Después elegí el número.' : 'Tap each toy once. Then choose the number.'}</p>
+      <div class="tomi-answers" data-tomi-count-answers>{[4,5,6].map(n => <button type="button" data-tomi-answer={n}>{n}</button>)}</div>
+      <div class="tomi-methods" data-tomi-methods hidden><button type="button" data-tomi-method="mark">✓ {es ? 'Marcar los que ya conté' : 'Mark the toys I counted'}</button><button type="button" data-tomi-method="repeat">↻ {es ? 'Contar el mismo dos veces' : 'Count the same toy twice'}</button></div>
+      <p class="tomi-feedback" data-tomi-feedback role="status" aria-live="polite"></p>
+      <div class="tomi-controls"><button type="button" class="tomi-help" data-tomi-help>☀ {es ? 'Una pista' : 'A little hint'}</button><button type="button" class="tomi-help" data-tomi-reset>{es ? 'Empezar de nuevo' : 'Start again'}</button><button type="button" class="tomi-continue" data-tomi-next hidden>{es ? 'Seguir →' : 'Continue →'}</button><a class="tomi-continue" data-tomi-next-lesson hidden href={buildGradeOneLessonUrl(locale, 'G01-01-L02')}>{es ? 'Preparar la mochila →' : 'Pack the backpack →'}</a></div>
+    </section>
+  </div>
+  <div class="tomi-bottom"><span>♡ {es ? 'Sin apuro. Cada intento ayuda.' : 'Take your time. Every try helps.'}</span><span>{es ? 'Nuestra misión: preparar el autito para salir.' : 'Our mission: get the toy car ready to go.'}</span></div>
+  <details class="tomi-adult"><summary>{es ? 'Para acompañar en casa' : 'For a grown-up'}</summary><p>{es ? 'Practicamos contar cada objeto una sola vez y reconocer el total. Invitá al niño a contar seis objetos reales y explicar cómo evitó repetirlos. Esta primera escena se puede repetir; no guarda progreso ni otorga puntos de dominio.' : 'We practice counting each object once and recognizing the total. Invite your child to count six real objects and explain how they avoided counting twice. This first scene can be replayed; it does not save progress or award mastery points.'}</p></details>
+  <noscript><p>{es ? 'Activá JavaScript para jugar. También podés contar los cinco juguetes con un adulto.' : 'Enable JavaScript to play. You can also count the five toys with a grown-up.'}</p></noscript>
+</article>
+<script>import '../../scripts/tomiFirstAdventure';</script>

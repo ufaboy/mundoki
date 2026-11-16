@@ -1,0 +1,63 @@
+---
+// Story hero drawing. Skin and hair colours come from CSS variables set by
+// `data-hero-skin` on any ancestor, so one static page serves every choice.
+//   hero="auto"  draws both heroes; CSS shows the one in `data-hero` on <html>
+//   hero="tomi" | "lola"  always draws that hero (used in the picker)
+import type { HeroId } from '../../content/heroes';
+
+interface Props {
+  hero?: HeroId | 'auto';
+  class?: string;
+}
+
+const { hero = 'auto', class: className } = Astro.props;
+const auto = hero === 'auto';
+const showTomi = auto || hero === 'tomi';
+const showLola = auto || hero === 'lola';
+---
+
+{showTomi && (
+  <svg class:list={['hero-art', className, { 'hero-only hero-only--tomi': auto }]} viewBox="0 0 220 290" aria-hidden="true">
+    <ellipse cx="109" cy="278" rx="64" ry="9" fill="#9f855e" opacity=".2" />
+    <path class="hero-skin-3" d="m77 214-3 48h26l9-45m9-1 6 47h25l-7-52" />
+    <path d="M69 260h32v15H59q-4-12 10-15m55 0h26q15 4 15 15h-41" fill="#5a7058" />
+    <path d="m70 184 1 47h35l5-21 6 21h33l-4-48" fill="#657d92" />
+    <path class="hero-limb" d="m70 134-24 43q-6 15 5 19 10 4 16-10l17-28m55-23 26 34q8 11 17 2l15-21" fill="none" stroke-width="20" stroke-linecap="round" />
+    <path d="M80 121q30-15 58 0l16 68q-44 15-86 0z" fill="#d5a844" />
+    <path d="M91 125q17 18 34 0" fill="none" stroke="#f1cc76" stroke-width="5" />
+    <path d="m107 153 4-9 4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7z" fill="#fff0bc" />
+    <ellipse class="hero-skin-2" cx="65" cy="83" rx="12" ry="16" />
+    <ellipse class="hero-skin-2" cx="151" cy="83" rx="12" ry="16" />
+    <rect class="hero-skin" x="67" y="31" width="84" height="91" rx="39" />
+    <path class="hero-hair" d="M65 77q-15-57 24-63 10-18 25-6 36-9 43 21 10 24-7 47l-8-30q-24 9-45-8-5 22-30 22z" />
+    <path class="hero-eyes" d="M85 77h7m32 0h7" stroke-width="5" stroke-linecap="round" />
+    <path class="hero-mouth" d="M102 97q9 9 18-1" fill="none" stroke-width="4" stroke-linecap="round" />
+    <ellipse class="hero-blush" cx="83" cy="94" rx="9" ry="5" />
+    <ellipse class="hero-blush" cx="135" cy="94" rx="9" ry="5" />
+  </svg>
+)}
+
+{showLola && (
+  <svg class:list={['hero-art', className, { 'hero-only hero-only--lola': auto }]} viewBox="0 0 220 290" aria-hidden="true">
+    <ellipse cx="109" cy="278" rx="64" ry="9" fill="#9f855e" opacity=".2" />
+    <path class="hero-skin-3" d="m77 214-3 48h26l9-45m9-1 6 47h25l-7-52" />
+    <path d="M69 260h32v15H59q-4-12 10-15m55 0h26q15 4 15 15h-41" fill="#b4566e" />
+    <path d="m70 182-8 50h95l-7-50z" fill="#6b5aa6" />
+    <path class="hero-limb" d="m70 134-24 43q-6 15 5 19 10 4 16-10l17-28m55-23 26 34q8 11 17 2l15-21" fill="none" stroke-width="20" stroke-linecap="round" />
+    <path d="M80 121q30-15 58 0l16 68q-44 15-86 0z" fill="#3f9c8f" />
+    <path d="M91 125q17 18 34 0" fill="none" stroke="#8fd6c9" stroke-width="5" />
+    <path d="M110 170q-16-11-11-21 5-7 11 0 6-7 11 0 5 10-11 21z" fill="#e6fff8" />
+    <path class="hero-hair" d="M66 58q-34 6-32 50 2 20 14 16 12-4 10-22-2-16 10-30z" />
+    <path class="hero-hair" d="M152 58q34 6 32 50-2 20-14 16-12-4-10-22 2-16-10-30z" />
+    <ellipse class="hero-skin-2" cx="65" cy="83" rx="12" ry="16" />
+    <ellipse class="hero-skin-2" cx="151" cy="83" rx="12" ry="16" />
+    <rect class="hero-skin" x="67" y="31" width="84" height="91" rx="39" />
+    <path class="hero-hair" d="M63 82q-14-66 46-68 60 2 46 68l-9-26q-26 6-46-12-8 24-30 24z" />
+    <circle cx="60" cy="62" r="7" fill="#e8607a" />
+    <circle cx="158" cy="62" r="7" fill="#e8607a" />
+    <path class="hero-eyes" d="M85 77h7m32 0h7" stroke-width="5" stroke-linecap="round" />
+    <path class="hero-mouth" d="M102 97q9 9 18-1" fill="none" stroke-width="4" stroke-linecap="round" />
+    <ellipse class="hero-blush" cx="83" cy="94" rx="9" ry="5" />
+    <ellipse class="hero-blush" cx="135" cy="94" rx="9" ry="5" />
+  </svg>
+)}

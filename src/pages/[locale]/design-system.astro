@@ -1,0 +1,393 @@
+---
+import DesignHead from '../../components/shared/DesignHead.astro';
+import HeroText from '../../components/shared/HeroText.astro';
+import MascotSvg from '../../components/play/MascotSvg.astro';
+import HeroCharacter from '../../components/shared/HeroCharacter.astro';
+import { HEROES, HERO_SKINS, DEFAULT_HERO, type HeroId } from '../../content/heroes';
+import { normalizeUrlLocale } from '../../i18n/routes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: { locale: 'es-ar' } }, { params: { locale: 'en-us' } }];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const es = locale === 'es-AR';
+const L = (esText: string, enText: string) => (es ? esText : enText);
+const otherHref = es ? '/en-us/design-system' : '/es-ar/design-system';
+
+const icons = {
+  star: 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z',
+  check: 'M5 12.5l4.5 4.5L19 7.5',
+  play: 'M8 5.5v13l11-6.5z',
+  home: 'M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z',
+  chart: 'M5 20v-9M12 20V4M19 20v-6',
+  retry: 'M4 12a8 8 0 1 0 2.6-5.9M4 4v4.5h4.5',
+  hint: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z',
+  lock: 'M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3',
+  arrow: 'M5 12h14M13 6l6 6-6 6',
+  sound: 'M4 10v4h4l5 4V6l-5 4zM16.5 9a4 4 0 0 1 0 6',
+  user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0',
+};
+
+const stages = [
+  { id: '1', label: L('1.º–3.º grado', 'Grades 1–3') },
+  { id: '2', label: L('4.º–7.º grado', 'Grades 4–7') },
+  { id: '3', label: L('Secundaria', 'Secondary') },
+];
+
+const principles = [
+  { n: '1', title: L('Una pantalla, una tarea', 'One screen, one task'), text: L('Un solo botón principal.', 'Only one main button.') },
+  { n: '2', title: L('Primero el dibujo', 'Picture first'), text: L('Las palabras ayudan, no mandan.', 'Words help. They do not lead.') },
+  { n: '3', title: L('Nada chiquito', 'Nothing small'), text: L('Texto de 18 px o más para chicos.', 'Text is 18 px or more for kids.') },
+  { n: '4', title: L('Equivocarse está bien', 'Mistakes are fine'), text: L('Decimos «probá otra vez», nunca «mal».', 'We say "try again", never "wrong".') },
+];
+
+const colors = [
+  { name: 'Sky', role: L('Acción principal', 'Main action'), bg: 'var(--mk-sky)', fg: '#fff' },
+  { name: 'Leaf', role: L('Correcto, listo', 'Correct, done'), bg: 'var(--mk-leaf)', fg: '#fff' },
+  { name: 'Sun', role: L('Estrellas y premios', 'Stars and rewards'), bg: 'var(--mk-sun)', fg: 'var(--mk-ink)' },
+  { name: 'Coral', role: L('Probá otra vez', 'Try again'), bg: 'var(--mk-coral)', fg: '#fff' },
+  { name: 'Grape', role: 'Premium', bg: 'var(--mk-grape)', fg: '#fff' },
+  { name: 'Ink', role: L('Texto', 'Text'), bg: 'var(--mk-ink)', fg: '#fff' },
+  { name: 'Canvas', role: L('Fondo', 'Background'), bg: 'var(--mk-canvas)', fg: 'var(--mk-ink)' },
+  { name: 'Sunk', role: L('Fondo hundido', 'Sunk background'), bg: 'var(--mk-sunk)', fg: 'var(--mk-ink)' },
+];
+
+const heroIds = Object.keys(HEROES) as HeroId[];
+const skinLabels = {
+  light: L('Piel clara', 'Light skin'),
+  brown: L('Piel morena', 'Brown skin'),
+  dark: L('Piel oscura', 'Dark skin'),
+};
+const heroTemplates = [
+  L('{name} está {listo|lista} para jugar.', '{name} is ready to play.'),
+  L('{name} dibuja un signo + en su cuaderno.', '{name} draws a + sign in {his|her} notebook.'),
+];
+
+const tiles = [
+  { art: '1 2 3', title: L('Contar hasta 20', 'Count to 20'), state: 'done', stars: 3 },
+  { art: '+', title: L('Sumar', 'Add'), state: 'now', stars: 1 },
+  { art: '−', title: L('Restar', 'Subtract'), state: 'locked', stars: 0 },
+];
+
+const results = [
+  { topic: L('Sumar', 'Add'), done: '18 / 20', pct: 90 },
+  { topic: L('Restar', 'Subtract'), done: '11 / 20', pct: 55 },
+  { topic: L('Medir', 'Measure'), done: '4 / 20', pct: 20 },
+];
+---
+
+<!doctype html>
+<html lang={locale} class="mk-root">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <DesignHead />
+    <title>{L('Sistema de diseño', 'Design system')} | Mundoki</title>
+    <style>
+      .ds-swatch { display:flex; flex-direction:column; justify-content:flex-end; min-height:7rem; padding:var(--mk-s4); border-radius:var(--mk-radius); border:var(--mk-border) solid var(--mk-line); }
+      .ds-swatch strong { font-weight:var(--mk-weight-display); }
+      .ds-swatch span { font-size:var(--mk-text-label); font-weight:var(--mk-weight-strong); }
+      .ds-num { display:grid; place-items:center; width:var(--mk-control); height:var(--mk-control); border-radius:var(--mk-radius-pill); background:var(--mk-sun); font-weight:var(--mk-weight-display); flex:none; }
+      .ds-type { display:grid; grid-template-columns:minmax(6rem,10rem) 1fr; gap:var(--mk-s4); align-items:baseline; padding:var(--mk-s3) 0; border-bottom:var(--mk-border) solid var(--mk-line); }
+      .ds-type:last-child { border-bottom:0; }
+      .ds-mascot { flex:none; }
+      .ds-exercise { max-width:40rem; margin:0 auto; width:100%; }
+      @media (max-width:560px) { .ds-type { grid-template-columns:1fr; gap:0; } .ds-mascot { display:none; } .mk-bubble::before { display:none; } }
+    </style>
+  </head>
+  <body class="mk-body mk-ui">
+    <header class="mk-topbar">
+      <a class="mk-brand" href={es ? '/es-ar/' : '/en-us/'}>
+        <span class="mk-brand__mark" aria-hidden="true">★</span>
+        Mundoki
+      </a>
+      <a class="mk-btn mk-btn--quiet" href={otherHref} hreflang={es ? 'en-US' : 'es-AR'}>{es ? 'English' : 'Español'}</a>
+    </header>
+
+    <main class="mk-page mk-stack mk-stack--loose">
+      <section class="mk-stack">
+        <h1 class="mk-display">{L('Sistema de diseño', 'Design system')}</h1>
+        <p class="mk-text">{L('Todo tiene un solo tamaño. Solo la lección cambia con el grado.', 'Everything has one size. Only the lesson changes with the grade.')}</p>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-rules">
+        <h2 class="mk-title" id="ds-rules">{L('Reglas', 'Rules')}</h2>
+        <div class="mk-grid">
+          {principles.map((rule) => (
+            <div class="mk-card mk-row" style="flex-wrap:nowrap;align-items:flex-start;">
+              <span class="ds-num" aria-hidden="true">{rule.n}</span>
+              <div class="mk-stack mk-stack--tight">
+                <h3 class="mk-heading">{rule.title}</h3>
+                <p class="mk-text">{rule.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-colors">
+        <h2 class="mk-title" id="ds-colors">{L('Colores', 'Colours')}</h2>
+        <div class="mk-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));">
+          {colors.map((color) => (
+            <div class="ds-swatch" style={`background:${color.bg};color:${color.fg};`}>
+              <strong>{color.name}</strong>
+              <span>{color.role}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-type">
+        <h2 class="mk-title" id="ds-type">{L('Letras', 'Type')}</h2>
+        <div class="mk-card">
+          <div class="ds-type"><span class="mk-label">Display</span><span class="mk-display">{L('¡Hola, Tomi!', 'Hi, Tomi!')}</span></div>
+          <div class="ds-type"><span class="mk-label">Title</span><span class="mk-title">{L('Sumar hasta 20', 'Add up to 20')}</span></div>
+          <div class="ds-type"><span class="mk-label">Body</span><span>{L('Contá las manzanas.', 'Count the apples.')}</span></div>
+          <div class="ds-type"><span class="mk-label">Label</span><span class="mk-label">{L('El texto más chico que existe', 'The smallest text there is')}</span></div>
+          <div class="ds-type"><span class="mk-label">Math</span><span class="mk-math">7 + 5 = 12</span></div>
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-buttons">
+        <h2 class="mk-title" id="ds-buttons">{L('Botones', 'Buttons')}</h2>
+        <div class="mk-card mk-stack">
+          <div class="mk-row">
+            <button type="button" class="mk-btn mk-btn--primary">
+              <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.play} /></svg>
+              {L('Jugar', 'Play')}
+            </button>
+            <button type="button" class="mk-btn mk-btn--go">
+              {L('Seguir', 'Next')}
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.arrow} /></svg>
+            </button>
+            <button type="button" class="mk-btn mk-btn--sun">{L('Ver premio', 'See prize')}</button>
+            <button type="button" class="mk-btn">{L('Volver', 'Back')}</button>
+            <button type="button" class="mk-btn" disabled>{L('Bloqueado', 'Locked')}</button>
+            <button type="button" class="mk-btn mk-btn--quiet">{L('Saltar', 'Skip')}</button>
+          </div>
+          <div class="mk-row">
+            <button type="button" class="mk-btn mk-btn--icon" aria-label={L('Escuchar', 'Listen')}>
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.sound} /></svg>
+            </button>
+            <button type="button" class="mk-btn mk-btn--icon" aria-label={L('Pista', 'Hint')}>
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.hint} /></svg>
+            </button>
+            <button type="button" class="mk-btn mk-btn--premium">{L('Hacete Premium', 'Go Premium')}</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-exercise">
+        <h2 class="mk-title" id="ds-exercise">{L('Lección', 'Lesson')}</h2>
+        <div class="mk-row">
+          <div class="mk-tabs" role="group" aria-label={L('Grado de la lección', 'Lesson grade')}>
+            {stages.map((stage) => (
+              <button type="button" data-set-stage={stage.id} aria-pressed={stage.id === '2' ? 'true' : 'false'}>{stage.label}</button>
+            ))}
+          </div>
+        </div>
+        <div class="mk-lesson mk-stack" data-stage="2" data-ds-lesson>
+        <div class="mk-card mk-stack ds-exercise" data-ds-exercise>
+          <ol class="mk-steps" aria-label={L('Paso 3 de 5', 'Step 3 of 5')}>
+            <li class="is-done"></li><li class="is-done"></li><li class="is-now"></li><li></li><li></li>
+          </ol>
+          <div class="mk-question">
+            <div class="mk-row" style="flex-wrap:nowrap;">
+              <div class="ds-mascot"><MascotSvg mood="thinking" size={96} idPrefix="ds-atomo" /></div>
+              <p class="mk-bubble" style="margin:0;">{L('¿Cuánto es?', 'How much is it?')}</p>
+              <button type="button" class="mk-btn mk-btn--icon" aria-label={L('Escuchar', 'Listen')} data-speak={L('¿Cuánto es siete más cinco?', 'How much is seven plus five?')}>
+                <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.sound} /></svg>
+              </button>
+            </div>
+            <p class="mk-math" style="margin:0;">7 + 5</p>
+            <div class="mk-choices">
+              {[11, 12, 13].map((value) => (
+                <button type="button" class="mk-choice" aria-pressed="false" data-correct={value === 12 ? 'true' : 'false'}>
+                  {value}
+                  <svg class="mk-icon mk-icon--correct" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.check} /></svg>
+                  <svg class="mk-icon mk-icon--retry" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.retry} /></svg>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div aria-live="polite" class="mk-stack mk-stack--tight">
+            <div class="mk-feedback mk-feedback--correct" data-ds-feedback="correct" hidden>
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.check} /></svg>
+              <span class="mk-feedback__text">{L('¡Muy bien!', 'Well done!')}</span>
+              <button type="button" class="mk-btn mk-btn--go">{L('Seguir', 'Next')}</button>
+            </div>
+            <div class="mk-feedback mk-feedback--retry" data-ds-feedback="retry" hidden>
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.retry} /></svg>
+              <span class="mk-feedback__text">{L('Casi. Probá otra vez.', 'Almost. Try again.')}</span>
+            </div>
+          </div>
+        </div>
+        <div class="mk-feedback mk-feedback--hint ds-exercise">
+          <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.hint} /></svg>
+          <span class="mk-feedback__text">{L('Pista: 7 + 3 = 10. Te faltan 2.', 'Hint: 7 + 3 = 10. Add 2 more.')}</span>
+        </div>
+        <div class="mk-card mk-card--sky mk-row ds-exercise" style="flex-wrap:nowrap;">
+          <div style="width:5.5rem;flex:none;"><HeroCharacter /></div>
+          <div class="mk-stack mk-stack--tight">
+            {heroTemplates.map((tpl) => (
+              <p class="mk-text"><HeroText text={tpl} /></p>
+            ))}
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-hero">
+        <h2 class="mk-title" id="ds-hero">{L('Tu personaje', 'Your character')}</h2>
+        <div class="mk-card mk-stack">
+          <div class="mk-row" role="group" aria-label={L('Elegí tu personaje', 'Pick your character')}>
+            {heroIds.map((id) => (
+              <button type="button" class="mk-pick" data-hero-pick={id} aria-pressed={id === DEFAULT_HERO.hero ? 'true' : 'false'}>
+                <span class="mk-pick__check" aria-hidden="true"><svg class="mk-icon" viewBox="0 0 24 24"><path d={icons.check} /></svg></span>
+                <HeroCharacter hero={id} />
+                {HEROES[id].name}
+              </button>
+            ))}
+          </div>
+          <div class="mk-row" role="group" aria-label={L('Color de piel', 'Skin colour')}>
+            {HERO_SKINS.map((skin) => (
+              <button type="button" class="mk-swatch" data-hero-skin={skin} data-skin-pick={skin} aria-label={skinLabels[skin]} aria-pressed={skin === DEFAULT_HERO.skin ? 'true' : 'false'}></button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-tiles">
+        <h2 class="mk-title" id="ds-tiles">{L('Lecciones', 'Lessons')}</h2>
+        <div class="mk-grid">
+          {tiles.map((tile) => (
+            <a href="#ds-tiles" class:list={['mk-tile', { 'is-done': tile.state === 'done', 'is-locked': tile.state === 'locked' }]}>
+              <div class="mk-tile__art" aria-hidden="true">
+                {tile.state === 'locked'
+                  ? <svg class="mk-icon" viewBox="0 0 24 24"><path d={icons.lock} /></svg>
+                  : tile.art}
+              </div>
+              <div class="mk-tile__body">
+                <h3 class="mk-heading">{tile.title}</h3>
+                {tile.state === 'locked'
+                  ? <span class="mk-chip">{L('Falta poco', 'Coming up')}</span>
+                  : (
+                    <span class="mk-stars" role="img" aria-label={L(`${tile.stars} de 3 estrellas`, `${tile.stars} of 3 stars`)}>
+                      {[1, 2, 3].map((n) => (
+                        <svg class:list={['mk-icon', { 'is-on': n <= tile.stars }]} viewBox="0 0 24 24" aria-hidden="true"><path d={icons.star} /></svg>
+                      ))}
+                    </span>
+                  )}
+              </div>
+            </a>
+          ))}
+        </div>
+        <div class="mk-row">
+          <span class="mk-chip mk-chip--sun">★ 24</span>
+          <span class="mk-chip mk-chip--leaf">{L('Listo', 'Done')}</span>
+          <span class="mk-chip mk-chip--sky">{L('3.º grado', 'Grade 3')}</span>
+          <span class="mk-chip mk-chip--grape">Premium</span>
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-nav">
+        <h2 class="mk-title" id="ds-nav">{L('Menú', 'Menu')}</h2>
+        <div class="mk-card" style="padding:0;overflow:hidden;">
+          <div class="mk-topbar" style="border-bottom:0;flex-wrap:wrap;">
+            <span class="mk-brand"><span class="mk-brand__mark" aria-hidden="true">★</span>Mundoki</span>
+            <ul class="mk-nav">
+              <li><a href="#ds-nav" aria-current="page"><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.home} /></svg>{L('Inicio', 'Home')}</a></li>
+              <li><a href="#ds-nav"><svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.play} /></svg>{L('Jugar', 'Play')}</a></li>
+              <li><a href="#ds-nav"><svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.star} /></svg>{L('Estrellas', 'Stars')}</a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="mk-stack" aria-labelledby="ds-parents">
+        <h2 class="mk-title" id="ds-parents">{L('Familia', 'Parents')}</h2>
+        <div class="mk-row mk-row--between">
+          <div class="mk-tabs" role="group" aria-label={L('Hijo', 'Child')}>
+            <button type="button" aria-pressed="true">Tomi</button>
+            <button type="button" aria-pressed="false">Lola</button>
+          </div>
+          <span class="mk-chip mk-chip--sky">{L('3.º grado', 'Grade 3')}</span>
+        </div>
+        <div class="mk-grid">
+          <div class="mk-card mk-stat"><span class="mk-stat__value">33</span><span class="mk-label">{L('Ejercicios esta semana', 'Exercises this week')}</span></div>
+          <div class="mk-card mk-stat"><span class="mk-stat__value">82%</span><span class="mk-label">{L('Respuestas correctas', 'Correct answers')}</span></div>
+          <div class="mk-card mk-stat"><span class="mk-stat__value">4</span><span class="mk-label">{L('Días seguidos', 'Days in a row')}</span></div>
+        </div>
+        <div class="mk-card mk-table-wrap">
+          <table class="mk-table">
+            <thead>
+              <tr><th scope="col">{L('Tema', 'Topic')}</th><th scope="col">{L('Avance', 'Progress')}</th><th scope="col" class="is-num">{L('Hechos', 'Done')}</th></tr>
+            </thead>
+            <tbody>
+              {results.map((row) => (
+                <tr>
+                  <td>{row.topic}</td>
+                  <td style="min-width:8rem;"><div class="mk-progress" role="img" aria-label={`${row.pct}%`}><span style={`width:${row.pct}%`}></span></div></td>
+                  <td class="is-num">{row.done}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="mk-grid">
+          <form class="mk-card mk-stack" onsubmit="return false">
+            <h3 class="mk-heading">{L('Crear cuenta', 'Create account')}</h3>
+            <div class="mk-field">
+              <label for="ds-email">Email</label>
+              <input class="mk-input" id="ds-email" type="email" autocomplete="off" placeholder="nombre@mail.com" />
+            </div>
+            <div class="mk-field">
+              <label for="ds-pass">{L('Contraseña', 'Password')}</label>
+              <input class="mk-input" id="ds-pass" type="text" autocomplete="off" aria-invalid="true" aria-describedby="ds-pass-error" />
+              <p class="mk-field__error" id="ds-pass-error">{L('Usá 8 letras o más.', 'Use 8 characters or more.')}</p>
+            </div>
+            <div class="mk-field">
+              <label for="ds-grade">{L('Grado', 'Grade')}</label>
+              <select class="mk-input" id="ds-grade">
+                <option>{L('1.º grado', 'Grade 1')}</option>
+                <option>{L('2.º grado', 'Grade 2')}</option>
+                <option>{L('3.º grado', 'Grade 3')}</option>
+              </select>
+            </div>
+            <label class="mk-check" for="ds-terms">
+              <input type="checkbox" id="ds-terms" />
+              <span>{L('Acepto las reglas', 'I accept the rules')}</span>
+            </label>
+            <button type="submit" class="mk-btn mk-btn--primary mk-btn--wide">{L('Crear cuenta', 'Create account')}</button>
+          </form>
+          <div class="mk-card mk-card--grape mk-stack">
+            <span class="mk-chip mk-chip--grape" style="align-self:flex-start;background:var(--mk-surface);">Premium</span>
+            <div class="mk-stat">
+              <span class="mk-stat__value">{L('$ 4.500', '$4,500')}</span>
+              <span class="mk-label">{L('por mes · cancelás cuando quieras', 'per month · cancel anytime')}</span>
+            </div>
+            <button type="button" class="mk-btn mk-btn--premium mk-btn--wide">{L('Suscribirme', 'Subscribe')}</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mk-footer">
+      <span>Mundoki</span>
+      <a href={otherHref} hreflang={es ? 'en-US' : 'es-AR'}>{es ? 'English' : 'Español'}</a>
+    </footer>
+
+    <script>
+      import { initDesignSystemDemo } from '../../scripts/designSystemDemo';
+      initDesignSystemDemo();
+      import { initListenButtons } from '../../scripts/speech';
+      void initListenButtons();
+      import { initHero } from '../../scripts/heroClient';
+      initHero();
+    </script>
+  </body>
+</html>

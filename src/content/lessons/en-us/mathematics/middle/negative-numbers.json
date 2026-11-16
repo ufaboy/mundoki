@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "middle",
+  "topic": "negative-numbers",
+  "locale": "en-US",
+  "slug": "negative-numbers",
+  "title": "Negative Numbers & Shifts on the Number Line",
+  "summary": "Negative numbers represent values less than zero, such as sub-zero temperatures, underground floors, or depths below sea level.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Pick the starting point and shift on the number line: adding moves right (+) and subtracting moves left (−).",
+  "workedExampleTitle": "Walking the number line: start at −4 and add +7",
+  "workedSteps": [
+    {
+      "title": "Step 1: Locate the starting position",
+      "explanation": "−4 sits 4 steps to the left of 0.",
+      "mathExpression": "\\text{Start: } -4"
+    },
+    {
+      "title": "Step 2: Step back to zero first",
+      "explanation": "Out of the 7 steps to the right, the first 4 steps bring us from −4 right up to 0.",
+      "mathExpression": "-4 + 4 = 0"
+    },
+    {
+      "title": "Step 3: Take the remaining steps past zero",
+      "explanation": "Since we needed to move 7 steps and used 4, we move 3 more steps to the right of 0, landing on +3.",
+      "mathExpression": "-4 + 7 = 3"
+    }
+  ],
+  "whyItWorks": "Every negative number is the mirror opposite of its positive twin across 0. That is why −4 and +4 cancel out to 0.",
+  "commonMistake": {
+    "wrongExample": "Common trap: thinking −8 is greater than −2 because 8 is greater than 2.",
+    "correction": "On the number line, numbers further to the right are always greater. −2 °C is warmer (greater) than −8 °C."
+  },
+  "deepDiveExtra": "Subtracting a negative number, like 5 − (−3), removes a debt of 3: it shifts you right, so 5 − (−3) = 5 + 3 = 8.",
+  "quickChecks": [
+    {
+      "id": "neg-q1",
+      "question": "If you start at −3 and move 4 steps further left (−3 − 4), where do you land?",
+      "options": [
+        { "label": "−7", "value": "-7", "isCorrect": true },
+        { "label": "−1", "value": "-1", "isCorrect": false },
+        { "label": "+7", "value": "7", "isCorrect": false }
+      ],
+      "explanation": "Start 3 units left of 0 and move 4 more units left: you reach −7."
+    },
+    {
+      "id": "neg-q2",
+      "question": "Which temperature is higher (greater)?",
+      "options": [
+        { "label": "−2 °C", "value": "-2", "isCorrect": true },
+        { "label": "−9 °C", "value": "-9", "isCorrect": false }
+      ],
+      "explanation": "−2 is further to the right on the number line (closer to 0) than −9."
+    }
+  ]
+}

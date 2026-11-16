@@ -1,0 +1,76 @@
+---
+import { t } from '../../i18n/translations';
+import { Locale } from '../../math/core/types';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div id="progress-dashboard-root" data-locale={locale} class="stack-lg">
+  <header class="card flex-between">
+    <div>
+      <div class="kicker">
+        {locale === 'es-AR' ? 'Panel de Dominio y Logros' : 'Mastery & Achievements Dashboard'}
+      </div>
+      <h1 class="section-title" style="margin:0;">{t(locale, 'progressTitle')}</h1>
+    </div>
+    <button type="button" class="btn btn-emerald btn-sm" id="btn-prog-sync">
+      ☁ {t(locale, 'playSyncNow')}
+    </button>
+  </header>
+
+  <div id="prog-sync-message" style="display:none;"></div>
+
+  <!-- Summary Metrics -->
+  <section class="grid-2">
+    <div class="card flex-between">
+      <div>
+        <div class="text-xs text-muted">{t(locale, 'progressSolved')}</div>
+        <div class="text-mono font-bold" style="font-size:1.85rem;" id="prog-stat-solved">0</div>
+      </div>
+      <div>
+        <div class="text-xs text-muted">{t(locale, 'progressAccuracy')}</div>
+        <div class="text-mono font-bold" style="font-size:1.85rem;color:var(--accent-emerald);" id="prog-stat-accuracy">
+          100%
+        </div>
+      </div>
+    </div>
+
+    <div class="card flex-between">
+      <div>
+        <div class="text-xs text-muted">{t(locale, 'progressEnergy')}</div>
+        <div class="text-mono font-bold" style="font-size:1.85rem;color:var(--accent-amber);" id="prog-stat-energy">
+          20⚡
+        </div>
+      </div>
+      <div>
+        <div class="text-xs text-muted">{t(locale, 'progressSyncPending')}</div>
+        <div class="text-mono font-bold" style="font-size:1.85rem;" id="prog-stat-pending">0</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Topic Mastery List -->
+  <section class="card stack-md">
+    <h2 class="section-title" style="margin:0;">
+      {locale === 'es-AR' ? 'Progreso por Tema y Guardián' : 'Topic & Guardian Mastery'}
+    </h2>
+    <div id="prog-topics-list" class="grid-2"></div>
+  </section>
+
+  <!-- Unlocked Spacecraft & Cosmetics -->
+  <section class="card stack-md">
+    <h2 class="section-title" style="margin:0;">
+      {locale === 'es-AR' ? 'Nave Espacial y Recompensas Desbloqueadas' : 'Spacecraft & Unlocked Rewards'}
+    </h2>
+    <div id="prog-rewards-list" class="grid-3"></div>
+  </section>
+</div>
+
+<script>
+  import { initProgressDashboard } from '../../scripts/progressClient';
+  initProgressDashboard();
+</script>

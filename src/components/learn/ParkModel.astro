@@ -1,0 +1,17 @@
+---
+import type {Locale} from '../../math/core/types';
+import {PARK_MODELS} from '../../content/grade7/parkModels';
+const {locale,lessonId,question}=Astro.props as {locale:Locale;lessonId:string;question:number};
+const es=locale==='es-AR';const data=PARK_MODELS[lessonId]?.[question];
+const squares=lessonId==='G07-04-L01'?(question===0?4:2):lessonId==='G07-04-L02'&&question===0?12:lessonId==='G07-04-L03'&&question===0?6:0;
+const tiles=lessonId==='G07-07-L02'&&question===0?3:lessonId==='G07-11-L03'&&question===0?2:0;
+const rectangles=lessonId==='G07-07-L03'?(question===0?[[3,4],[2,6]]:[[6,4],[8,2]]):[];
+---
+{data&&<figure class="park-model" data-park-model data-solved="false"><figcaption>{es?'Datos de este desafío':'This challenge’s data'}</figcaption>
+<div class="park-data">{data.map(value=><span>{value[locale]}</span>)}</div>
+{squares>0&&<svg viewBox={`0 0 ${Math.max(280,squares*40+40)} 100`} role="img" aria-label={es?`${squares} cuadrados con lados compartidos`:`${squares} squares sharing sides`}><g stroke="#345951" stroke-width="4" fill="none">{Array.from({length:squares},(_,i)=><path d={`M${20+i*40} 25h40m-40 40h40`}/>)}{Array.from({length:squares+1},(_,i)=><path d={`M${20+i*40} 25v40`}/>)}</g></svg>}
+{tiles>0&&<svg viewBox="0 0 360 200" role="img" aria-label={es?`${tiles} filas de ${tiles} copias del rectángulo original`:`${tiles} rows of ${tiles} copies of the original rectangle`}><rect x="20" y="55" width="55" height="35" fill="#efc773" stroke="#345951"/>{Array.from({length:tiles*tiles},(_,i)=><rect x={140+(i%tiles)*55} y={35+Math.floor(i/tiles)*35} width="55" height="35" fill="#efc773" stroke="#345951"/>)}<text x="20" y="140">×{tiles} →</text></svg>}
+{rectangles.length>0&&<svg viewBox="0 0 440 210" role="img" aria-label={es?'Rectángulos dibujados a la misma escala':'Rectangles drawn at the same scale'}>{rectangles.map(([w,h],i)=><g><rect x={20+i*220} y="35" width={w*20} height={h*20} fill="#d5dfc6" stroke="#345951" stroke-width="3"/><text x={20+i*220} y="185">{w} × {h}</text></g>)}</svg>}
+{lessonId==='G07-08-L02'&&question===1&&<svg viewBox="0 0 380 145" role="img" aria-label={es?'Tres capas, cada una de dos por dos cubitos':'Three layers, each two by two unit cubes'}>{[0,1,2].map(layer=><g>{[0,1,2,3].map(i=><rect x={25+layer*120+(i%2)*32} y={20+Math.floor(i/2)*32} width="32" height="32" fill="#d5dfc6" stroke="#345951"/>)}<text x={25+layer*120} y="115">{es?'Capa':'Layer'} {layer+1}</text></g>)}</svg>}
+{lessonId==='G07-10-L02'&&<svg viewBox="0 0 280 90" role="img" aria-label={es?'Tres fichas rojas y una azul':'Three red counters and one blue'}>{[0,1,2,3].map(i=><g><circle cx={40+i*65} cy="40" r="24" fill={i===3?'#bad9ed':'#edb7a6'} stroke="#345951"/><text x={32+i*65} y="46">{i===3?(es?'A':'B'):'R'}</text></g>)}</svg>}
+</figure>}

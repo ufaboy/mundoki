@@ -1,0 +1,41 @@
+{
+  "name": "mundoki",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
+    "start": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
+    "build": "node scripts/astro-cli.mjs build",
+    "build:worker": "node scripts/cf-cli.mjs build",
+    "preview": "node scripts/astro-cli.mjs preview --port 3000 --host 0.0.0.0",
+    "preview:worker": "node scripts/cf-cli.mjs preview --port 3000 --host 0.0.0.0",
+    "deploy": "npm run build:worker && wrangler deploy",
+    "deploy:check": "npm run build:worker && wrangler deploy --dry-run",
+    "cf:types": "wrangler types worker-configuration.d.ts --strict-vars=false",
+    "db:migrate:local": "wrangler d1 migrations apply mundoki-d1 --local",
+    "db:migrate:remote": "wrangler d1 migrations apply mundoki-d1 --remote",
+    "test": "tsx src/tests/runCliTests.ts && tsx src/tests/securityRegression.ts && tsx src/tests/promoSuite.ts",
+    "clean": "rm -rf dist .astro",
+    "lint": "tsc --noEmit",
+    "promo:deploy:check": "wrangler deploy --config wrangler.promo.jsonc --dry-run",
+    "promo:deploy": "wrangler deploy --config wrangler.promo.jsonc"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.4.7",
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@types/katex": "^0.16.8",
+    "astro": "^7.4.11",
+    "better-auth": "^1.7.21",
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.11",
+    "drizzle-orm": "^0.45.4",
+    "katex": "^0.19.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.160.0"
+  }
+}

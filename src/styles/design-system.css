@@ -1,0 +1,1501 @@
+/*
+ * Mundoki Design System — tokens + base components (native CSS, no frameworks).
+ *
+ * Everything is namespaced `--mk-*` / `.mk-*` so it can live next to the legacy
+ * rules in global.css while pages are migrated one by one.
+ *
+ * Sizes use `--mk-rem` (= 1rem on new pages, root 100%). Legacy pages keep an
+ * 18px root, so there `--mk-rem` is scaled back (`html.mk-legacy`): the header,
+ * menu and footer are pixel-identical on old and new pages. Write sizes as
+ * `calc(N * var(--mk-rem))`, never bare rem.
+ *
+ * Scope: `.mk-ui` turns the system on for an element and everything inside it
+ * (font, focus ring, hover rules). `.mk-body` is the page background.
+ *
+ * One fixed size for everything shared: header, menu, footer, catalog, account,
+ * payment and the parent area never change size, so nothing jumps between pages.
+ *
+ * Only lesson content is sized by age. Wrap it in `.mk-lesson` and set the stage
+ * on that wrapper (the server knows the grade from the URL):
+ *   <div class="mk-lesson" data-stage="1">   Grades 1–3   biggest, fewest words
+ *   <div class="mk-lesson" data-stage="2">   Grades 4–7   same as the shared size
+ *   <div class="mk-lesson" data-stage="3">   Grades 8–12  calmer, denser
+ * `data-stage` does nothing outside `.mk-lesson`.
+ *
+ * Mobile first: the base styles are for a phone held upright. Wider layouts
+ * are added with `min-width` queries only — never `max-width`.
+ *
+ * Hard rules:
+ *   - Anything you can tap is at least 44px tall and wide (56px for main actions).
+ *   - No text below --mk-text-label. There is no "caption" or "small" size.
+ *   - One primary button per screen.
+ *   - State is never shown by colour alone: always colour + icon (+ word).
+ */
+
+:root {
+  --mk-rem: 1rem;
+
+  /* ---------- Colour: surfaces & ink ---------- */
+  --mk-canvas: #FFF8EC;
+  --mk-surface: #FFFFFF;
+  --mk-sunk: #FBEFD9;
+  --mk-ink: #1C2443;
+  --mk-ink-soft: #4B5475;
+  --mk-line: #EADFCB;
+  --mk-line-strong: #878DA6;
+
+  /* ---------- Colour: brand hues (base / pressed edge / tint) ---------- */
+  --mk-sky: #0B79C4;
+  --mk-sky-deep: #075A94;
+  --mk-sky-tint: #E1F2FF;
+
+  --mk-sun: #FFC933;
+  --mk-sun-deep: #D99B00;
+  --mk-sun-tint: #FFF3C9;
+  --mk-sun-ink: #8A5A00;
+
+  --mk-leaf: #15803D;
+  --mk-leaf-deep: #0F5C2C;
+  --mk-leaf-tint: #DDF7E6;
+
+  --mk-coral: #C2410C;
+  --mk-coral-deep: #8F2F08;
+  --mk-coral-tint: #FFE8D9;
+
+  --mk-grape: #6D43D0;
+  --mk-grape-deep: #4E2CA3;
+  --mk-grape-tint: #EEE7FF;
+
+  --mk-danger: #C92A2A;
+
+  /* ---------- Colour: meaning (use these in components) ---------- */
+  --mk-action: var(--mk-sky);          /* the one main thing to press */
+  --mk-success: var(--mk-leaf);        /* correct, done */
+  --mk-retry: var(--mk-coral);         /* "try again" — never red, never "wrong" */
+  --mk-reward: var(--mk-sun);          /* stars, streaks, prizes */
+  --mk-premium: var(--mk-grape);       /* subscription */
+
+  /* ---------- Type ---------- */
+  --mk-font: 'Nunito Variable', 'Nunito', 'Nunito Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mk-font-math: 'Nunito Variable', 'Nunito', ui-rounded, system-ui, sans-serif;
+  --mk-weight-body: 600;
+  --mk-weight-strong: 800;
+  --mk-weight-display: 900;
+
+  /* ---------- Space (4px grid) ---------- */
+  --mk-s1: calc(0.25 * var(--mk-rem));
+  --mk-s2: calc(0.5 * var(--mk-rem));
+  --mk-s3: calc(0.75 * var(--mk-rem));
+  --mk-s4: calc(1 * var(--mk-rem));
+  --mk-s5: calc(1.5 * var(--mk-rem));
+  --mk-s6: calc(2 * var(--mk-rem));
+  --mk-s7: calc(3 * var(--mk-rem));
+  --mk-s8: calc(4 * var(--mk-rem));
+
+  /* ---------- Shape & motion ---------- */
+  --mk-radius-pill: 999px;
+  --mk-border: 2px;
+  --mk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-fast: 120ms;
+  --mk-shadow-card: 0 2px 0 var(--mk-line), 0 10px 24px rgba(28, 36, 67, 0.06);
+
+  --mk-page-max: calc(65 * var(--mk-rem));
+}
+
+/* ---------- Shared size (all common UI) = lesson stage 2 (Grades 4–7) ---------- */
+:root,
+.mk-lesson[data-stage='2'] {
+  --mk-text-label: calc(1.125 * var(--mk-rem));                      /* 18px — smallest text allowed */
+  --mk-text-body: calc(1.25 * var(--mk-rem));                        /* 20px */
+  --mk-text-title: calc(1.75 * var(--mk-rem));                       /* 28px */
+  --mk-text-display: clamp(calc(2.25 * var(--mk-rem)), 5vw, calc(3 * var(--mk-rem)));   /* 36–48px */
+  --mk-text-math: calc(2.25 * var(--mk-rem));                        /* numbers in exercises */
+  --mk-leading: 1.5;
+  --mk-control: calc(3.5 * var(--mk-rem));                           /* 56px button / input height */
+  --mk-radius: 20px;
+  --mk-radius-sm: 14px;
+  --mk-press: 5px;                                /* depth of the 3D button edge */
+  --mk-gap: var(--mk-s5);
+  --mk-pad: var(--mk-s5);
+}
+
+/* ---------- Lesson stage 1 (Grades 1–3) ---------- */
+.mk-lesson[data-stage='1'] {
+  --mk-text-label: calc(1.25 * var(--mk-rem));                       /* 20px */
+  --mk-text-body: calc(1.375 * var(--mk-rem));                       /* 22px */
+  --mk-text-title: calc(2 * var(--mk-rem));                          /* 32px */
+  --mk-text-display: clamp(calc(2.5 * var(--mk-rem)), 6vw, calc(3.5 * var(--mk-rem)));  /* 40–56px */
+  --mk-text-math: calc(3 * var(--mk-rem));
+  --mk-leading: 1.45;
+  --mk-control: calc(4 * var(--mk-rem));                             /* 64px */
+  --mk-radius: 28px;
+  --mk-radius-sm: 18px;
+  --mk-press: 6px;
+  --mk-gap: var(--mk-s6);
+  --mk-pad: var(--mk-s5);
+  --mk-weight-body: 700;
+}
+
+/* ---------- Lesson stage 3 (Grades 8–12) ---------- */
+.mk-lesson[data-stage='3'] {
+  --mk-text-label: calc(1 * var(--mk-rem));                          /* 16px — absolute floor */
+  --mk-text-body: calc(1.125 * var(--mk-rem));                       /* 18px */
+  --mk-text-title: calc(1.5 * var(--mk-rem));                        /* 24px */
+  --mk-text-display: clamp(calc(2 * var(--mk-rem)), 4vw, calc(2.5 * var(--mk-rem)));    /* 32–40px */
+  --mk-text-math: calc(1.75 * var(--mk-rem));
+  --mk-leading: 1.55;
+  --mk-control: calc(3 * var(--mk-rem));                             /* 48px */
+  --mk-radius: 14px;
+  --mk-radius-sm: 10px;
+  --mk-press: 3px;
+  --mk-gap: var(--mk-s4);
+  --mk-pad: var(--mk-s5);
+  --mk-weight-body: 500;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/* Stand-in shown while Nunito loads, stretched to Nunito's width and height
+   so text does not move when the real font arrives. */
+@font-face {
+  font-family: 'Nunito Fallback';
+  src: local('Arial'), local('Roboto'), local('Helvetica Neue');
+  font-weight: 100 900;
+  size-adjust: 102.5%;
+  ascent-override: 98.5%;
+  descent-override: 34.1%;
+  line-gap-override: 0%;
+}
+
+.mk-root {
+  font-size: 100%;
+}
+
+/* Legacy pages (global.css) run on an 18px root: undo it for this system. */
+:root.mk-legacy {
+  --mk-rem: 0.888889rem;
+}
+
+/* Lesson content: the only place where sizes follow the grade. */
+.mk-lesson {
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-body);
+  line-height: var(--mk-leading);
+}
+
+.mk-body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--mk-canvas);
+  -webkit-text-size-adjust: 100%;
+}
+
+.mk-ui {
+  color: var(--mk-ink);
+  font-family: var(--mk-font);
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-body);
+  line-height: var(--mk-leading);
+}
+
+.mk-ui,
+.mk-ui::before,
+.mk-ui::after {
+  box-sizing: border-box;
+}
+
+.mk-ui *,
+.mk-ui *::before,
+.mk-ui *::after {
+  box-sizing: border-box;
+}
+
+.mk-ui [hidden] {
+  display: none !important;
+}
+
+.mk-ui :focus-visible {
+  outline: 4px solid var(--mk-ink);
+  outline-offset: 3px;
+  border-radius: var(--mk-radius-sm);
+}
+
+.mk-display,
+.mk-title,
+.mk-heading {
+  margin: 0;
+  color: var(--mk-ink);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.mk-display {
+  font-size: var(--mk-text-display);
+  font-weight: var(--mk-weight-display);
+  letter-spacing: -0.01em;
+}
+
+.mk-title {
+  font-size: var(--mk-text-title);
+  font-weight: var(--mk-weight-display);
+}
+
+.mk-heading {
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-text {
+  margin: 0;
+  max-width: 34em;
+}
+
+.mk-label {
+  margin: 0;
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  color: var(--mk-ink-soft);
+}
+
+.mk-math {
+  font-family: var(--mk-font-math);
+  font-size: var(--mk-text-math);
+  font-weight: var(--mk-weight-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.mk-icon {
+  width: 1.4em;
+  height: 1.4em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mk-icon--fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* ---------- Layout helpers ---------- */
+
+.mk-page {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: var(--mk-page-max);
+  margin: 0 auto;
+  padding: var(--mk-s5) var(--mk-s4) var(--mk-s8);
+}
+
+.mk-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-gap);
+}
+
+.mk-stack--tight {
+  gap: var(--mk-s3);
+}
+
+.mk-stack--loose {
+  gap: var(--mk-s7);
+}
+
+.mk-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mk-s4);
+}
+
+.mk-row--between {
+  justify-content: space-between;
+}
+
+.mk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(15 * var(--mk-rem))), 1fr));
+  gap: var(--mk-gap);
+}
+
+/* ==========================================================================
+   Button — a chunky key you can press
+   ========================================================================== */
+
+.mk-btn {
+  --_bg: var(--mk-surface);
+  --_fg: var(--mk-ink);
+  --_edge: var(--mk-line-strong);
+  --_line: var(--mk-line-strong);
+  /* Hover look of the plain (white) button; coloured variants reset these. */
+  --_bg-h: var(--mk-sky-tint);
+  --_edge-h: var(--mk-sky);
+  --_line-h: var(--mk-sky);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-s3);
+  min-height: var(--mk-control);
+  min-width: var(--mk-control);
+  padding: 0 calc(var(--mk-control) * 0.45);
+  border: var(--mk-border) solid var(--_line);
+  border-radius: var(--mk-radius);
+  background: var(--_bg);
+  color: var(--_fg);
+  font: inherit;
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-strong);
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 var(--mk-press) 0 var(--_edge);
+  margin-bottom: var(--mk-press);
+  transition: transform var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease),
+    filter var(--mk-fast) var(--mk-ease);
+  touch-action: manipulation;
+}
+
+
+.mk-btn:active,
+.mk-btn.is-pressed {
+  transform: translateY(var(--mk-press));
+  box-shadow: 0 0 0 var(--_edge);
+}
+
+.mk-btn:disabled,
+.mk-btn[aria-disabled='true'] {
+  --_bg: var(--mk-sunk);
+  --_fg: var(--mk-ink-soft);
+  --_edge: var(--mk-line);
+  --_line: var(--mk-line);
+  cursor: not-allowed;
+  filter: none;
+}
+
+.mk-btn[aria-disabled='true']:active {
+  transform: none;
+  box-shadow: 0 var(--mk-press) 0 var(--_edge);
+}
+
+.mk-btn--primary {
+  --_bg-h: initial;
+  --_edge-h: initial;
+  --_line-h: initial;
+  --_bg: var(--mk-sky);
+  --_fg: #FFFFFF;
+  --_edge: var(--mk-sky-deep);
+  --_line: var(--mk-sky);
+}
+
+.mk-btn--go {
+  --_bg-h: initial;
+  --_edge-h: initial;
+  --_line-h: initial;
+  --_bg: var(--mk-leaf);
+  --_fg: #FFFFFF;
+  --_edge: var(--mk-leaf-deep);
+  --_line: var(--mk-leaf);
+}
+
+.mk-btn--sun {
+  --_bg-h: initial;
+  --_edge-h: initial;
+  --_line-h: initial;
+  --_bg: var(--mk-sun);
+  --_fg: var(--mk-ink);
+  --_edge: var(--mk-sun-deep);
+  --_line: var(--mk-sun);
+}
+
+.mk-btn--premium {
+  --_bg-h: initial;
+  --_edge-h: initial;
+  --_line-h: initial;
+  --_bg: var(--mk-grape);
+  --_fg: #FFFFFF;
+  --_edge: var(--mk-grape-deep);
+  --_line: var(--mk-grape);
+}
+
+/* Quiet: for the second, less important action. No edge, no fill. */
+.mk-btn--quiet {
+  --_line-h: transparent;
+  --_bg: transparent;
+  --_fg: var(--mk-sky-deep);
+  --_line: transparent;
+  box-shadow: none;
+  margin-bottom: 0;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.mk-btn--quiet:active {
+  transform: none;
+}
+
+.mk-btn--wide {
+  width: 100%;
+}
+
+.mk-btn--icon {
+  padding: 0;
+  width: var(--mk-control);
+  border-radius: var(--mk-radius-pill);
+}
+
+/* Read-aloud button while the voice is talking */
+.mk-btn.is-speaking {
+  --_bg: var(--mk-sky-tint);
+  --_fg: var(--mk-sky-deep);
+  --_edge: var(--mk-sky);
+  --_line: var(--mk-sky);
+}
+
+/* ==========================================================================
+   Card
+   ========================================================================== */
+
+.mk-card {
+  background: var(--mk-surface);
+  border: var(--mk-border) solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  padding: var(--mk-pad);
+  box-shadow: var(--mk-shadow-card);
+}
+
+.mk-card--sunk {
+  background: var(--mk-sunk);
+  box-shadow: none;
+}
+
+.mk-card--sky { background: var(--mk-sky-tint); border-color: transparent; box-shadow: none; }
+.mk-card--sun { background: var(--mk-sun-tint); border-color: transparent; box-shadow: none; }
+.mk-card--leaf { background: var(--mk-leaf-tint); border-color: transparent; box-shadow: none; }
+.mk-card--grape { background: var(--mk-grape-tint); border-color: transparent; box-shadow: none; }
+
+/* ---------- Lesson tile: picture first, 1 line of text, progress ---------- */
+
+.mk-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s3);
+  padding: var(--mk-s3);
+  background: var(--mk-surface);
+  border: var(--mk-border) solid var(--mk-line);
+  border-radius: var(--mk-radius);
+  box-shadow: 0 var(--mk-press) 0 var(--mk-line);
+  color: var(--mk-ink);
+  text-decoration: none;
+  transition: transform var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+}
+
+a.mk-tile:active {
+  transform: translateY(var(--mk-press));
+  box-shadow: 0 0 0 var(--mk-line);
+}
+
+.mk-tile__art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-sky-tint);
+  color: var(--mk-sky-deep);
+  font-size: calc(3 * var(--mk-rem));
+  font-weight: var(--mk-weight-display);
+}
+
+.mk-tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s2);
+  padding: 0 var(--mk-s2) var(--mk-s2);
+}
+
+.mk-tile.is-locked .mk-tile__art {
+  background: var(--mk-sunk);
+  color: var(--mk-ink-soft);
+}
+
+.mk-tile.is-done .mk-tile__art {
+  background: var(--mk-leaf-tint);
+  color: var(--mk-leaf-deep);
+}
+
+/* ==========================================================================
+   Progress, stars, steps, chips
+   ========================================================================== */
+
+.mk-progress {
+  height: calc(1 * var(--mk-rem));
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-sunk);
+  border: var(--mk-border) solid var(--mk-line);
+  overflow: hidden;
+}
+
+.mk-progress > span {
+  display: block;
+  height: 100%;
+  min-width: calc(1 * var(--mk-rem));
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-leaf);
+  transition: width 400ms var(--mk-ease);
+}
+
+.mk-stars {
+  display: inline-flex;
+  gap: var(--mk-s1);
+  color: var(--mk-line-strong);
+  font-size: var(--mk-text-body);
+}
+
+.mk-stars .mk-icon {
+  fill: var(--mk-surface);
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.mk-stars .is-on {
+  fill: var(--mk-sun);
+  stroke: var(--mk-sun-deep);
+}
+
+.mk-steps {
+  display: flex;
+  gap: var(--mk-s2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-steps > li {
+  flex: 1;
+  height: calc(0.75 * var(--mk-rem));
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-sunk);
+  border: var(--mk-border) solid var(--mk-line);
+}
+
+.mk-steps > .is-done {
+  background: var(--mk-leaf);
+  border-color: var(--mk-leaf);
+}
+
+.mk-steps > .is-now {
+  background: var(--mk-sun);
+  border-color: var(--mk-sun-deep);
+}
+
+.mk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-s2);
+  padding: var(--mk-s1) var(--mk-s3);
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-sunk);
+  color: var(--mk-ink);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  white-space: nowrap;
+}
+
+.mk-chip--sun { background: var(--mk-sun-tint); }
+.mk-chip--leaf { background: var(--mk-leaf-tint); color: var(--mk-leaf-deep); }
+.mk-chip--sky { background: var(--mk-sky-tint); color: var(--mk-sky-deep); }
+.mk-chip--grape { background: var(--mk-grape-tint); color: var(--mk-grape-deep); }
+
+/* ==========================================================================
+   Exercise: question, answer choices, feedback
+   ========================================================================== */
+
+.mk-question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-gap);
+  text-align: center;
+}
+
+.mk-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(9 * var(--mk-rem))), 1fr));
+  gap: var(--mk-s4);
+  width: 100%;
+}
+
+.mk-choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-s3);
+  min-height: calc(var(--mk-control) * 1.4);
+  padding: var(--mk-s3) var(--mk-s4);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  font: inherit;
+  font-size: var(--mk-text-math);
+  font-weight: var(--mk-weight-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  cursor: pointer;
+  box-shadow: 0 var(--mk-press) 0 var(--mk-line-strong);
+  margin-bottom: var(--mk-press);
+  transition: transform var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+  touch-action: manipulation;
+}
+
+.mk-choice:active {
+  transform: translateY(var(--mk-press));
+  box-shadow: none;
+}
+
+.mk-choice .mk-icon {
+  display: none;
+  font-size: 0.7em;
+}
+
+.mk-choice[aria-pressed='true'] {
+  background: var(--mk-sky-tint);
+  border-color: var(--mk-sky);
+  box-shadow: 0 var(--mk-press) 0 var(--mk-sky);
+}
+
+.mk-choice.is-correct {
+  background: var(--mk-leaf-tint);
+  border-color: var(--mk-leaf);
+  color: var(--mk-leaf-deep);
+  box-shadow: 0 var(--mk-press) 0 var(--mk-leaf);
+}
+
+.mk-choice.is-retry {
+  background: var(--mk-coral-tint);
+  border-color: var(--mk-coral);
+  color: var(--mk-coral-deep);
+  box-shadow: 0 var(--mk-press) 0 var(--mk-coral);
+}
+
+.mk-choice.is-correct .mk-icon--correct,
+.mk-choice.is-retry .mk-icon--retry {
+  display: block;
+}
+
+.mk-feedback {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s4);
+  padding: var(--mk-s4) var(--mk-pad);
+  border-radius: var(--mk-radius);
+  border: var(--mk-border) solid transparent;
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-feedback > .mk-icon {
+  font-size: 1.5em;
+}
+
+.mk-feedback__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.mk-feedback--correct {
+  background: var(--mk-leaf-tint);
+  border-color: var(--mk-leaf);
+  color: var(--mk-leaf-deep);
+}
+
+.mk-feedback--retry {
+  background: var(--mk-coral-tint);
+  border-color: var(--mk-coral);
+  color: var(--mk-coral-deep);
+}
+
+.mk-feedback--hint {
+  background: var(--mk-sun-tint);
+  border-color: var(--mk-sun-ink);
+  color: var(--mk-ink);
+}
+
+/* Mascot speech bubble */
+.mk-bubble {
+  position: relative;
+  padding: var(--mk-s4) var(--mk-s5);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+  border: var(--mk-border) solid var(--mk-ink);
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-bubble::before {
+  content: '';
+  position: absolute;
+  left: -calc(0.6 * var(--mk-rem));
+  top: 50%;
+  width: calc(1 * var(--mk-rem));
+  height: calc(1 * var(--mk-rem));
+  background: inherit;
+  border-left: var(--mk-border) solid var(--mk-ink);
+  border-bottom: var(--mk-border) solid var(--mk-ink);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* ==========================================================================
+   Story hero — drawing, skin tones, picker
+   ========================================================================== */
+
+:root,
+[data-hero-skin='light'] {
+  --hero-skin: #F0BD8E;
+  --hero-skin-2: #E6AC7C;
+  --hero-skin-3: #D49669;
+  --hero-blush: #E9A084;
+  --hero-mouth: #A05A46;
+  --hero-hair: #614637;
+}
+
+[data-hero-skin='brown'] {
+  --hero-skin: #C68C5F;
+  --hero-skin-2: #B97F54;
+  --hero-skin-3: #A97148;
+  --hero-blush: #B56F58;
+  --hero-mouth: #74392C;
+  --hero-hair: #2A211E;
+}
+
+[data-hero-skin='dark'] {
+  --hero-skin: #7E4D30;
+  --hero-skin-2: #72432A;
+  --hero-skin-3: #663B23;
+  --hero-blush: #93533F;
+  --hero-mouth: #3B1C13;
+  --hero-hair: #17110F;
+}
+
+.hero-art { display: block; width: 100%; height: auto; }
+.hero-skin { fill: var(--hero-skin); }
+.hero-skin-2 { fill: var(--hero-skin-2); }
+.hero-skin-3 { fill: var(--hero-skin-3); }
+.hero-limb { stroke: var(--hero-skin-2); }
+.hero-blush { fill: var(--hero-blush); }
+.hero-hair { fill: var(--hero-hair); }
+.hero-eyes { stroke: var(--hero-hair); }
+.hero-mouth { stroke: var(--hero-mouth); }
+
+/* Pictures and texts for every hero are in the page; only the chosen one shows.
+   <html data-hero> is set before first paint, so nothing flashes.
+   Each new hero adds one pair of lines here. */
+:root:not([data-hero='lola']) .hero-only--lola { display: none; }
+[data-hero='lola'] .hero-only--tomi { display: none; }
+
+/* Big picture choice (hero picker) */
+.mk-pick {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-s2);
+  width: min(100%, calc(12 * var(--mk-rem)));
+  padding: var(--mk-s4) var(--mk-s4) var(--mk-s3);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  font: inherit;
+  font-size: var(--mk-text-title);
+  font-weight: var(--mk-weight-display);
+  cursor: pointer;
+  box-shadow: 0 var(--mk-press) 0 var(--mk-line-strong);
+  margin-bottom: var(--mk-press);
+  transition: transform var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+  touch-action: manipulation;
+}
+
+.mk-pick:active {
+  transform: translateY(var(--mk-press));
+  box-shadow: none;
+}
+
+.mk-pick[aria-pressed='true'] {
+  background: var(--mk-sky-tint);
+  border-color: var(--mk-sky);
+  box-shadow: 0 var(--mk-press) 0 var(--mk-sky);
+}
+
+.mk-pick__check {
+  position: absolute;
+  top: var(--mk-s2);
+  right: var(--mk-s2);
+  display: none;
+  place-items: center;
+  width: calc(2.25 * var(--mk-rem));
+  height: calc(2.25 * var(--mk-rem));
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-sky);
+  color: #FFFFFF;
+  font-size: calc(1 * var(--mk-rem));
+}
+
+.mk-pick[aria-pressed='true'] .mk-pick__check {
+  display: grid;
+}
+
+/* Round colour choice (skin tone) */
+.mk-swatch {
+  width: var(--mk-control);
+  height: var(--mk-control);
+  padding: 0;
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius-pill);
+  background: var(--hero-skin);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.mk-swatch[aria-pressed='true'] {
+  border-color: var(--mk-surface);
+  box-shadow: 0 0 0 4px var(--mk-sky);
+}
+
+/* ==========================================================================
+   Navigation — 3 or 4 destinations, icon + word, never a hamburger
+   ========================================================================== */
+
+.mk-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-s4);
+  padding: var(--mk-s3) var(--mk-s4);
+  background: var(--mk-surface);
+  border-bottom: var(--mk-border) solid var(--mk-line);
+}
+
+/* Site header: scrolls away on phones (the docked menu stays), sticks from tablet up. */
+.mk-topbar--site {
+  position: relative;
+  z-index: 30;
+}
+
+@media (min-width: 48rem) {
+  .mk-topbar--site {
+    position: sticky;
+    top: 0;
+  }
+}
+
+/* Phones: the wordmark is smaller and the Familia button shows its icon only. */
+.mk-topbar--site .mk-brand {
+  font-size: calc(1.375 * var(--mk-rem));
+}
+
+.mk-topbar__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mk-topbar--site .mk-btn {
+  padding: 0 var(--mk-s3);
+}
+
+@media (min-width: 30rem) {
+  .mk-topbar--site .mk-brand {
+    font-size: var(--mk-text-title);
+  }
+
+  .mk-topbar__label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .mk-topbar--site .mk-btn {
+    padding: 0 var(--mk-s4);
+  }
+}
+
+.mk-btn.is-current {
+  --_bg: var(--mk-sky-tint);
+  --_fg: var(--mk-sky-deep);
+  --_edge: var(--mk-sky);
+  --_line: var(--mk-sky);
+}
+
+.mk-topbar__nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.mk-skip {
+  position: absolute;
+  top: -100px;
+  left: var(--mk-s4);
+  z-index: 100;
+  padding: var(--mk-s3) var(--mk-s4);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-ink);
+  color: #FFFFFF;
+  font-family: var(--mk-font);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-skip:focus {
+  top: var(--mk-s3);
+}
+
+.mk-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-s3);
+  color: var(--mk-ink);
+  font-size: var(--mk-text-title);
+  font-weight: var(--mk-weight-display);
+  text-decoration: none;
+}
+
+.mk-brand__mark {
+  display: grid;
+  place-items: center;
+  width: calc(2.75 * var(--mk-rem));
+  height: calc(2.75 * var(--mk-rem));
+  border-radius: calc(0.9 * var(--mk-rem));
+  background: var(--mk-sun);
+  box-shadow: 0 3px 0 var(--mk-sun-deep);
+  color: var(--mk-ink);
+  font-size: calc(1.5 * var(--mk-rem));
+}
+
+/* Phone first: a tab bar — equal columns, icon above word. */
+.mk-nav {
+  display: flex;
+  gap: var(--mk-s1);
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-nav > li {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mk-nav a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-height: var(--mk-control);
+  padding: var(--mk-s2) var(--mk-s1);
+  border-radius: var(--mk-radius);
+  color: var(--mk-ink-soft);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+}
+
+.mk-nav a[aria-current='page'] {
+  background: var(--mk-sky-tint);
+  color: var(--mk-sky-deep);
+}
+
+/* The app menu: stuck to the bottom of a phone screen, within thumb reach. */
+.mk-nav--dock {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 40;
+  padding: var(--mk-s2) var(--mk-s2) calc(var(--mk-s2) + env(safe-area-inset-bottom));
+  background: var(--mk-surface);
+  border-top: var(--mk-border) solid var(--mk-line);
+}
+
+/* Keep the end of the page clear of the docked menu. */
+body:has(.mk-nav--dock) {
+  padding-bottom: calc(var(--mk-control) + var(--mk-s6) + env(safe-area-inset-bottom));
+}
+
+/* Tablet and wider: the menu is a row in the header, icon beside word. */
+@media (min-width: 48rem) {
+  .mk-nav {
+    gap: var(--mk-s2);
+    width: auto;
+  }
+
+  .mk-nav > li {
+    flex: none;
+  }
+
+  .mk-nav a {
+    flex-direction: row;
+    gap: var(--mk-s2);
+    padding: 0 var(--mk-s4);
+  }
+
+  .mk-nav--dock {
+    position: static;
+    padding: 0;
+    background: none;
+    border-top: 0;
+  }
+
+  body:has(.mk-nav--dock) {
+    padding-bottom: 0;
+  }
+}
+
+.mk-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-s4);
+  padding: var(--mk-s5) var(--mk-s4);
+  background: var(--mk-surface);
+  border-top: var(--mk-border) solid var(--mk-line);
+  color: var(--mk-ink-soft);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(2.75 * var(--mk-rem));
+  padding: 0 var(--mk-s2);
+  color: var(--mk-sky-deep);
+}
+
+/* Segmented switch (child picker in the parent area) */
+.mk-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--mk-s1);
+  padding: var(--mk-s1);
+  border-radius: var(--mk-radius);
+  background: var(--mk-sunk);
+  border: var(--mk-border) solid var(--mk-line);
+}
+
+.mk-tabs button {
+  min-height: calc(var(--mk-control) - calc(0.75 * var(--mk-rem)));
+  padding: 0 var(--mk-s4);
+  border: 0;
+  border-radius: calc(var(--mk-radius) - calc(0.35 * var(--mk-rem)));
+  background: transparent;
+  color: var(--mk-ink-soft);
+  font: inherit;
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  cursor: pointer;
+}
+
+.mk-tabs button[aria-pressed='true'] {
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  box-shadow: 0 2px 0 var(--mk-line-strong);
+}
+
+/* ==========================================================================
+   Forms (mostly the parent area)
+   ========================================================================== */
+
+.mk-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s2);
+}
+
+.mk-field > label {
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  color: var(--mk-ink);
+}
+
+.mk-input {
+  width: 100%;
+  min-height: var(--mk-control);
+  padding: 0 var(--mk-s4);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  font: inherit;
+  font-size: var(--mk-text-body);
+}
+
+.mk-input:focus-visible {
+  outline: 4px solid var(--mk-sky);
+  outline-offset: 0;
+  border-color: var(--mk-sky-deep);
+}
+
+.mk-input[aria-invalid='true'] {
+  border-color: var(--mk-danger);
+  background: #FFF5F5;
+}
+
+.mk-field__error {
+  margin: 0;
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  color: var(--mk-danger);
+}
+
+/* Tick box with its words: the whole row is the tap target */
+.mk-check {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s3);
+  min-height: var(--mk-control);
+  cursor: pointer;
+}
+
+/* Big answer box for typed numeric answers */
+.mk-input--answer {
+  max-width: calc(12 * var(--mk-rem));
+  min-height: calc(var(--mk-control) * 1.3);
+  text-align: center;
+  font-family: var(--mk-font-math);
+  font-size: var(--mk-text-math);
+  font-weight: var(--mk-weight-display);
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--mk-radius);
+}
+
+/* ==========================================================================
+   Parent area: numbers and results
+   ========================================================================== */
+
+.mk-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s1);
+}
+
+.mk-stat__value {
+  font-size: var(--mk-text-display);
+  font-weight: var(--mk-weight-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mk-table-wrap {
+  overflow-x: auto;
+}
+
+.mk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mk-text-body);
+}
+
+.mk-table th,
+.mk-table td {
+  padding: var(--mk-s4) var(--mk-s3);
+  text-align: left;
+  border-bottom: var(--mk-border) solid var(--mk-line);
+  vertical-align: middle;
+}
+
+.mk-table th {
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  color: var(--mk-ink-soft);
+}
+
+.mk-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.mk-table .is-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--mk-weight-strong);
+}
+
+/* ==========================================================================
+   Home
+   ========================================================================== */
+
+/* Greeting: hero picture, a few words, one main button */
+.mk-hello {
+  display: grid;
+  gap: var(--mk-s4);
+  justify-items: center;
+  text-align: center;
+}
+
+.mk-hello__art {
+  width: calc(9 * var(--mk-rem));
+}
+
+.mk-hello__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-s4);
+}
+
+@media (min-width: 40rem) {
+  .mk-hello {
+    grid-template-columns: auto 1fr;
+    gap: var(--mk-s6);
+    justify-items: start;
+    align-items: center;
+    text-align: left;
+  }
+
+  .mk-hello__art {
+    width: calc(12 * var(--mk-rem));
+  }
+
+  .mk-hello__body {
+    align-items: flex-start;
+  }
+}
+
+/* "Change character": closed by default, opens in place */
+.mk-details > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(2.75 * var(--mk-rem));
+  padding: 0 var(--mk-s3);
+  border-radius: var(--mk-radius-sm);
+  color: var(--mk-sky-deep);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  list-style: none;
+}
+
+.mk-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mk-details[open] > summary {
+  margin-bottom: var(--mk-s4);
+}
+
+/* Grade tile: a big number you press */
+.mk-grades {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(5.5 * var(--mk-rem)), 1fr));
+  gap: var(--mk-s3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-grade {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-s1);
+  min-height: calc(6.5 * var(--mk-rem));
+  padding: var(--mk-s3) var(--mk-s2);
+  border: var(--mk-border) solid var(--mk-line-strong);
+  border-radius: var(--mk-radius);
+  background: var(--mk-surface);
+  color: var(--mk-ink);
+  text-decoration: none;
+  box-shadow: 0 var(--mk-press) 0 var(--mk-line-strong);
+  margin-bottom: var(--mk-press);
+  transition: transform var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+  touch-action: manipulation;
+}
+
+.mk-grade:active {
+  transform: translateY(var(--mk-press));
+  box-shadow: none;
+}
+
+.mk-grade__num {
+  font-size: var(--mk-text-display);
+  font-weight: var(--mk-weight-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mk-grade__word {
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  color: var(--mk-ink-soft);
+}
+
+/* ==========================================================================
+   Hover — everything you can press answers the pointer
+   ==========================================================================
+   One rule of thumb:
+     raised things (buttons, answers, tiles)  lift 2px and turn sky
+     flat things (menu, tabs, links)          get a sky background
+     fields (input, select, textarea)         get a sky border and halo
+   Only on devices with a real pointer, so nothing stays "stuck" on touch.
+   `:where()` keeps these rules weak: pressed, selected and disabled states
+   declared above always win. */
+
+.mk-ui :where(a, button, select, summary, label[for], [role='button'], input[type='checkbox'], input[type='radio']) {
+  cursor: pointer;
+}
+
+.mk-ui :where(:disabled, [aria-disabled='true']) {
+  cursor: not-allowed;
+}
+
+/* Legacy global.css underlines every hovered link; keep our controls clean. */
+.mk-ui a:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile, .mk-grade):hover,
+a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
+  text-decoration: none;
+}
+
+/* Plain text links */
+.mk-ui a:where(:not([class], .mk-nav a)) {
+  color: var(--mk-sky-deep);
+  font-weight: var(--mk-weight-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  border-radius: 0.4em;
+}
+
+/* Tick boxes and radio buttons */
+.mk-ui :where(input[type='checkbox'], input[type='radio']) {
+  width: calc(2 * var(--mk-rem));
+  height: calc(2 * var(--mk-rem));
+  margin: 0;
+  flex: none;
+  accent-color: var(--mk-sky);
+}
+
+@media (hover: hover) {
+  /* Raised: buttons */
+  :where(.mk-btn):where(:not(:disabled, [aria-disabled='true'])):hover {
+    background: var(--_bg-h, var(--_bg));
+    border-color: var(--_line-h, var(--_line));
+    box-shadow: 0 calc(var(--mk-press) + 2px) 0 var(--_edge-h, var(--_edge));
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+  }
+
+  :where(.mk-btn--quiet):where(:not(:disabled, [aria-disabled='true'])):hover {
+    box-shadow: none;
+    transform: none;
+    filter: none;
+  }
+
+  /* Raised: answers and picture choices */
+  :where(.mk-choice, .mk-pick, .mk-grade):where(:not(:disabled)):hover {
+    background: var(--mk-sky-tint);
+    border-color: var(--mk-sky);
+    box-shadow: 0 calc(var(--mk-press) + 2px) 0 var(--mk-sky);
+    transform: translateY(-2px);
+  }
+
+  /* Raised: lesson tiles */
+  :where(a.mk-tile):hover {
+    border-color: var(--mk-sky);
+    box-shadow: 0 calc(var(--mk-press) + 3px) 0 var(--mk-sky);
+    transform: translateY(-3px);
+  }
+
+  :where(.mk-swatch):hover {
+    transform: scale(1.12);
+    border-color: var(--mk-sky);
+  }
+
+  /* Flat: menu, tabs, brand, links */
+  .mk-nav a:hover,
+  .mk-tabs button:not([aria-pressed='true']):hover {
+    background: var(--mk-sky-tint);
+    color: var(--mk-sky-deep);
+  }
+
+  :where(.mk-brand):hover .mk-brand__mark {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .mk-ui a:where(:not([class], .mk-nav a)):hover {
+    background: var(--mk-sky-tint);
+    color: var(--mk-sky);
+    box-shadow: 0 0 0 0.2em var(--mk-sky-tint);
+  }
+
+  .mk-ui :where(summary):hover {
+    color: var(--mk-sky);
+    background: var(--mk-sky-tint);
+  }
+
+  /* Fields */
+  :where(.mk-input):where(:not(:disabled)):hover {
+    border-color: var(--mk-sky);
+    box-shadow: 0 0 0 4px var(--mk-sky-tint);
+  }
+
+  .mk-ui :where(input[type='checkbox'], input[type='radio']):where(:not(:disabled)):hover {
+    outline: 4px solid var(--mk-sky-tint);
+    outline-offset: 2px;
+  }
+}
+
+.mk-brand__mark,
+.mk-swatch,
+.mk-input,
+.mk-nav a,
+.mk-tabs button {
+  transition: transform var(--mk-fast) var(--mk-ease), background-color var(--mk-fast) var(--mk-ease),
+    border-color var(--mk-fast) var(--mk-ease), box-shadow var(--mk-fast) var(--mk-ease);
+}
+
+/* ==========================================================================
+   Motion
+   ========================================================================== */
+
+@keyframes mk-pop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.mk-pop {
+  animation: mk-pop 320ms var(--mk-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-ui *,
+  .mk-ui *::before,
+  .mk-ui *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

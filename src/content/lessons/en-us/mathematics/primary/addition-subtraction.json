@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "primary",
+  "topic": "addition-subtraction",
+  "locale": "en-US",
+  "slug": "addition-subtraction",
+  "title": "Addition & Subtraction by Grouping Tens and Ones",
+  "summary": "Adding combines quantities together, while subtracting finds how much remains or the distance between two numbers.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Adjust the sliders below to group blocks by 10s. Whenever you gather 10 single units, they snap into 1 full ten-rod.",
+  "workedExampleTitle": "Let’s solve 27 + 15 visually step by step",
+  "workedSteps": [
+    {
+      "title": "Step 1: Break into ten-rods and single ones",
+      "explanation": "27 has 2 tens (20) and 7 ones. 15 has 1 ten (10) and 5 ones.",
+      "mathExpression": "27 + 15 = (20 + 7) + (10 + 5)"
+    },
+    {
+      "title": "Step 2: Combine the tens first",
+      "explanation": "Add 20 + 10 to get 30.",
+      "mathExpression": "20 + 10 = 30"
+    },
+    {
+      "title": "Step 3: Make a new ten from the ones",
+      "explanation": "Add 7 + 5. Since 7 needs 3 to reach 10, we form a new ten with 2 left over: 10 + 2 = 12. Finally, 30 + 12 = 42.",
+      "mathExpression": "30 + 12 = 42"
+    }
+  ],
+  "whyItWorks": "Our number system is base-10: each digit’s value comes from its place. Grouping by 10 turns any large calculation into small, reliable steps.",
+  "commonMistake": {
+    "wrongExample": "Common trap: solving 27 + 15 by writing 2+1=3 next to 7+5=12 as \"312\".",
+    "correction": "Watch out! Those 12 ones equal 1 ten plus 2 ones, so that extra ten joins the 3 tens to make 42, not 312."
+  },
+  "deepDiveExtra": "You can also subtract by \"counting up\". For 52 − 38: from 38 to 40 is 2, and from 40 to 52 is 12. Total distance: 2 + 12 = 14.",
+  "quickChecks": [
+    {
+      "id": "add-q1",
+      "question": "If you split 36 + 24 into tens and ones, which sum do you get?",
+      "options": [
+        { "label": "(30 + 20) + (6 + 4) = 60", "value": "60", "isCorrect": true },
+        { "label": "(3 + 2) + (6 + 4) = 15", "value": "15", "isCorrect": false },
+        { "label": "50 + 10 = 510", "value": "510", "isCorrect": false }
+      ],
+      "explanation": "30 + 20 is 50, and 6 + 4 makes another full ten (10). 50 + 10 = 60."
+    },
+    {
+      "id": "add-q2",
+      "question": "How much do you add to 28 to reach 45?",
+      "options": [
+        { "label": "17 (2 to reach 30, plus 15 to reach 45)", "value": "17", "isCorrect": true },
+        { "label": "23 (by subtracting 8 − 5)", "value": "23", "isCorrect": false }
+      ],
+      "explanation": "From 28 add 2 to hit 30, then 15 more to reach 45: 2 + 15 = 17."
+    }
+  ]
+}

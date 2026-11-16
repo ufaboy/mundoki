@@ -1,0 +1,77 @@
+---
+// The one site header + menu, shared by every page (new and legacy layouts).
+// Children get three destinations; everything for adults sits behind "Familia".
+// On phones the menu docks to the bottom of the screen; from tablet up it is a
+// row inside the header.
+import type { Locale } from '../../math/core/types';
+import { t } from '../../i18n/translations';
+import { buildAccountUrl, buildHomeUrl, buildPlayUrl, buildProgressUrl, type SiteNavId } from '../../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  activeNav?: SiteNavId;
+}
+
+const { locale, activeNav = 'home' } = Astro.props;
+
+const items = [
+  {
+    href: buildHomeUrl(locale),
+    label: t(locale, 'navHome'),
+    current: activeNav === 'home' || activeNav === 'learn',
+    icon: 'M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z',
+    fill: false,
+  },
+  {
+    href: buildPlayUrl(locale),
+    label: t(locale, 'navPlay'),
+    current: activeNav === 'play',
+    icon: 'M8 5.5v13l11-6.5z',
+    fill: true,
+  },
+  {
+    href: buildProgressUrl(locale),
+    label: t(locale, 'navStars'),
+    current: activeNav === 'progress',
+    icon: 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z',
+    fill: true,
+  },
+];
+const familyCurrent = activeNav === 'account' || activeNav === 'premium';
+---
+
+<header class="mk-ui mk-topbar mk-topbar--site">
+  <a class="mk-brand" href={buildHomeUrl(locale)}>
+    <span class="mk-brand__mark" aria-hidden="true">★</span>
+    Mundoki
+  </a>
+
+  <nav class="mk-topbar__nav" aria-label={t(locale, 'navMain')}>
+    <ul class="mk-nav mk-nav--dock">
+      {items.map((item) => (
+        <li>
+          <a href={item.href} aria-current={item.current ? 'page' : undefined}>
+            <svg class:list={['mk-icon', { 'mk-icon--fill': item.fill }]} viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <a class:list={['mk-btn', { 'is-current': familyCurrent }]} href={buildAccountUrl(locale)} aria-current={familyCurrent ? 'page' : undefined}>
+    <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0" /></svg>
+    <span class="mk-topbar__label" id="header-account-link">{t(locale, 'navFamily')}</span>
+  </a>
+</header>
+
+<script is:inline>
+  // Show the signed-in adult's name on the Familia button.
+  try {
+    var mkUser = JSON.parse(window.localStorage.getItem('mundoki_user') || 'null');
+    var mkLink = document.getElementById('header-account-link');
+    if (mkUser && mkUser.name && mkLink) mkLink.textContent = String(mkUser.name);
+  } catch (error) {
+    // Ignore storage errors.
+  }
+</script>

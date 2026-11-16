@@ -1,0 +1,7 @@
+---
+import type { Locale } from '../../math/core/types';
+import SchoolCourseCatalog from './SchoolCourseCatalog.astro';
+import { SCHOOL_COURSES } from '../../content/schoolCourses';
+interface Props { locale: Locale }
+---
+<SchoolCourseCatalog locale={Astro.props.locale} course={SCHOOL_COURSES[0]} />

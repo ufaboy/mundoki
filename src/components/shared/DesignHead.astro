@@ -1,0 +1,47 @@
+---
+// Put inside <head> of every page built on the design system.
+// It loads the styles and font, and removes the two "flashes" on load:
+//   1. font: Nunito is preloaded, and a size-matched fallback holds the layout
+//   2. hero and grade: the child's saved hero and grade are applied to <html>
+//      before first paint (data-hero, data-hero-skin, data-grade)
+import '@fontsource-variable/nunito';
+import '../../styles/design-system.css';
+import nunitoLatin from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
+import { DEFAULT_HERO, HEROES, HERO_SKINS, HERO_STORAGE_KEY } from '../../content/heroes';
+import { GRADE_STORAGE_KEY } from '../../content/savedGrade';
+
+const boot = {
+  key: HERO_STORAGE_KEY,
+  gradeKey: GRADE_STORAGE_KEY,
+  heroes: Object.keys(HEROES),
+  skins: [...HERO_SKINS],
+  fallback: DEFAULT_HERO,
+};
+---
+
+<link rel="preload" as="font" type="font/woff2" href={nunitoLatin} crossorigin />
+<script is:inline define:vars={{ boot }}>
+  (function () {
+    var choice = boot.fallback;
+    try {
+      var saved = JSON.parse(localStorage.getItem(boot.key) || 'null');
+      if (saved) {
+        choice = {
+          hero: boot.heroes.indexOf(saved.hero) >= 0 ? saved.hero : choice.hero,
+          skin: boot.skins.indexOf(saved.skin) >= 0 ? saved.skin : choice.skin,
+        };
+      }
+    } catch (error) {
+      // Storage blocked or unreadable: keep the default hero.
+    }
+    var data = document.documentElement.dataset;
+    data.hero = choice.hero;
+    data.heroSkin = choice.skin;
+    try {
+      var grade = localStorage.getItem(boot.gradeKey);
+      if (grade && /^grade-(1[0-2]|[1-9])$/.test(grade)) data.grade = grade;
+    } catch (error) {
+      // No saved grade: the home page shows its first-visit view.
+    }
+  })();
+</script>

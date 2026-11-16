@@ -1,0 +1,24 @@
+---
+import type {Locale} from '../../math/core/types';
+const {locale,lessonId,question}=Astro.props as {locale:Locale;lessonId:string;question:number};const es=locale==='es-AR';
+const models:Record<string,number[][][]>={
+ 'G05-02-L02':[[[5,8]],[]], 'G05-02-L03':[[[4,4],[4,4],[1,4]],[[3,3],[2,3]]],
+ 'G05-03-L01':[[[12,12]],[[8,12]]], 'G05-03-L02':[[[4,7],[12,21]],[[1,2],[2,3]]],
+ 'G05-03-L03':[[[10,15],[2,3]],[]], 'G05-04-L01':[[[4,9],[7,9]],[[2,5],[2,3]]],
+ 'G05-04-L02':[[[5,6],[3,4]],[]], 'G05-04-L03':[[[7,8],[8,8],[1,8]],[]],
+ 'G05-05-L01':[[[3,8],[4,8]],[[9,10],[2,10]]], 'G05-05-L02':[[[1,4],[1,6]],[[5,6],[1,2]]],
+ 'G05-06-L02':[[[70,100]],[]], 'G05-06-L03':[[[63,100],[70,100]],[]],
+ 'G05-07-L01':[[[75,100]],[[40,100]]], 'G05-07-L02':[[[1,8]],[]]
+};
+const fractions=models[lessonId]?.[question]??[];
+const sum=lessonId==='G05-05-L01'&&question===0?{parts:8,first:3,second:4}:lessonId==='G05-05-L02'&&question===0?{parts:12,first:3,second:2}:null;
+const product=lessonId==='G05-01-L01'?(question===0?{columns:50,rows:6,removed:2}:{columns:28,rows:25,removed:0}):null;
+const buttons=lessonId==='G05-02-L01'&&question===0;
+const records=lessonId==='G05-12-L02'?[0,1,1,2,2,2,3,3]:lessonId==='G05-12-L03'?(question===0?[2,2,2,7,9]:[1,1,3,3,4]):[];
+---
+{(fractions.length||buttons||records.length||product)&&<figure class="moon-model" data-moon-model data-solved="false"><figcaption>{es?'Datos del desafío':'Challenge data'}</figcaption>
+{product&&<><svg viewBox="0 0 560 160" role="img" aria-label={es?`${product.columns} columnas por ${product.rows} filas${product.removed?', con dos columnas para quitar':''}`:`${product.columns} columns by ${product.rows} rows${product.removed?', with two columns to remove':''}`}><rect x="60" y="35" width="450" height="95" fill="#b7cce5" stroke="#405e85" stroke-width="2"/>{product.removed>0&&<rect x={60+450*(product.columns-product.removed)/product.columns} y="35" width={450*product.removed/product.columns} height="95" fill="#e5b36c" stroke="#405e85"/>}<text x="275" y="25" text-anchor="middle">{product.columns}</text><text x="30" y="88" text-anchor="middle">{product.rows}</text></svg><p>{product.removed>0?(es?'La franja naranja son 2 columnas completas.':'The orange strip is 2 full columns.'):(es?'Esquema: las etiquetas indican las cantidades.':'Schematic: labels give the quantities.')}</p></>}
+{sum?<><div class="moon-fraction-cells" style={`--parts:${sum.parts}`} aria-label={es?'Un entero dividido en partes iguales':'One whole divided into equal parts'}>{Array.from({length:sum.parts},(_,i)=><span class:list={{shaded:i<sum.first,'moon-addition':i>=sum.first&&i<sum.first+sum.second}}/>)}</div><p>{es?'Al resolver, se agrega la segunda cantidad sin cambiar el entero.':'Solving adds the second amount without changing the whole.'}</p></>:fractions.map(([n,d])=><div class="moon-fraction"><div class:list={['moon-fraction-cells',{'moon-hundred':d===100}]} style={`--parts:${d===100?10:d}`} aria-label={es?`${n} de ${d} partes iguales`:`${n} of ${d} equal parts`}>{Array.from({length:d},(_,i)=><span class:list={{shaded:i<n}}/>)}</div><small>{es?'Un entero':'One whole'}</small></div>)}
+{buttons&&<div class="moon-counter-groups" aria-label={es?'Doce botones en cuatro grupos iguales':'Twelve buttons in four equal groups'}>{Array.from({length:4},()=> <span>● ● ●</span>)}</div>}
+{records.length>0&&<div class="moon-records">{records.map(value=><span>{value}</span>)}</div>}
+</figure>}

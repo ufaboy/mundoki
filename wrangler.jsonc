@@ -1,0 +1,41 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "mundoki",
+	"workers_dev": true,
+	// Preserve optional provider settings configured in the dashboard.
+	"keep_vars": true,
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"compatibility_date": "2026-03-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist/client"
+	},
+	"observability": {
+		"enabled": true,
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1
+		},
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.01
+		}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "mundoki-d1",
+			"database_id": "e99ffef6-d0ac-4d9b-abb0-585033cd6519",
+			"migrations_dir": "drizzle"
+		},
+	],
+	"vars": {
+		"APP_URL": "https://mundoki.mercosur.workers.dev",
+		"BETTER_AUTH_URL": "https://mundoki.mercosur.workers.dev",
+		"DEFAULT_LOCALE": "es-AR",
+		"PREMIUM_MONTHLY_ARS": "4500"
+	}
+}

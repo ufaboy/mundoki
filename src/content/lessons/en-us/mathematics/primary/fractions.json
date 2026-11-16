@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "primary",
+  "topic": "fractions",
+  "locale": "en-US",
+  "slug": "fractions",
+  "title": "Fractions: Equal Parts of a Whole",
+  "summary": "A fraction represents one or more equal parts of a whole—whether a pizza, an energy bar, or a collection of objects.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Adjust the numerator (top) and denominator (bottom). Compare the circular pizza and rectangular bar to see how both show the exact same share.",
+  "workedExampleTitle": "Why do 1/4 and 2/8 represent the exact same amount?",
+  "workedSteps": [
+    {
+      "title": "Step 1: The denominator demands equal parts",
+      "explanation": "Cut a pizza or bar into 4 equal pieces and take 1 piece: you have 1/4 (\"one fourth\").",
+      "mathExpression": "\\frac{1}{4} = \\text{1 of 4 equal parts}"
+    },
+    {
+      "title": "Step 2: Split each fourth in half",
+      "explanation": "If we slice each of the 4 pieces into 2 equal parts, there are now 8 smaller slices, and our share covers 2 of those 8.",
+      "mathExpression": "\\frac{1 \\times 2}{4 \\times 2} = \\frac{2}{8}"
+    },
+    {
+      "title": "Step 3: Adding fractions of the same size",
+      "explanation": "To add 1/4 + 2/4, add the numerators (1 + 2 = 3) and keep the denominator 4 because the slice size did not change.",
+      "mathExpression": "\\frac{1}{4} + \\frac{2}{4} = \\frac{3}{4}"
+    }
+  ],
+  "whyItWorks": "Multiplying or dividing top and bottom by the same number is multiplying by 1: it changes the slice count without changing the total shaded amount.",
+  "commonMistake": {
+    "wrongExample": "Common trap: computing 1/4 + 2/4 = 3/8 by adding the denominators too.",
+    "correction": "The denominator names the size of the piece (\"fourths\"). 1 fourth plus 2 fourths equals 3 fourths (3/4), not 3 eighths!"
+  },
+  "deepDiveExtra": "The larger the denominator, the smaller each individual slice becomes: 1/8 of a bar is half the size of 1/4 of a bar.",
+  "quickChecks": [
+    {
+      "id": "frac-q1",
+      "question": "Which of these fractions is equivalent to 1/2?",
+      "options": [
+        { "label": "3/6 (half of 6 equal parts)", "value": "3/6", "isCorrect": true },
+        { "label": "1/4", "value": "1/4", "isCorrect": false },
+        { "label": "2/6", "value": "2/6", "isCorrect": false }
+      ],
+      "explanation": "3 is half of 6, so 3/6 simplifies directly to 1/2."
+    },
+    {
+      "id": "frac-q2",
+      "question": "What is 2/5 + 2/5?",
+      "options": [
+        { "label": "4/5", "value": "4/5", "isCorrect": true },
+        { "label": "4/10", "value": "4/10", "isCorrect": false }
+      ],
+      "explanation": "2 fifths plus 2 fifths equals 4 fifths (4/5)."
+    }
+  ]
+}

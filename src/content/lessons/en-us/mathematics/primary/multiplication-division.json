@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "primary",
+  "topic": "multiplication-division",
+  "locale": "en-US",
+  "slug": "multiplication-division",
+  "title": "Multiplication & Division with Rows and Columns",
+  "summary": "Multiplying quickly combines equal groups, and dividing splits a total into fair, equal shares.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Change the rows and columns in the interactive array to see how 3 groups of 4 link 4 + 4 + 4 = 12 to 3 × 4 = 12.",
+  "workedExampleTitle": "Connecting 3 × 4 = 12 with 12 ÷ 3 = 4",
+  "workedSteps": [
+    {
+      "title": "Step 1: Arrange equal rows",
+      "explanation": "Picture 3 rows with 4 counters in each row. Instead of counting one by one, add by row.",
+      "mathExpression": "4 + 4 + 4 = 12"
+    },
+    {
+      "title": "Step 2: Write as multiplication",
+      "explanation": "\"3 groups of 4\" is written 3 × 4 = 12. Rotate the grid and you see 4 rows of 3 (4 × 3 = 12).",
+      "mathExpression": "3 \\times 4 = 4 \\times 3 = 12"
+    },
+    {
+      "title": "Step 3: Division undoes multiplication",
+      "explanation": "If we start with 12 counters and split them into 3 equal rows, each row gets 4 counters.",
+      "mathExpression": "12 \\div 3 = 4"
+    }
+  ],
+  "whyItWorks": "Because rotating the rectangle of counters never changes how many counters exist, factor order does not change the product.",
+  "commonMistake": {
+    "wrongExample": "Common trap: thinking 3 × 4 means 3 + 4 = 7.",
+    "correction": "The × symbol means repeated equal groups: 3 rows of 4 items (4 + 4 + 4 = 12)."
+  },
+  "deepDiveExtra": "To multiply larger numbers like 6 × 7, split 7 into 5 + 2: compute (6 × 5) + (6 × 2) = 30 + 12 = 42.",
+  "quickChecks": [
+    {
+      "id": "mul-q1",
+      "question": "Which repeated addition matches 4 × 5?",
+      "options": [
+        { "label": "5 + 5 + 5 + 5 = 20", "value": "20", "isCorrect": true },
+        { "label": "4 + 5 = 9", "value": "9", "isCorrect": false }
+      ],
+      "explanation": "4 groups of 5 items add up to 5 + 5 + 5 + 5 = 20."
+    },
+    {
+      "id": "mul-q2",
+      "question": "If 6 × 8 = 48, what is 48 ÷ 6?",
+      "options": [
+        { "label": "8", "value": "8", "isCorrect": true },
+        { "label": "6", "value": "6", "isCorrect": false },
+        { "label": "42", "value": "42", "isCorrect": false }
+      ],
+      "explanation": "If 6 rows of 8 make 48, splitting 48 into 6 equal rows leaves 8 in each."
+    }
+  ]
+}

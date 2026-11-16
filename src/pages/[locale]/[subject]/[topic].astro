@@ -1,0 +1,205 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import InteractiveDiagram from '../../../components/learn/InteractiveDiagram.astro';
+import { t } from '../../../i18n/translations';
+import {
+  buildCatalogUrl,
+  buildGradeUrl,
+  buildLearnTopicUrl,
+  buildPlayUrl,
+  normalizeUrlLocale,
+  resolveTopicFromSlug,
+} from '../../../i18n/routes';
+import { renderLatexToHtml } from '../../../lib/katexRender';
+import { getGradeById } from '../../../math/curriculum';
+import { TOPICS_CATALOG } from '../../../math/topics/generators';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  const paths: { params: { locale: string; subject: string; topic: string } }[] = [];
+  for (const item of TOPICS_CATALOG) {
+    paths.push({
+      params: { locale: 'es-ar', subject: 'matematicas', topic: item.slugEs },
+    });
+    paths.push({
+      params: { locale: 'en-us', subject: 'mathematics', topic: item.slugEn },
+    });
+    // Also support canonical topic IDs in both locales
+    if (item.slugEs !== item.id) {
+      paths.push({
+        params: { locale: 'es-ar', subject: 'matematicas', topic: item.id },
+      });
+    }
+  }
+  return paths;
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const topicId = resolveTopicFromSlug(Astro.params.topic || '');
+const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+const switchHref = buildLearnTopicUrl(otherLocale, topicId);
+
+const allLessons = await getCollection('lessons');
+const lessonEntry =
+  allLessons.find((entry) => entry.data.topic === topicId && entry.data.locale === locale) ||
+  allLessons.find((entry) => entry.data.topic === topicId)!;
+
+const lesson = lessonEntry.data;
+const topicMeta = TOPICS_CATALOG.find((t) => t.id === topicId) || TOPICS_CATALOG[0];
+const gradeMeta = getGradeById(topicMeta.gradeId);
+---
+
+<BaseLayout
+  title={lesson.title}
+  description={lesson.summary}
+  locale={locale}
+  activeNav="learn"
+  switchLocaleHref={switchHref}
+>
+  <article class="article-container stack-lg">
+    <!-- Breadcrumb & Topic Header -->
+    <header class="card stack-md">
+      <div class="flex-between text-xs text-mono">
+        <div class="flex-row">
+          <a href={buildCatalogUrl(locale)}>
+            ← {locale === 'es-AR' ? 'Catálogo' : 'Catalog'}
+          </a>
+          <span class="text-muted">/</span>
+          <a href={buildGradeUrl(locale, gradeMeta.id)} class="grade-pill">
+            {gradeMeta.labelShort[locale]}
+          </a>
+        </div>
+        <span>
+          {lesson.stage === 'primary' ? t(locale, 'stagePrimary') : t(locale, 'stageMiddle')} · 🪐{' '}
+          {topicMeta.planetName[locale]}
+        </span>
+      </div>
+
+      <h1 class="hero-title" style="font-size:2rem;margin-bottom:4px;">{lesson.title}</h1>
+
+      <div class="callout stack-sm">
+        <div class="kicker" style="margin:0;">{t(locale, 'lessonWhatIsThis')}</div>
+        <p style="margin:0;font-size:1.05rem;">{lesson.summary}</p>
+      </div>
+    </header>
+
+    <!-- 02. See It Visually (Interactive SVG Diagram) -->
+    <section class="card stack-md">
+      <div class="kicker">{t(locale, 'lessonSeeVisually')}</div>
+      <p class="text-sm text-muted" style="margin-top:0;">{lesson.visualInteractiveHint}</p>
+      <InteractiveDiagram topicId={topicId} locale={locale} />
+    </section>
+
+    <!-- 03. Let's Solve One Step by Step (Pre-rendered KaTeX) -->
+    <section class="card stack-md">
+      <div class="kicker">{t(locale, 'lessonSolveOne')}</div>
+      <h2 class="section-title">{lesson.workedExampleTitle}</h2>
+
+      <div class="stack-md">
+        {lesson.workedSteps.map((step) => (
+          <div class="card-subtle stack-sm">
+            <h3 style="font-size:1.02rem;margin:0;">{step.title}</h3>
+            <p class="text-sm" style="margin:0;">{step.explanation}</p>
+            <div
+              class="card"
+              style="padding:10px 14px;background:#fff;overflow-x:auto;"
+              set:html={renderLatexToHtml(step.mathExpression, false)}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div class="callout callout-emerald stack-sm">
+        <strong>{t(locale, 'lessonWhyWorks')}</strong>
+        <p class="text-sm" style="margin:0;">{lesson.whyItWorks}</p>
+      </div>
+    </section>
+
+    <!-- 04. Watch Out For This Common Mistake -->
+    <section class="card stack-md">
+      <div class="kicker" style="color:var(--accent-amber);">{t(locale, 'lessonWatchOut')}</div>
+      <div class="callout callout-amber stack-sm">
+        <p class="text-sm font-bold" style="margin:0;">✗ {lesson.commonMistake.wrongExample}</p>
+        <p class="text-sm" style="margin:0;">✓ {lesson.commonMistake.correction}</p>
+      </div>
+
+      <!-- Optional Collapsible Extra Explanation -->
+      <details class="card-subtle">
+        <summary class="font-bold text-sm" style="cursor:pointer;">
+          {t(locale, 'lessonExtraDetail')}
+        </summary>
+        <p class="text-sm" style="margin:10px 0 0;">{lesson.deepDiveExtra}</p>
+      </details>
+    </section>
+
+    <!-- 05. Quick Understanding Checks -->
+    <section class="card stack-md">
+      <div class="kicker">{t(locale, 'lessonCheckUnderstanding')}</div>
+      <div class="grid-2">
+        {lesson.quickChecks.map((qc) => (
+          <div class="card-subtle stack-sm" data-quick-check={qc.id}>
+            <p class="font-bold text-sm" style="margin:0;">{qc.question}</p>
+            <div class="stack-sm">
+              {qc.options.map((opt) => (
+                <button
+                  type="button"
+                  class="btn btn-outline btn-sm"
+                  style="width:100%;justify-content:flex-start;text-align:left;"
+                  data-qc-option={opt.value}
+                  data-qc-correct={opt.isCorrect ? 'true' : 'false'}
+                  data-qc-explanation={qc.explanation}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <div data-qc-feedback style="display:none;margin-top:8px;"></div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Server-Protected Premium Masterclass Section (Never bundled in static client assets) -->
+    <section class="card stack-md">
+      <div class="flex-between">
+        <div>
+          <div class="kicker" style="color:var(--accent-violet);">
+            {t(locale, 'lessonPremiumMasterclass')}
+          </div>
+          <p class="text-xs text-muted" style="margin:0;">
+            {locale === 'es-AR'
+              ? 'Este módulo avanzado nunca se incluye en el paquete estático público; se entrega desde el Worker tras verificar tu suscripción activa.'
+              : 'This advanced module is never bundled in public static assets; it is served from the Worker endpoint after verifying active entitlement.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="btn btn-outline btn-sm"
+          id="btn-load-masterclass"
+          data-topic-id={topicId}
+          data-locale={locale}
+        >
+          {locale === 'es-AR' ? 'Cargar Laboratorio Protegido' : 'Load Protected Masterclass'}
+        </button>
+      </div>
+      <div id="masterclass-result-box" style="display:none;"></div>
+    </section>
+
+    <!-- 06. Practice in Play Mode CTA -->
+    <section class="space-panel flex-between">
+      <div>
+        <div class="text-xs text-mono" style="color:#7DD3FC;">
+          🪐 {topicMeta.planetName[locale]} · {topicMeta.guardianName[locale]}
+        </div>
+        <h2 style="color:#fff;margin:4px 0;font-size:1.35rem;">
+          {t(locale, 'lessonStartAdventure')}
+        </h2>
+      </div>
+      <a href={buildPlayUrl(locale, topicId)} class="btn btn-emerald">
+        {t(locale, 'actionPlay')} →
+      </a>
+    </section>
+  </article>
+</BaseLayout>

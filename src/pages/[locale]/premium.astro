@@ -1,0 +1,114 @@
+---
+import { promoText } from '../../i18n/promos';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../i18n/translations';
+import { buildPremiumUrl, normalizeUrlLocale } from '../../i18n/routes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: { locale: 'es-ar' } }, { params: { locale: 'en-us' } }];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+---
+
+<BaseLayout
+  title={locale === 'es-AR' ? 'Suscripción Premium · Mercado Pago' : 'Premium Subscription · Mercado Pago'}
+  locale={locale}
+  activeNav="premium"
+  switchLocaleHref={buildPremiumUrl(otherLocale)}
+>
+  <div id="premium-page-root" data-locale={locale} class="article-container stack-lg">
+    <header class="card stack-sm">
+      <div class="kicker">Mercado Pago · ARS</div>
+      <h1 class="section-title" style="margin:0;">{t(locale, 'premiumTitle')}</h1>
+      <p class="text-sm text-muted" style="margin:0;">{t(locale, 'premiumSubtitle')}</p>
+      <div class="callout stack-sm" style="margin-top:10px;">
+        <strong id="premium-current-state">
+          {locale === 'es-AR' ? 'Plan Actual: Demo Gratis' : 'Current Plan: Free Demo'}
+        </strong>
+      </div>
+    </header>
+
+    <div id="premium-status-box" style="display:none;"></div>
+
+    <section id="promo-redeem" data-locale={locale} class="card stack-md">
+      <h2>{promoText(locale, 'code')}</h2>
+      <label for="promo-code">{locale === 'es-AR' ? 'Código personal' : 'Personal code'}</label>
+      <div class="flex-row"><input id="promo-code" type="text" maxlength="64" autocomplete="off" spellcheck="false" /><button type="button" class="btn btn-outline" id="promo-review">{promoText(locale, 'review')}</button></div>
+      <p id="promo-summary" class="callout" aria-live="polite"></p>
+      <label class="flex-row"><input id="promo-consent" type="checkbox" /><span>{promoText(locale, 'consent')}</span></label>
+      <button type="button" class="btn btn-primary" id="promo-accept" disabled>{promoText(locale, 'accept')}</button>
+      <p id="promo-status" role="status" aria-live="polite"></p>
+      <a href={`/${locale.toLowerCase()}/account`}>{promoText(locale, 'sign_in')}</a>
+    </section>
+
+    <!-- Adult Billing & Mercado Pago Checkout Card -->
+    <section class="card stack-md">
+      <div class="flex-between">
+        <div>
+          <h2 style="margin:0;font-size:1.35rem;">Mundoki Premium</h2>
+          <div class="text-sm text-muted">
+            {locale === 'es-AR'
+              ? 'Acceso a lecciones protegidas en servidor, misiones avanzadas y guardado en D1.'
+              : 'Server-protected masterclasses, advanced missions, and Cloudflare D1 cloud sync.'}
+          </div>
+        </div>
+        <div class="text-mono font-bold" style="font-size:1.45rem;color:var(--accent-emerald);">
+          {t(locale, 'premiumPriceLabel')}
+        </div>
+      </div>
+
+      <div class="callout callout-amber text-sm">
+        {t(locale, 'premiumAdultNotice')}
+      </div>
+
+      <label class="flex-row text-sm" style="cursor:pointer;">
+        <input id="checkbox-adult-confirm" type="checkbox" style="width:18px;height:18px;" />
+        <span>{t(locale, 'premiumAdultCheckbox')}</span>
+      </label>
+
+      <div class="flex-row">
+        <button type="button" class="btn btn-primary" id="btn-start-checkout">
+          {t(locale, 'premiumCheckoutBtn')}
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline"
+          id="btn-cancel-subscription"
+          style="display:none;"
+        >
+          {t(locale, 'premiumCancelBtn')}
+        </button>
+      </div>
+
+      <!-- Development Webhook Simulator Panel (Visible when MERCADOPAGO_ACCESS_TOKEN is unconfigured) -->
+      <div id="premium-dev-webhook-panel" class="card-subtle stack-sm" style="display:none;">
+        <strong class="text-sm">
+          {locale === 'es-AR'
+            ? '[SIMULADOR DE WEBHOOK MERCADO PAGO — SOLO DESARROLLO]'
+            : '[MERCADO PAGO WEBHOOK SIMULATOR — DEV ONLY]'}
+        </strong>
+        <p class="text-xs text-muted" style="margin:0;">
+          {locale === 'es-AR'
+            ? 'En producción el acceso solo se activa cuando el Worker verifica el webhook firmado de Mercado Pago. Hacé clic abajo para enviar un evento firmado idempotente a POST /api/webhooks/mercadopago.'
+            : 'In production, entitlement is only granted when the Worker verifies a signed Mercado Pago webhook. Click below to send an idempotent signed webhook to POST /api/webhooks/mercadopago.'}
+        </p>
+        <button type="button" class="btn btn-emerald btn-sm" id="btn-simulate-mp-webhook">
+          {locale === 'es-AR'
+            ? 'Simular Webhook Verificado de Mercado Pago (Activar Premium)'
+            : 'Simulate Verified Mercado Pago Webhook (Activate Premium)'}
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    import { initPromoClient } from '../../scripts/promoClient';
+    initPromoClient();
+    import { initPremiumPage } from '../../scripts/premiumClient';
+    initPremiumPage();
+  </script>
+</BaseLayout>

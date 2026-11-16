@@ -1,0 +1,5 @@
+---
+import type {Locale} from '../../math/core/types';
+const {locale}=Astro.props as {locale:Locale};const es=locale==='es-AR';
+---
+<details class="city-notebook island-choices"><summary>{es?'Personalizá tu expedición':'Make the expedition yours'}</summary><div><label>{es?'Nombre de la expedición':'Expedition name'} <input data-island-name maxlength="24" autocomplete="off" placeholder={es?'Mi expedición':'My expedition'}/></label><div class="island-colors" role="group" aria-label={es?'Color de los inventos':'Invention color'}>{(['teal','coral','gold'] as const).map((color,i)=><button type="button" data-island-color={color} aria-pressed="false">{(es?['Turquesa','Coral','Dorado']:['Teal','Coral','Gold'])[i]}</button>)}</div></div></details>

@@ -1,0 +1,42 @@
+---
+import type { Locale } from '../../math/core/types';
+import { buildGradeOneLessonUrl } from '../../i18n/routes';
+import TomiCharacter from './TomiCharacter.astro';
+import TomiRoomBackground from './TomiRoomBackground.astro';
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+---
+<article class="tomi-adventure tomi-stickers" data-stickers-adventure data-locale={locale}>
+  <nav class="tomi-topline" aria-label={es ? 'La aventura' : 'The adventure'}><a href={buildGradeOneLessonUrl(locale, 'G01-02-L01')}>← {es ? 'Las tizas de Tomi' : 'Tomi’s chalk'}</a><span>{es ? 'LA GRAN PASEADA DE TOMI' : 'TOMI’S BIG DAY OUT'}</span><span class="tomi-chapter">05 / 35</span></nav>
+  <header class="tomi-heading"><div><p>{es ? 'CAPÍTULO 1 · EN CASA' : 'CHAPTER 1 · AT HOME'}</p><h1>{es ? 'Figuritas para compartir' : 'Stickers to share'}</h1></div><span class="tomi-skill">✦ {es ? 'Decenas y unidades' : 'Tens and ones'}</span></header>
+  <div class="tomi-game">
+    <div class="tomi-room stickers-room" role="group" aria-label={es ? 'Tomi prepara figuritas para sus amigos.' : 'Tomi prepares stickers for his friends.'}>
+      <TomiRoomBackground /><TomiCharacter />
+      <div class="tomi-speech" data-sticker-speech>{es ? '¡Llevemos figuritas! Esta hoja tiene diez, y acá hay siete sueltas.' : 'Let’s bring stickers! This sheet has ten, and here are seven loose ones.'}</div>
+      <div class="stickers-workbench">
+        <div class="stickers-collections">
+          {[0, 1].map(group => <section class:list={['stickers-collection', { 'stickers-loose': group === 1 }]} data-sticker-group={group} aria-labelledby={`sticker-group-${group}`}>
+            <h2 id={`sticker-group-${group}`} data-sticker-group-title={group}>{group === 0 ? (es ? 'Una decena' : 'One ten') : (es ? 'Siete sueltas' : 'Seven loose ones')}</h2>
+            <div class="stickers-grid">{Array.from({length:10}, (_,i) => <button type="button" class="sticker-piece" data-sticker-piece={`${group}-${i}`} data-sticker-group-index={group} aria-label={`${group === 0 ? (es ? 'Hoja' : 'Sheet') : (es ? 'Segundo grupo' : 'Second group')}: ${es ? 'figurita' : 'sticker'} ${i+1}`} aria-pressed="false" hidden={group === 1 && i >= 7}><span class="sticker-star" aria-hidden="true">★</span><span class="sticker-mark" aria-hidden="true">✓</span></button>)}</div>
+            <p data-sticker-caption={group}>{group === 0 ? (es ? '10 figuritas en una hoja' : '10 stickers on one sheet') : (es ? '7 figuritas fuera de la hoja' : '7 stickers outside the sheet')}</p>
+          </section>)}
+        </div>
+        <div class="stickers-equation" aria-label={es ? 'Cantidad total' : 'Total quantity'}><span>10</span><span>+</span><span data-sticker-part>7</span><span>=</span><strong data-sticker-total>?</strong></div>
+        <p class="stickers-keepsake" data-sticker-keepsake hidden>{es ? '✓ Guardamos la primera colección: 17 figuritas.' : '✓ First collection saved: 17 stickers.'}</p>
+        <div class="stickers-reward" data-sticker-reward hidden><span aria-hidden="true">✉</span><span data-sticker-reward-text></span></div>
+      </div>
+    </div>
+    <section class="tomi-task" aria-labelledby="stickers-question">
+      <div class="tomi-task-heading"><span class="tomi-step" data-sticker-step>1</span><div><p class="tomi-eyebrow" data-sticker-eyebrow>{es ? 'UNA DECENA Y ALGUNAS MÁS' : 'ONE TEN AND SOME MORE'}</p><h2 id="stickers-question" data-sticker-question>{es ? 'Una decena y siete unidades: ¿cuántas figuritas hay?' : 'One ten and seven ones: how many stickers are there?'}</h2></div></div>
+      <p class="tomi-instruction" data-sticker-instruction>{es ? 'La hoja completa vale diez. Seguí contando las sueltas: once, doce… Podés marcar cada figurita.' : 'The full sheet stands for ten. Count on with the loose ones: eleven, twelve… You can mark each sticker.'}</p>
+      <div class="tomi-answers" data-sticker-answers>{[7,17].map(n => <button type="button" data-sticker-answer={n}>{n}</button>)}</div>
+      <div class="tomi-methods" data-sticker-reasons hidden><button type="button" data-sticker-reason="two">{es ? 'Porque hay solo dos figuritas' : 'Because there are only two stickers'}</button><button type="button" data-sticker-reason="tens">{es ? 'Porque 10 + 10 = 20' : 'Because 10 + 10 = 20'}</button></div>
+      <p class="tomi-feedback" data-sticker-feedback role="status" aria-live="polite"></p>
+      <div class="tomi-controls"><button type="button" class="tomi-help" data-sticker-help>☀ {es ? 'Una pista' : 'A little hint'}</button><button type="button" class="tomi-help" data-sticker-reset>{es ? 'Empezar de nuevo' : 'Start again'}</button><button type="button" class="tomi-continue" data-sticker-next hidden>{es ? 'Preparar otro regalo →' : 'Prepare another gift →'}</button><a class="tomi-continue" data-sticker-finish hidden href={buildGradeOneLessonUrl(locale, 'G01-02-L03')}>{es ? 'Siguiente episodio →' : 'Next episode →'}</a></div>
+    </section>
+  </div>
+  <div class="tomi-bottom"><span>♡ {es ? 'Sin apuro. Cada intento ayuda.' : 'Take your time. Every try helps.'}</span><span>{es ? 'Nuestra misión: preparar figuritas para los amigos.' : 'Our mission: get stickers ready for our friends.'}</span></div>
+  <details class="tomi-adult"><summary>{es ? 'Para acompañar en casa' : 'For a grown-up'}</summary><p>{es ? 'Cada decena contiene diez unidades. El segundo regalo es una colección distinta: las siete sueltas no se convierten en diez. Representá 16 con un grupo de diez y seis objetos sueltos. Esta escena no guarda progreso ni otorga puntos de dominio.' : 'Each ten contains ten ones. The second gift is a different collection: the seven loose stickers do not turn into ten. Represent 16 using one group of ten and six loose objects. This scene does not save progress or award mastery points.'}</p></details>
+  <noscript><p>{es ? 'Activá JavaScript para jugar. También podés contar una hoja de diez figuritas y siete sueltas con un adulto.' : 'Enable JavaScript to play. You can also count a sheet of ten stickers and seven loose ones with a grown-up.'}</p></noscript>
+</article>
+<script>import '../../scripts/tomiStickersAdventure';</script>

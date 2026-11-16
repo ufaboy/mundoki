@@ -1,0 +1,15 @@
+---
+// Story text that follows the chosen hero. Every hero's wording is rendered;
+// CSS shows the one matching <html data-hero>, so there is no rewrite on load.
+//   <HeroText text="{name} está {listo|lista}." />
+import { HEROES, personalize, type HeroId } from '../../content/heroes';
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const heroIds = Object.keys(HEROES) as HeroId[];
+---
+
+{heroIds.map((id) => <span class={`hero-only hero-only--${id}`}>{personalize(text, id)}</span>)}

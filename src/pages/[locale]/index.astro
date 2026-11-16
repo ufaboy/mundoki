@@ -1,0 +1,132 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import HeroCharacter from '../../components/shared/HeroCharacter.astro';
+import HeroText from '../../components/shared/HeroText.astro';
+import { DEFAULT_HERO, HEROES, HERO_SKINS, type HeroId } from '../../content/heroes';
+import { t } from '../../i18n/translations';
+import { buildAccountUrl, buildGradeUrl, buildPlayUrl, normalizeUrlLocale } from '../../i18n/routes';
+import { GRADES_CATALOG } from '../../math/curriculum';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: { locale: 'es-ar' } }, { params: { locale: 'en-us' } }];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const es = locale === 'es-AR';
+const switchHref = es ? '/en-us/' : '/es-ar/';
+
+// CABA structure: primaria is 1.º–7.º grado, secundaria is 1.º–5.º año.
+const PRIMARY_YEARS = 7;
+const grades = [...GRADES_CATALOG].sort((a, b) => a.gradeNumber - b.gradeNumber);
+const levels = [
+  {
+    title: t(locale, 'homePrimary'),
+    word: t(locale, 'homeGradeWord'),
+    grades: grades.filter((grade) => grade.gradeNumber <= PRIMARY_YEARS),
+    offset: 0,
+  },
+  {
+    title: t(locale, 'homeSecondary'),
+    word: t(locale, 'homeYearWord'),
+    grades: grades.filter((grade) => grade.gradeNumber > PRIMARY_YEARS),
+    offset: PRIMARY_YEARS,
+  },
+];
+
+const heroIds = Object.keys(HEROES) as HeroId[];
+const skinLabels = {
+  light: t(locale, 'homeSkinLight'),
+  brown: t(locale, 'homeSkinBrown'),
+  dark: t(locale, 'homeSkinDark'),
+};
+
+// The saved grade sits on <html data-grade> before first paint, so the right
+// "continue" button shows without any script and without a flash.
+const resumeCss = [
+  ':root[data-grade] .home-first { display: none; }',
+  '.home-resume { display: none; }',
+  ...grades.map((grade) => `:root[data-grade='${grade.id}'] .home-resume[data-for='${grade.id}'] { display: inline-flex; }`),
+].join('\n');
+---
+
+<AppLayout title={t(locale, 'homeTitle')} locale={locale} activeNav="home" switchLocaleHref={switchHref}>
+  <style is:inline set:html={resumeCss}></style>
+
+  <div class="mk-stack mk-stack--loose">
+    <section class="mk-card mk-card--sky mk-hello">
+      <div class="mk-hello__art"><HeroCharacter /></div>
+      <div class="mk-hello__body">
+        <h1 class="mk-display"><HeroText text={t(locale, 'homeHello')} /></h1>
+        <p class="mk-text">{t(locale, 'homeInvite')}</p>
+
+        <a class="mk-btn mk-btn--primary home-first" href={buildPlayUrl(locale, 'addition-subtraction')}>
+          <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+          {t(locale, 'homePlay')}
+        </a>
+        {grades.map((grade) => (
+          <a class="mk-btn mk-btn--go home-resume" data-for={grade.id} href={buildGradeUrl(locale, grade.id)}>
+            {t(locale, 'homeResume')}: {grade.labelShort[locale].replace('.°', '.º')}
+            <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        ))}
+
+        <details class="mk-details">
+          <summary>{t(locale, 'homeChangeHero')}</summary>
+          <div class="mk-stack">
+            <div class="mk-row" role="group" aria-label={t(locale, 'homePickHero')}>
+              {heroIds.map((id) => (
+                <button type="button" class="mk-pick" data-hero-pick={id} aria-pressed={id === DEFAULT_HERO.hero ? 'true' : 'false'}>
+                  <span class="mk-pick__check" aria-hidden="true"><svg class="mk-icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+                  <HeroCharacter hero={id} />
+                  {HEROES[id].name}
+                </button>
+              ))}
+            </div>
+            <div class="mk-row" role="group" aria-label={t(locale, 'homeSkinColour')}>
+              {HERO_SKINS.map((skin) => (
+                <button type="button" class="mk-swatch" data-hero-skin={skin} data-skin-pick={skin} aria-label={skinLabels[skin]} aria-pressed={skin === DEFAULT_HERO.skin ? 'true' : 'false'}></button>
+              ))}
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="mk-stack" aria-labelledby="home-grades">
+      <h2 class="mk-title" id="home-grades">{t(locale, 'homeGradeQuestion')}</h2>
+      {levels.map((level) => (
+        <div class="mk-stack mk-stack--tight">
+          <h3 class="mk-heading">{level.title}</h3>
+          <ul class="mk-grades">
+            {level.grades.map((grade) => (
+              <li>
+                <a class="mk-grade" href={buildGradeUrl(locale, grade.id)} data-grade-pick={grade.id} aria-label={grade.labelShort[locale]}>
+                  <span class="mk-grade__num" aria-hidden="true">{grade.gradeNumber - level.offset}{es ? '.º' : ''}</span>
+                  <span class="mk-grade__word" aria-hidden="true">{level.word}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+    <section class="mk-card mk-row mk-row--between" aria-labelledby="home-family">
+      <div class="mk-stack mk-stack--tight">
+        <h2 class="mk-title" id="home-family">{t(locale, 'homeFamilyTitle')}</h2>
+        <p class="mk-text">{t(locale, 'homeFamilyText')}</p>
+      </div>
+      <a class="mk-btn" href={buildAccountUrl(locale)}>
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0" /></svg>
+        {t(locale, 'navFamily')}
+      </a>
+    </section>
+  </div>
+
+  <script>
+    import { initHome } from '../../scripts/homeClient';
+    initHome();
+  </script>
+</AppLayout>

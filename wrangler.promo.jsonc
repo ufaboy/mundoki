@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mundoki-promo-billing",
+  "main": "src/workers/promoScheduler.ts",
+  "compatibility_date": "2026-11-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "keep_vars": true,
+  "triggers": { "crons": ["0 */6 * * *"] },
+  "observability": { "enabled": true, "traces": { "enabled": true } },
+  "d1_databases": [{
+			"binding": "DB",
+			"database_name": "mundoki-d1",
+			"database_id": "e99ffef6-d0ac-4d9b-abb0-585033cd6519",
+			"migrations_dir": "drizzle"
+		},],
+  "vars": { "PROMO_LIVE_BILLING_ENABLED": "false" }
+}

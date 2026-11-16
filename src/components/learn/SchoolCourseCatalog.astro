@@ -1,0 +1,45 @@
+---
+import type { Locale } from '../../math/core/types';
+import { getCourseForPackage, getSchoolPackage, type SchoolCourse } from '../../content/schoolCourses';
+import { buildLearnTopicUrl, buildCatalogUrl, buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+interface Props { locale: Locale; course: SchoolCourse }
+const { locale, course } = Astro.props;
+const duration = course.gradeNumber >= 4 ? '12–18' : '8–12';
+const es = locale === 'es-AR';
+---
+<div class="stack-lg grade-one">
+  <a href={buildCatalogUrl(locale)}>← {es ? 'Todos los grados' : 'All grades'}</a>
+  <header class="card stack-md">
+    <p class="kicker">{course.label[locale]}</p>
+    <h1>{course.title[locale]}</h1>
+    <p>{es ? `${course.lessons.length} lecciones cortas en ${course.packages.length} recorridos. Contá, probá, dibujá y explicá cómo pensaste.` : `${course.lessons.length} short lessons in ${course.packages.length} learning paths. Count, try, draw, and explain your thinking.`}</p>
+    <p>{es ? `Podés explorar formas, espacio y medidas aunque todavía estés practicando los números. Cada lección dura unos ${duration} minutos.` : `You can explore shapes, space, and measurement while you are still practicing numbers. Each lesson takes about ${duration} minutes.`}</p>
+    {course.gradeNumber === 7 && <p>{es ? 'Este recorrido cierra la primaria de CABA. Fórmulas y azar se ofrecen como exploraciones adicionales: podés pasar al resto del recorrido sin completarlas. La selección de temas es editorial y no certifica alineación curricular oficial.' : 'This path completes CABA primary school. Formulas and chance are additional explorations: you can continue with the rest of the path without completing them. The topic selection is editorial and does not certify official curriculum alignment.'}</p>}
+    <a class="btn btn-primary" href={buildSchoolLessonUrl(locale, course.gradeId, course.lessons[0].id)}>{course.startLabel[locale]} →</a>
+  </header>
+  {course.packages.map((pack, index) => (
+    <section class="card stack-md" id={pack.id.toLowerCase()}>
+      <h2>{index + 1}. {pack.title[locale]}</h2>
+      {pack.prerequisites.length > 0 && <p class="text-sm text-muted">{es ? 'Antes conviene practicar: ' : 'Helpful practice first: '}{pack.prerequisites.map((id, i) => <>{i > 0 && ', '}<a href={`${buildGradeUrl(locale, getCourseForPackage(id).gradeId)}#${id.toLowerCase()}`}>{getSchoolPackage(id).title[locale]}</a></>)}</p>}
+      <ol class="g1-lesson-list">
+        {course.lessons.filter(l => l.packageId === pack.id).map(lesson => (
+          <li><a href={buildSchoolLessonUrl(locale, course.gradeId, lesson.id)}><strong>{lesson.title[locale]}</strong><span>{lesson.objective[locale]}</span></a></li>
+        ))}
+      </ol>
+    </section>
+  ))}
+  {course.gradeNumber === 6 && <aside class="card stack-sm">
+    <h2>{es ? 'Exploración opcional' : 'Optional exploration'}</h2>
+    <a href={buildLearnTopicUrl(locale, 'negative-numbers')}>{es ? 'Primer encuentro con números negativos' : 'A first look at negative numbers'}</a>
+    <p>{es ? 'Podés explorar este material aparte; no es requisito para los recorridos ni para el proyecto de sexto.' : 'You can explore this material separately; it is not a prerequisite for the Grade 6 paths or project.'}</p>
+  </aside>}
+  <section class="card stack-md" id="project">
+    <h2>{es ? 'Proyecto final: ' : 'Final project: '}{course.project.title[locale]}</h2>
+    <p>{course.project.introduction[locale]}</p>
+    <ol>{course.project.tasks.map(task => <li>{task[locale]}</li>)}</ol>
+    <details><summary>{es ? 'Guía para acompañar y revisar' : 'Guide for helping and reviewing'}</summary>
+      <ul>{course.project.rubric.map(item => <li>{item[locale]}</li>)}</ul>
+      <p>{es ? 'Observá el dibujo o escuchá la explicación. Si algo falta, volvé al recorrido correspondiente y probá con otros objetos. Esta revisión no se califica automáticamente.' : 'Look at the drawing or listen to the explanation. If something is missing, revisit the relevant path and try other objects. This review is not automatically graded.'}</p>
+    </details>
+  </section>
+</div>

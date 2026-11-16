@@ -1,0 +1,55 @@
+{
+  "subject": "mathematics",
+  "stage": "middle",
+  "topic": "percentages-proportions",
+  "locale": "en-US",
+  "slug": "percentages-proportions",
+  "title": "Visual Percentages & Proportions",
+  "summary": "A percentage (\"per hundred\") tells how many parts we take out of 100 equal parts, linking fractions, decimals, and proportional scales.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Slide the percentage and total value to watch the 0%–100% bar and proportional quantity scale together in real time.",
+  "workedExampleTitle": "Two visual ways to find 25% of 80",
+  "workedSteps": [
+    {
+      "title": "Step 1: See the percentage as a fraction out of 100",
+      "explanation": "25% means 25 out of 100. Simplifying 25/100 by 25 shows that 25% is always 1/4 of the whole.",
+      "mathExpression": "25\\% = \\frac{25}{100} = \\frac{1}{4}"
+    },
+    {
+      "title": "Step 2: Split the total into 4 equal quarters",
+      "explanation": "One fourth of 80 is 80 ÷ 4 = 20.",
+      "mathExpression": "80 \\div 4 = 20"
+    },
+    {
+      "title": "Step 3: Alternative method using 10% building blocks",
+      "explanation": "10% of 80 is 8, and 5% is half of that (4). So 25% = 10% + 10% + 5% = 8 + 8 + 4 = 20.",
+      "mathExpression": "8 + 8 + 4 = 20"
+    }
+  ],
+  "whyItWorks": "A proportion keeps the ratio between part and whole constant: 20 out of 80 is the exact same ratio as 25 out of 100.",
+  "commonMistake": {
+    "wrongExample": "Common trap: assuming 25% of 80 is just 25.",
+    "correction": "25% only equals 25 when the total is 100. When the total is 80, 25% is one-fourth of 80, which is 20."
+  },
+  "deepDiveExtra": "To calculate any percentage mentally, find 10% first (divide by 10) and 1% (divide by 100), then combine them.",
+  "quickChecks": [
+    {
+      "id": "pct-q1",
+      "question": "What is 50% of 140?",
+      "options": [
+        { "label": "70 (half of 140)", "value": "70", "isCorrect": true },
+        { "label": "50", "value": "50", "isCorrect": false }
+      ],
+      "explanation": "50% equals 50/100 = 1/2. Half of 140 is 70."
+    },
+    {
+      "id": "pct-q2",
+      "question": "If 10% of 60 is 6, what is 30% of 60?",
+      "options": [
+        { "label": "18 (3 times 6)", "value": "18", "isCorrect": true },
+        { "label": "36", "value": "36", "isCorrect": false }
+      ],
+      "explanation": "30% is 3 times 10%, so 3 × 6 = 18."
+    }
+  ]
+}

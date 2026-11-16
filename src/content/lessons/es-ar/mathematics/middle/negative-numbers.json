@@ -1,0 +1,56 @@
+{
+  "subject": "mathematics",
+  "stage": "middle",
+  "topic": "negative-numbers",
+  "locale": "es-AR",
+  "slug": "numeros-negativos",
+  "title": "Números Negativos y Desplazamientos en la Recta",
+  "summary": "Los números negativos representan valores menores que cero, como temperaturas bajo cero, pisos subterráneos o profundidades bajo el nivel del mar.",
+  "accessLevel": "free",
+  "visualInteractiveHint": "Elegí el punto de partida y el cambio en la recta numérica: sumar mueve hacia la derecha (+) y restar mueve hacia la izquierda (−).",
+  "workedExampleTitle": "Caminando por la recta: de −4 sumamos +7",
+  "workedSteps": [
+    {
+      "title": "Paso 1: Ubicar el punto de partida",
+      "explanation": "El −4 está 4 pasos a la izquierda del 0.",
+      "mathExpression": "\\text{Inicio: } -4"
+    },
+    {
+      "title": "Paso 2: Llegar primero al cero",
+      "explanation": "De los 7 pasos hacia la derecha, usamos los primeros 4 pasos para llegar de −4 hasta 0.",
+      "mathExpression": "-4 + 4 = 0"
+    },
+    {
+      "title": "Paso 3: Avanzar los pasos restantes",
+      "explanation": "Como teníamos que avanzar 7 y ya usamos 4, avanzamos 3 pasos más a la derecha del 0 y llegamos a +3.",
+      "mathExpression": "-4 + 7 = 3"
+    }
+  ],
+  "whyItWorks": "Cada número negativo es el opuesto simétrico de su positivo respecto del 0. Por eso −4 y +4 se cancelan exactamente en 0.",
+  "commonMistake": {
+    "wrongExample": "Confusión típica: creer que −8 es mayor que −2 porque 8 es mayor que 2.",
+    "correction": "En la recta numérica, cuanto más a la derecha está un número, mayor es. −2 °C es más cálido (mayor) que −8 °C."
+  },
+  "deepDiveExtra": "Restar un número negativo, como 5 − (−3), equivale a sacar una deuda de 3: te mueve hacia la derecha, así que 5 − (−3) = 5 + 3 = 8.",
+  "quickChecks": [
+    {
+      "id": "neg-q1",
+      "question": "Si estás en −3 y bajás 4 lugares más a la izquierda (−3 − 4), ¿dónde terminás?",
+      "options": [
+        { "label": "−7", "value": "-7", "isCorrect": true },
+        { "label": "−1", "value": "-1", "isCorrect": false },
+        { "label": "+7", "value": "7", "isCorrect": false }
+      ],
+      "explanation": "Empezás 3 lugares a la izquierda del 0 y te alejás 4 más hacia la izquierda: llegás a −7."
+    },
+    {
+      "id": "neg-q2",
+      "question": "¿Cuál temperatura es más alta (mayor)?",
+      "options": [
+        { "label": "−2 °C", "value": "-2", "isCorrect": true },
+        { "label": "−9 °C", "value": "-9", "isCorrect": false }
+      ],
+      "explanation": "−2 está más a la derecha en la recta numérica (más cerca del 0) que −9."
+    }
+  ]
+}

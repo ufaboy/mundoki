@@ -1,0 +1,30 @@
+---
+import type { Locale } from '../../math/core/types';
+interface Props {locale:Locale;packageId:string}
+const {locale,packageId}=Astro.props;const es=locale==='es-AR';
+const kind=['G05-02','G05-03','G05-04','G05-05'].includes(packageId)?'fractions':['G05-06','G05-07','G05-08'].includes(packageId)?'decimals':packageId==='G05-12'?'mode':null;
+---
+{kind && <section class="card stack-md g5-lab" data-g5-lab={kind} data-locale={locale}>
+ <h2>{es?'Explorá y justificá':'Explore and justify'}</h2>
+ {kind==='fractions' && <>
+  <p>{es?'Cada fila completa representa un entero del mismo tamaño. Cambiá A y B: las nuevas particiones conservan sus valores.':'Each complete row represents a whole of the same size. Change A and B: the new partitions preserve their values.'}</p>
+  {['A','B'].map((name,i)=><fieldset class="stack-sm"><legend>{es?'Fracción':'Fraction'} {name}</legend>
+   <label>{es?'Denominador':'Denominator'} {name} <select data-den={i}>{[2,3,4,6,8,12].map(d=><option value={d} selected={d===(i===0?3:4)}>{d}</option>)}</select></label>
+   <label>{es?'Numerador':'Numerator'} {name} <input type="range" min="0" max={i===0?6:8} value={i===0?2:3} step="1" data-num={i}/></label>
+  </fieldset>)}
+  <label>{es?'Operación':'Operation'} <select data-operation><option value="compare">{es?'Comparar':'Compare'}</option><option value="add">{es?'Sumar':'Add'}</option><option value="subtract">{es?'Restar A − B':'Subtract A − B'}</option></select></label>
+ </>}
+ {kind==='decimals' && <>
+  <p>{es?'Cada cuadrícula completa vale uno; cada casilla vale un centésimo. Calculamos con cantidades enteras de centésimos.':'Each complete grid is one; each cell is one hundredth. We calculate using whole counts of hundredths.'}</p>
+  {['A','B'].map((name,i)=><label>{es?'Centésimos':'Hundredths'} {name} <input type="range" min="0" max="200" step="1" value={i===0?80:75} data-num={i}/></label>)}
+  <label>{es?'Operación':'Operation'} <select data-operation><option value="compare">{es?'Comparar':'Compare'}</option><option value="add">{es?'Sumar':'Add'}</option><option value="subtract">{es?'Restar A − B':'Subtract A − B'}</option></select></label>
+ </>}
+ {kind==='mode' && <>
+  <p>{es?'Investigamos cuántos libros leyó cada persona. Ajustá cuántas personas dieron cada respuesta. El valor y su frecuencia no son lo mismo.':'We investigate how many books each person read. Adjust how many people gave each answer. The value and its frequency are different.'}</p>
+  {[0,1,2,3,4].map((n)=><label>{es?`${n} ${n === 1 ? 'libro' : 'libros'}: personas`:`${n} ${n === 1 ? 'book' : 'books'}: people`} <input type="range" min="0" max="10" step="1" value={[1,2,3,3,1][n]} data-frequency={n}/></label>)}
+ </>}
+ <p data-g5-summary role="status" aria-live="polite"></p>
+ <div data-g5-model></div>
+ <p>{es?'Predecí qué cambia, probalo y explicá tu conclusión.':'Predict what changes, try it, and explain your conclusion.'} {kind !== 'mode' && (es?'Para la resta, elegí A mayor o igual que B.':'For subtraction, choose A greater than or equal to B.')}</p>
+ <noscript>{es?'Activá JavaScript para modificar el modelo, o reproducí el ejemplo con papel y lápiz.':'Enable JavaScript to change the model, or reproduce the example with pencil and paper.'}</noscript>
+</section>}

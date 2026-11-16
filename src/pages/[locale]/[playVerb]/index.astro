@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PlayWorkspace from '../../../components/play/PlayWorkspace.astro';
+import { buildPlayUrl, normalizeUrlLocale } from '../../../i18n/routes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [
+    { params: { locale: 'es-ar', playVerb: 'jugar' } },
+    { params: { locale: 'en-us', playVerb: 'play' } },
+  ];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+const switchHref = buildPlayUrl(otherLocale);
+---
+
+<BaseLayout
+  title={locale === 'es-AR' ? 'Modo Jugar · Aventura Espacial' : 'Play Mode · Space Adventure'}
+  locale={locale}
+  activeNav="play"
+  switchLocaleHref={switchHref}
+>
+  <PlayWorkspace locale={locale} topicId="addition-subtraction" />
+</BaseLayout>

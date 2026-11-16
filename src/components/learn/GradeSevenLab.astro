@@ -1,0 +1,39 @@
+---
+import type { Locale } from '../../math/core/types';
+interface Props {locale:Locale;packageId:string}
+const {locale,packageId}=Astro.props;const es=locale==='es-AR';
+const kinds:Record<string,string>={'G07-04':'pattern','G07-05':'formula','G07-06':'angle','G07-07':'scale','G07-08':'box','G07-10':'chance'};
+const kind=kinds[packageId];
+const labels:Record<string,string>=es?{
+ pattern:'Cada cuadrado nuevo comparte exactamente un lado. Los colores distinguen horizontales y verticales.',
+ formula:'Exploración adicional. Rectángulos de altura 2 cm; ancho positivo. La tabla y los puntos muestran P = 2w + 4.',
+ angle:'Dos rectas se cruzan. El ángulo marcado y su adyacente completan media vuelta. Usá las propiedades para justificar.',
+ scale:'Cada celda representa 1 cm². El dibujo ampliado contiene k × k copias del original; compará borde y superficie.',
+ box:'Modelo sin espesor. La cuadrícula muestra una capa de cubitos de 1 cm³; las tres tarjetas muestran un ejemplar de cada par de caras, no una red para plegar.',
+ chance:'Exploración opcional. Revelá una serie ya registrada de 20 lanzamientos, siempre la misma. No genera azar ni predice el próximo resultado. C = cara; X = cruz.'
+}:{
+ pattern:'Each new square shares exactly one side. Colors distinguish horizontal and vertical sticks.',
+ formula:'Additional exploration. Rectangles have height 2 cm and positive width. The table and points show P = 2w + 4.',
+ angle:'Two straight lines cross. The marked angle and its adjacent angle complete half a turn. Use properties to justify.',
+ scale:'Each cell represents 1 cm². The enlarged drawing contains k × k copies of the original; compare boundary and surface.',
+ box:'Model without thickness. The grid shows one layer of 1 cm³ cubes; the three cards show one of each pair of faces, not a folding net.',
+ chance:'Optional exploration. Reveal an already recorded sequence of 20 tosses, always the same. It does not generate randomness or predict the next outcome. H = heads; T = tails.'
+};
+const controls:Record<string,[string,string,number,number,number,number][]>= {
+ pattern:[['n',es?'Cuadrados':'Squares',1,12,1,4]],
+ formula:[['w',es?'Ancho (cm)':'Width (cm)',0.5,10,0.5,3]],
+ angle:[['a',es?'Ángulo (°)':'Angle (°)',10,170,5,65]],
+ scale:[['w',es?'Ancho original (cm)':'Original width (cm)',1,6,1,3],['h',es?'Altura original (cm)':'Original height (cm)',1,6,1,2],['k',es?'Factor k':'Factor k',1,3,1,2]],
+ box:[['w',es?'Ancho (cm)':'Width (cm)',1,6,1,2],['d',es?'Profundidad (cm)':'Depth (cm)',1,6,1,3],['h',es?'Altura (cm)':'Height (cm)',1,6,1,4]],
+ chance:[['n',es?'Ensayos revelados':'Revealed trials',1,20,1,10]],
+};
+---
+{kind && <section class="card stack-md g7-lab" data-g7-lab={kind} data-locale={locale}>
+ <h2>{es?'Explorá, compará y justificá':'Explore, compare, and justify'}</h2>
+ <p>{labels[kind]}</p>
+ {controls[kind].map(([name,label,min,max,step,value])=><label>{label}<input type="range" name={name} min={min} max={max} step={step} value={value}/></label>)}
+ <p data-result aria-live="polite"></p>
+ <div data-picture></div><div data-table></div>
+ <p>{es?'Predecí antes de mover un control. Después explicá lo que cambió y lo que se conservó.':'Predict before moving a control. Then explain what changed and what stayed the same.'}</p>
+ <noscript>{es?'Activá JavaScript para mover el modelo; los ejemplos y explicaciones de la lección están disponibles arriba.':'Enable JavaScript to move the model; lesson examples and explanations remain available above.'}</noscript>
+</section>}

@@ -1,0 +1,40 @@
+---
+import type { Locale } from '../../math/core/types';
+import { GRADE_SIX_LESSONS, GRADE_SIX_PROJECT } from '../../content/grade6';
+import { GRADE_SIX_ASSESSMENTS } from '../../content/grade6/assessments';
+import { OCEAN_MISSIONS, OCEAN_CHAPTERS } from '../../content/grade6/oceanAdventure';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import OceanModel from './OceanModel.astro';
+import OceanScene from './OceanScene.astro';
+import OceanChoices from './OceanChoices.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+import GradeSixLab from './GradeSixLab.astro';
+import UpperPrimaryLab from './UpperPrimaryLab.astro';
+const {locale,lessonId}=Astro.props as {locale:Locale;lessonId:string};
+const es=locale==='es-AR';
+const index=GRADE_SIX_LESSONS.findIndex(l=>l.id===lessonId);
+const lesson=GRADE_SIX_LESSONS[index],mission=OCEAN_MISSIONS[index];
+if(!lesson||mission.id!==lesson.id)throw new Error(`Missing ocean mission: ${lessonId}`);
+const chapter=OCEAN_CHAPTERS.find(c=>c.id===lesson.packageId)!;
+const next=GRADE_SIX_LESSONS[index+1];
+const lastInPackage=!next||next.packageId!==lesson.packageId;
+---
+<article class="city-adventure city-lesson ocean-adventure" data-ocean-root data-ocean-lesson data-ocean-index={index} data-locale={locale}>
+ <nav class="city-top"><a href={`${buildGradeUrl(locale,'grade-6')}#${lesson.packageId.toLowerCase()}`}>← {es?'Mapa de la misión':'Ocean map'}</a><span>{es?'MISIÓN':'MISSION'} {index+1} / {GRADE_SIX_LESSONS.length}</span></nav>
+ <header class="city-heading"><p class="city-kicker">{chapter.icon} {chapter.title[locale]}</p><h1>{mission.title[locale]}</h1><p>{mission.introduction[locale]}</p></header>
+ <div class="city-scene-frame"><div class="city-scene-top"><span data-ocean-emblem-display aria-hidden="true">★</span><span data-ocean-name-display>{es?'Mi expedición':'My expedition'}</span><div aria-label={es?'Pasos de esta misión':'Mission steps'}>{lesson.checks.map((_,i)=><span data-ocean-badge={i}>{i+1}</span>)}</div></div><OceanScene kind={mission.scene}/><p class="ocean-scene-caption">{es?'Escena de la historia · los datos del desafío están abajo.':'Story scene · challenge data are below.'}</p><p class="city-reward" data-ocean-reward role="status" aria-live="polite" hidden></p></div>
+ <OceanChoices locale={locale}/>
+ <section class="city-challenge">
+ {lesson.checks.map((check,i)=><div data-ocean-question={i} hidden={i!==0} data-answer={check.answer} data-reward={mission.rewards[i][locale]}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / {lesson.checks.length}</p><h2 tabindex="-1" data-ocean-question-title>{check.prompt[locale]}</h2>
+ {(/estos supuestos|del ejemplo|ese plano|franja de plantas/.test(check.prompt['es-AR']))&&<p class="ocean-context">{lesson.story[locale]}</p>}
+ <OceanModel locale={locale} lessonId={lesson.id} question={i}/>
+ <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option,j)=><button type="button" data-ocean-answer={j}>{option[locale]}</button>)}</div><p class="city-hint" data-ocean-hint hidden>{check.explanation[locale]}</p></div>)}
+ <p class="city-feedback" data-ocean-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-ocean-help>{es?'Una pista':'A hint'}</button><button type="button" class="city-secondary" data-ocean-reset>{es?'Volver a jugar':'Play again'}</button><button type="button" class="city-primary" data-ocean-next hidden>{es?'Siguiente desafío':'Next challenge'} →</button><a class="city-primary" data-ocean-finish hidden href={next?buildSchoolLessonUrl(locale,'grade-6',next.id):'#ocean-celebration'}>{next?(es?'Siguiente misión':'Next mission'):(es?'¡Misión cumplida!':'Mission accomplished!')} →</a></div>
+ </section>
+ <details class="city-notebook"><summary>{es?'¿Cómo se hace? Abrí el cuaderno de ideas':'How does it work? Open the idea notebook'}</summary><div><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><h3>{es?'Ejemplo guiado (otros datos)':'Worked example (different data)'}</h3><figure class="city-example" data-scene><div>{lesson.scene.items.map((item,i)=><button type="button" data-scene-item aria-pressed="false" aria-label={`${es?'Tarjeta':'Card'} ${i+1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="city-secondary" data-scene-reset>{es?'Borrar marcas':'Clear marks'}</button></figure><ol>{lesson.steps.map(step=><li>{step[locale]}</li>)}</ol><p>{lesson.misconception[locale]}</p><GradeSixLab locale={locale} packageId={lesson.packageId}/><UpperPrimaryLab locale={locale} packageId={lesson.packageId}/></div></details>
+ {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es?'Un desafío extra: cinco preguntas':'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_SIX_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-ocean-check`} assessment/></div></details>}
+ <details class="city-notebook"><summary>{es?'Para explorar con un adulto':'Explore with a grown-up'}</summary><div><p>{lesson.warmup[locale]}</p><p>{lesson.exit[locale]}</p><p>{es?'Revisen juntos el dibujo y la explicación. Cada misión muestra una etapa de la historia; las respuestas no se guardan ni otorgan puntos de dominio. El nombre, el color y el emblema de la expedición se guardan solo en este navegador.':'Review the drawing and explanation together. Each mission shows a stage of the story; answers are not saved and do not award mastery points. The expedition name, color, and emblem are saved only in this browser.'}</p></div></details>
+ {!next && <section class="city-celebration" id="ocean-celebration" data-ocean-celebration hidden><p class="city-kicker">{es?'DE VUELTA EN LA COSTA':'BACK ON SHORE'}</p><h2>{es?'¡La estación vuelve a investigar!':'The station is researching again!'}</h2><OceanScene kind="park" preview/><p>{es?'La estación observaba cambios en el océano. Recuperamos sus instrumentos y registros. ¡Ahora compartimos la investigación en nuestro parque!':'The station observed changes in the ocean. We restored its instruments and records. Now we can share the research in our park!'}</p><a class="city-primary" href={buildGradeUrl(locale,'grade-6')}>{es?'Volver al mapa':'Back to the mission map'} →</a><details class="city-notebook"><summary>{es?'Proyecto en familia: nuestro patio de investigación':'Family project: our research yard'}</summary><div><p>{GRADE_SIX_PROJECT.introduction[locale]}</p><ol>{GRADE_SIX_PROJECT.tasks.map(task=><li>{task[locale]}</li>)}</ol><ul>{GRADE_SIX_PROJECT.rubric.map(item=><li>{item[locale]}</li>)}</ul></div></details></section>}
+ <noscript><p>{es?'Activá JavaScript para construir. Podés leer los ejemplos del cuaderno sin activarlo.':'Enable JavaScript to build. You can read the notebook examples without it.'}</p></noscript>
+</article>
+<script>import '../../scripts/oceanAdventure';</script>

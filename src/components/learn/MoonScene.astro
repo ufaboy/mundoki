@@ -1,0 +1,26 @@
+---
+import type {MoonScene} from '../../content/grade5/moonAdventure';
+const {kind='hangar',preview=false}=Astro.props as {kind?:MoonScene;preview?:boolean};
+const lunar=['landing','rover','research'].includes(kind);
+const space=lunar||kind==='flight';
+---
+<div class="moon-stage" data-moon-stage data-kind={kind} data-phase={preview?'complete':'start'} aria-hidden="true">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="380" rx="24" fill={space?'#182c50':'#e1eaf5'}/>
+{space?<>{[[85,70],[175,120],[310,50],[600,90],[710,45],[820,140]].map(([x,y])=><path d={`M${x-4} ${y}h8m-4-4v8`} stroke="#fff0bd" stroke-width="2"/>)}<circle cx="760" cy="95" r="46" fill={lunar?'#7db7d1':'#e1dfd6'}/>{lunar&&<path d="M728 72q33-25 50 13l-18 27-26-8z" fill="#83ba9f"/>}</>:<><circle cx="765" cy="65" r="30" fill="#f3cf7e"/><path d="M90 80h120m-60 20h130" stroke="#fff" stroke-width="20" stroke-linecap="round"/></>}
+{kind!=='flight'&&<><path d="M0 310Q200 275 400 310T900 300V380H0Z" fill={lunar?'#b7bdc7':'#a5b9b0'}/><ellipse cx="650" cy="336" rx="65" ry="12" fill={lunar?'#969eae':'#8fa79a'}/></>}
+{['hangar','hull','launch'].includes(kind)&&<><path d="M220 310V60H370M235 85h120m-120 50h120m-120 50h120m-120 50h120" fill="none" stroke="#8495a9" stroke-width="10"/><path d="M335 60v70" stroke="#4c617b" stroke-width="5"/><path d="M180 315h410" stroke="#455e77" stroke-width="14"/>
+<g class:list={['moon-rocket',{'moon-assembly':kind==='hangar'||kind==='hull'}]}>
+<g class="moon-base"><path d="M400 245h100v57H400z" fill="var(--moon-paint,#378d8b)"/><path d="M400 255l-28 47h28m100-47 28 47h-28" fill="#e2a565"/></g>
+{kind!=='hangar'&&<g class:list={{'moon-installed':kind==='hull'}}><rect x="400" y="135" width="100" height="110" rx="8" fill="#f8f3e6"/><path d="M400 140q10-62 50-85 40 23 50 85z" fill="var(--moon-paint,#378d8b)"/><circle cx="450" cy="185" r="24" fill="#86b6d0" stroke="#536c86" stroke-width="7"/></g>}
+<text x="450" y="280" text-anchor="middle" fill="white" font-size="27" data-moon-emblem-display>★</text>
+{kind==='launch'&&<path class="moon-built moon-flame" d="M416 302q10 30 34 58 24-28 34-58" fill="#f5b85b"/>}
+</g></>}
+{kind==='tank'&&<><rect x="335" y="125" width="160" height="170" rx="35" fill="#e7edef" stroke="#526782" stroke-width="7"/><path class="moon-built" d="M495 215h70v85" fill="none" stroke="var(--moon-paint,#378d8b)" stroke-width="15"/><rect x="365" y="155" width="100" height="90" rx="12" fill="#273f5c"/><circle class="moon-done" cx="415" cy="200" r="25" fill="#89d5ba"/></>}
+{kind==='cargo'&&<><rect x="465" y="130" width="180" height="180" rx="35" fill="#f6f0e3" stroke="#536b83" stroke-width="6"/><rect x="490" y="185" width="125" height="125" fill="#253d59"/><path d="M180 310h440" stroke="#536b83" stroke-width="14"/><g class="moon-cargo"><rect x="260" y="240" width="75" height="65" rx="8" fill="#dfad70"/><path d="M295 240v65m-35-34h75" stroke="#a47349" stroke-width="5"/></g><rect class="moon-done" x="490" y="185" width="125" height="125" rx="8" fill="var(--moon-paint,#378d8b)"/></>}
+{(kind==='console'||kind==='research')&&<><rect x="290" y="160" width="260" height="140" rx="20" fill="#536b83"/><rect x="312" y="180" width="216" height="85" rx="8" fill="#192e4c"/><path class="moon-built" d="M330 240l30-35 35 22 35-30 35 35 40-20" fill="none" stroke="#89d5ba" stroke-width="6"/><path d="M625 300v-90m-35-50q35 70 70 0" fill="none" stroke="#c6d5df" stroke-width="12"/><path class="moon-done" d="M610 125q15-15 30 0m-45-20q30-30 60 0m-75-20q45-45 90 0" fill="none" stroke="#eac37c" stroke-width="5"/></>}
+{kind==='flight'&&<g class="moon-flight"><path d="M285 230l55-40 80 40-80 40z" fill="#f6f0e3"/><circle cx="347" cy="230" r="18" fill="#80bdd5"/><g class="moon-built" fill="var(--moon-paint,#378d8b)" stroke="#c4d4e8" stroke-width="4"><path d="M315 188v-55h65v55zm0 84v55h65v-55z"/></g></g>}
+{kind==='landing'&&<g class="moon-lander"><path class="moon-built" d="M375 210l-40 65h-25m170-65 40 65h25" fill="none" stroke="#d9b678" stroke-width="9"/><path d="M360 200v-70l65-35 65 35v70z" fill="#f0d6a1" stroke="#5f7186" stroke-width="5"/><rect x="393" y="130" width="65" height="44" rx="10" fill="#4e789a"/><path d="M370 205h110" stroke="#78899b" stroke-width="14"/></g>}
+{kind==='rover'&&<><path d="M660 300v-95h100v95" fill="#e0e4e8" stroke="#7c899e" stroke-width="5"/><g class="moon-rover"><path d="M240 270v-55h140v55z" fill="var(--moon-paint,#378d8b)"/><circle cx="262" cy="280" r="24" fill="#334b65"/><circle cx="357" cy="280" r="24" fill="#334b65"/><path d="M320 215v-40l40-20" fill="none" stroke="#d9b678" stroke-width="8"/><path class="moon-built" d="M270 215l7-28 28-8 24 16-10 20z" fill="#a5acb8" stroke="#59697e" stroke-width="3"/></g></>}
+{kind==='home'&&<><g class="moon-capsule"><path d="M350 105q90-110 180 0z" fill="var(--moon-paint,#378d8b)"/><path d="M350 105l60 100m120-100-60 100m-30-100v100" stroke="#61748c" stroke-width="3"/><path d="M410 205h60l18 45h-96z" fill="#ece2ce" stroke="#536b83" stroke-width="5"/></g><g class="moon-done"><path d="M595 280h180m-165 0v45m150-45v45" stroke="#bc8c65" stroke-width="10"/><path d="M620 275v-20h30v20m35 0v-20h30v20" fill="#e5c582"/><circle cx="570" cy="270" r="12" fill="#d9a580"/><path d="M570 286v35m0-25-15 10m15-10 15 10" stroke="#425e79" stroke-width="10"/></g></>}
+</svg></div>

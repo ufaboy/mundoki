@@ -1,0 +1,22 @@
+---
+import type {Locale} from '../../math/core/types';
+const {locale,lessonId,question}=Astro.props as {locale:Locale;lessonId:string;question:number};const es=locale==='es-AR';
+const place=lessonId==='G06-01-L01'&&question===0;
+const roman=lessonId==='G06-01-L02';
+const signals=lessonId==='G06-03-L03'&&question===0;
+const area=lessonId==='G06-09-L01'&&question===1?{w:5,h:3,cut:0}:lessonId==='G06-09-L02'&&question===0?{w:7,h:5,cut:2}:lessonId==='G06-09-L03'&&question===0?{w:5,h:5,cut:0}:null;
+const percent=lessonId==='G06-08-L01'?(question===0?40:75):null;
+const mean=lessonId==='G06-12-L01'&&question===0?[1,3,8]:lessonId==='G06-12-L02'&&question===0?[0,4,4,8]:lessonId==='G06-12-L03'&&question===0?[2,2,2,10]:null;
+const inverse=lessonId==='G06-07-L01';
+const scale=lessonId==='G06-10-L01'&&question===0?{factor:50,length:1}:lessonId==='G06-10-L02'&&question===0?{factor:200,length:3}:null;
+---
+{(place||roman||signals||area||percent!==null||mean||inverse||scale)&&<figure class="ocean-model" data-ocean-model data-solved="false"><figcaption>{es?'Datos del desafío':'Challenge data'}</figcaption>
+{place&&<div class="ocean-place">{[3,0,6,0,4].map((n,i)=><span><small>{(es?['Decenas de mil','Miles','Centenas','Decenas','Unidades']:['Ten thousands','Thousands','Hundreds','Tens','Ones'])[i]}</small><b>{n}</b></span>)}</div>}
+{roman&&<p class="ocean-numerals">{question===0?'X + X + V':'IV = V − I · VI = V + I'}</p>}
+{signals&&<><p>{es?'Dos señales: una cada 6 unidades de tiempo y otra cada 8.':'Two signals: one every 6 time units and one every 8.'}</p><div class="ocean-signal-list">{[6,8].map(n=><div><strong>{n}</strong>{Array.from({length:4},(_,i)=><span class:list={{'ocean-common':n*(i+1)===24}}>{n*(i+1)}</span>)}</div>)}</div></>}
+{area&&<><svg viewBox={`0 0 ${area.w*35+70} ${area.h*35+65}`} role="img" aria-label={es?`Rectángulo ${area.w} por ${area.h} metros${area.cut?', con esquina de 2 por 2 para quitar':''}`:`Rectangle ${area.w} by ${area.h} meters${area.cut?', with a 2 by 2 corner to remove':''}`}><text x="45" y="23">{area.w} m</text><text x="4" y="55">{area.h} m</text>{Array.from({length:area.w*area.h},(_,i)=><rect x={40+(i%area.w)*35} y={35+Math.floor(i/area.w)*35} width="35" height="35" fill={area.cut&&i%area.w>=area.w-area.cut&&Math.floor(i/area.w)<area.cut?'#e5b38b':'#9ec5bc'} stroke="#406f79"/>)}</svg><p>{es?'Cada casilla representa 1 m².':'Each cell represents 1 m².'} {area.cut>0&&(es?'La esquina naranja se quita.':'The orange corner is removed.')}</p></>}
+{percent!==null&&<><div class="ocean-hundred" aria-label={`${percent}/100`}>{Array.from({length:100},(_,i)=><span class:list={{shaded:i<percent}}/>)}</div><p>{es?'La cuadrícula completa representa un entero.':'The complete grid represents one whole.'}</p></>}
+{mean&&<><div class="ocean-records">{mean.map(n=><span>{n}</span>)}</div><div class="ocean-piles" aria-hidden="true">{mean.map(n=><div><span class="ocean-before" style={`height:${n*12}px`}/><span class="ocean-after" style={`height:${mean.reduce((a,b)=>a+b,0)/mean.length*12}px`}/></div>)}</div><p>{es?'Al resolver, las pilas se equilibran sin cambiar el total. Los datos originales siguen arriba.':'Solving balances the piles without changing the total. Original observations remain above.'}</p></>}
+{inverse&&<><p>{es?'Trabajo total: 24 horas-persona. Mismo ritmo, tarea divisible y sin esperas.':'Total work: 24 person-hours. Equal rates, divisible work, no waiting.'}</p><div class="ocean-records"><span>2 × 12 = 24</span><span>3 × ? = 24</span><span>4 × 6 = 24</span></div></>}
+{scale&&<div class="ocean-records"><span>{es?'Escala':'Scale'} 1:{scale.factor}</span><span>{scale.length} cm × {scale.factor} = ? cm</span></div>}
+</figure>}

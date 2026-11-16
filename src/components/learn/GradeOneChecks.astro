@@ -1,0 +1,19 @@
+---
+import type { Locale } from '../../math/core/types';
+import type { GradeOneCheck } from '../../content/grade1/model';
+interface Props { locale: Locale; checks: GradeOneCheck[]; id: string; assessment?: boolean }
+const { locale, checks, id, assessment = false } = Astro.props;
+const es = locale === 'es-AR';
+---
+<form class="stack-md g1-checks" data-g1-checks data-assessment={assessment ? 'true' : 'false'} data-locale={locale}>
+  {checks.map((check, index) => (
+    <fieldset class="card-subtle stack-sm" data-answer={check.answer}>
+      <legend>{index + 1}. {check.prompt[locale]}</legend>
+      {check.options.map((option, i) => <label class="g1-option"><input type="radio" name={`${id}-${index}`} value={i} required /> <span>{option[locale]}</span></label>)}
+      <p class="g1-feedback" data-feedback hidden><strong data-result></strong> {check.explanation[locale]}</p>
+    </fieldset>
+  ))}
+  <button class="btn btn-primary" type="submit">{es ? 'Revisar respuestas' : 'Check answers'}</button>
+  <p data-summary role="status" aria-live="polite"></p>
+  <button class="btn btn-outline" type="reset">{es ? 'Volver a intentar' : 'Try again'}</button>
+</form>

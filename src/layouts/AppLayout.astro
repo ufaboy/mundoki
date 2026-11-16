@@ -1,0 +1,52 @@
+---
+// Layout for pages built on the design system (src/styles/design-system.css).
+// Legacy pages still use BaseLayout; both share SiteHeader and SiteFooter, so
+// the header and menu never change between them.
+import DesignHead from '../components/shared/DesignHead.astro';
+import SiteHeader from '../components/shared/SiteHeader.astro';
+import SiteFooter from '../components/shared/SiteFooter.astro';
+import type { Locale } from '../math/core/types';
+import { t } from '../i18n/translations';
+import type { SiteNavId } from '../i18n/routes';
+
+interface Props {
+  title: string;
+  description?: string;
+  locale: Locale;
+  activeNav?: SiteNavId;
+  switchLocaleHref?: string;
+}
+
+const {
+  locale = 'es-AR',
+  title,
+  description = locale === 'en-US'
+    ? 'Mundoki — visual mathematics for primary and secondary school.'
+    : 'Mundoki — matemática visual para primaria y secundaria.',
+  activeNav = 'home',
+  switchLocaleHref,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={locale} class="mk-root">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{title} | Mundoki</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={`${title} | Mundoki`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <DesignHead />
+  </head>
+  <body class="mk-body mk-ui">
+    <a href="#main-content" class="mk-skip">{t(locale, 'skipToContent')}</a>
+    <SiteHeader locale={locale} activeNav={activeNav} />
+    <main id="main-content" class="mk-page">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} switchLocaleHref={switchLocaleHref} />
+  </body>
+</html>

@@ -1,0 +1,291 @@
+---
+import { t } from '../../i18n/translations';
+import { Locale } from '../../math/core/types';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div id="account-page-root" data-locale={locale} class="article-container stack-lg">
+  <header class="card stack-sm">
+    <div class="kicker">Better Auth · Cloudflare D1 · OAuth 2.0 · Magic Link · 2FA (TOTP)</div>
+    <h1 class="section-title" style="margin:0;">{t(locale, 'authTitle')}</h1>
+    <p class="text-sm text-muted" style="margin:0;">
+      {locale === 'es-AR'
+        ? 'Podés usar Mundoki sin registrarte. Creá o conectá tu cuenta para sincronizar el progreso en Cloudflare D1, usar Enlace Mágico sin contraseña o proteger tu cuenta con 2FA (TOTP).'
+        : 'You can use Mundoki without registering. Create or connect an account to synchronize progress in Cloudflare D1, use a passwordless Magic Link, or protect your account with 2FA (TOTP).'}
+    </p>
+  </header>
+
+  <div id="account-status-banner" style="display:none;" role="status" aria-live="polite"></div>
+
+  <!-- 1. Guest Authentication View -->
+  <div id="account-guest-view" class="stack-lg">
+    <!-- OAuth 2.0 Section (temporarily hidden until OAuth credentials are configured) -->
+    <section id="oauth-section" class="card stack-md" hidden style="display:none;">
+      <h2 style="font-size:1.15rem;margin:0;">{t(locale, 'authOAuthSectionTitle')}</h2>
+      <div class="grid-3">
+        <button type="button" class="btn btn-outline" data-oauth-provider="google">
+          🌐 {t(locale, 'authOAuthGoogle')}
+        </button>
+        <button type="button" class="btn btn-outline" data-oauth-provider="facebook">
+          📘 {t(locale, 'authOAuthFacebook')}
+        </button>
+        <button type="button" class="btn btn-outline" data-oauth-provider="apple">
+           {t(locale, 'authOAuthApple')}
+        </button>
+      </div>
+
+      <!-- Development OAuth Sandbox (Shown when provider credentials are unconfigured) -->
+      <div id="oauth-dev-sandbox" class="card-subtle stack-sm" style="display:none;">
+        <div class="flex-between">
+          <strong class="text-sm" id="oauth-sandbox-provider-label">Google OAuth 2.0</strong>
+          <span class="text-xs text-mono text-muted">[DEV SANDBOX]</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-dev-oauth-email">
+            {locale === 'es-AR' ? 'Correo de prueba OAuth:' : 'Test OAuth Email:'}
+          </label>
+          <input
+            id="input-dev-oauth-email"
+            type="email"
+            class="input-field"
+            value="explorador.oauth@mundoki.edu.ar"
+          />
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-dev-oauth">
+          {locale === 'es-AR' ? 'Completar Acceso OAuth Simulado' : 'Complete Simulated OAuth Sign-In'}
+        </button>
+      </div>
+    </section>
+
+    <!-- Email / Password & Magic Link Tabs -->
+    <section class="card stack-md">
+      <div class="flex-row">
+        <button type="button" class="btn btn-primary btn-sm" data-auth-tab="signin">
+          {t(locale, 'authSignIn')}
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" data-auth-tab="signup">
+          {t(locale, 'authSignUp')}
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" data-auth-tab="magic">
+          ✉ {t(locale, 'authMagicLinkTab')}
+        </button>
+      </div>
+
+      <!-- Password Form -->
+      <div id="auth-password-section">
+        <form id="form-password-auth" class="stack-sm">
+          <div id="auth-name-group" class="form-group" style="display:none;">
+            <label class="form-label" for="input-auth-name">{t(locale, 'authDisplayName')}</label>
+            <input id="input-auth-name" type="text" class="input-field" placeholder="Cadete Solar" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-auth-email">{t(locale, 'authEmail')}</label>
+            <input
+              id="input-auth-email"
+              type="email"
+              required
+              class="input-field"
+              placeholder="estudiante@escuela.edu.ar"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-auth-password">{t(locale, 'authPassword')}</label>
+            <input
+              id="input-auth-password"
+              type="password"
+              required
+              minlength="6"
+              class="input-field"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-submit-password-auth">
+            {t(locale, 'authSignIn')}
+          </button>
+        </form>
+      </div>
+
+      <!-- Magic Link Form -->
+      <div id="auth-magic-section" style="display:none;" class="stack-md">
+        <p class="text-sm text-muted" style="margin:0;">{t(locale, 'authMagicLinkDesc')}</p>
+        <form id="form-magic-link" class="stack-sm">
+          <div class="form-group">
+            <label class="form-label" for="input-magic-email">{t(locale, 'authEmail')}</label>
+            <input
+              id="input-magic-email"
+              type="email"
+              required
+              class="input-field"
+              placeholder="tutor@familia.com.ar"
+            />
+          </div>
+          <button type="submit" class="btn btn-emerald">
+            ✉ {t(locale, 'authMagicLinkSendBtn')}
+          </button>
+        </form>
+        <div id="magic-dev-outbox" class="callout callout-emerald stack-sm" style="display:none;"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 2. Two-Factor Authentication (2FA) Login Challenge View -->
+  <section id="account-2fa-challenge-view" class="card stack-md" style="display:none;">
+    <div class="kicker" style="color:var(--accent-amber);">RFC 6238 TOTP · 2FA</div>
+    <h2 class="section-title" style="margin:0;">{t(locale, 'twoFactorChallengeTitle')}</h2>
+    <p class="text-sm text-muted" style="margin:0;">
+      {t(locale, 'twoFactorChallengeDesc')} (<strong id="challenge-2fa-email"></strong>)
+    </p>
+
+    <div
+      id="challenge-2fa-dev-totp"
+      class="callout callout-amber text-mono text-sm"
+      style="display:none;"
+    ></div>
+
+    <form id="form-2fa-challenge" class="stack-sm">
+      <div class="form-group">
+        <label class="form-label" for="input-2fa-challenge-code">
+          {locale === 'es-AR'
+            ? 'Código TOTP de 6 dígitos o código de recuperación (ej. XXXX-XXXX):'
+            : '6-digit TOTP code or recovery backup code (e.g. XXXX-XXXX):'}
+        </label>
+        <input
+          id="input-2fa-challenge-code"
+          type="text"
+          required
+          class="input-field input-mono"
+          placeholder="123456"
+        />
+      </div>
+      <div class="flex-row">
+        <button type="submit" class="btn btn-primary">
+          {t(locale, 'twoFactorVerifyLoginBtn')}
+        </button>
+        <button type="button" class="btn btn-outline" id="btn-cancel-2fa-challenge">
+          {locale === 'es-AR' ? 'Cancelar' : 'Cancel'}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 3. Authenticated User Profile & 2FA Management View -->
+  <div id="account-loggedin-view" class="stack-lg" style="display:none;">
+    <a id="account-admin-promos" class="btn btn-outline" href={`/${locale.toLowerCase()}/admin/promos`} hidden>{locale === 'es-AR' ? 'Administrar invitaciones' : 'Manage invitations'}</a>
+    <a id="account-return-promo" class="btn btn-primary" href={`/${locale.toLowerCase()}/premium`} hidden>{locale === 'es-AR' ? 'Volver a mi invitación' : 'Return to my invitation'}</a>
+    <section class="card stack-md">
+      <div class="flex-between">
+        <div>
+          <div class="kicker">{locale === 'es-AR' ? 'Sesión Activa' : 'Active Session'}</div>
+          <h2 id="user-profile-name" style="margin:0;font-size:1.45rem;">Explorador</h2>
+          <div id="user-profile-email" class="text-sm text-muted text-mono"></div>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-sign-out">
+          {t(locale, 'authSignOut')}
+        </button>
+      </div>
+
+      <div class="grid-2 text-sm">
+        <div class="card-subtle">
+          <div class="text-xs text-muted">
+            {locale === 'es-AR' ? 'Métodos de acceso vinculados' : 'Linked sign-in methods'}
+          </div>
+          <strong class="text-mono" id="user-profile-methods">password</strong>
+        </div>
+        <div class="card-subtle">
+          <div class="text-xs text-muted">
+            {locale === 'es-AR' ? 'Estado de Suscripción' : 'Subscription Tier'}
+          </div>
+          <strong id="user-profile-tier">Free Demo</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two-Factor Authentication (2FA / TOTP + Backup Codes) Card -->
+    <section class="card stack-md">
+      <div class="flex-between">
+        <div>
+          <div class="kicker">RFC 6238 TOTP + Backup Recovery Codes</div>
+          <h3 style="margin:0;font-size:1.2rem;">{t(locale, 'twoFactorTitle')}</h3>
+          <div id="user-2fa-status-badge" class="text-sm text-muted">2FA Disabled</div>
+        </div>
+
+        <div class="flex-row">
+          <button type="button" class="btn btn-primary btn-sm" id="btn-start-2fa-setup">
+            🔐 {t(locale, 'twoFactorSetupBtn')}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            id="btn-disable-2fa"
+            style="display:none;"
+          >
+            {t(locale, 'twoFactorDisableBtn')}
+          </button>
+        </div>
+      </div>
+
+      <!-- 2FA Setup Wizard -->
+      <div id="panel-2fa-setup" class="card-subtle stack-md" style="display:none;">
+        <div class="stack-sm">
+          <div class="text-xs text-muted">
+            {locale === 'es-AR'
+              ? '1. Clave Secreta Base32 para Google Authenticator / Authy / 1Password:'
+              : '1. Base32 Secret Key for Google Authenticator / Authy / 1Password:'}
+          </div>
+          <code id="totp-setup-secret" class="card text-mono font-bold" style="display:block;padding:10px;"></code>
+          <div class="text-xs text-mono text-muted" id="totp-setup-uri" style="word-break:break-all;"></div>
+        </div>
+
+        <div class="callout callout-amber text-sm">
+          {locale === 'es-AR'
+            ? '[MODO DESARROLLO — Código TOTP actual de 6 dígitos]: '
+            : '[DEV TOTP HELPER — Current 6-digit code]: '}
+          <strong class="text-mono" id="totp-setup-dev-code"></strong>
+        </div>
+
+        <div class="stack-sm">
+          <div class="text-xs font-bold">
+            {locale === 'es-AR'
+              ? '2. Códigos de Recuperación de Respaldo (un solo uso):'
+              : '2. Single-Use Backup Recovery Codes:'}
+          </div>
+          <div id="totp-backup-codes-list" class="flex-row"></div>
+        </div>
+
+        <form id="form-enable-2fa" class="stack-sm">
+          <label class="form-label" for="input-totp-verify-code">
+            {locale === 'es-AR'
+              ? '3. Ingresá el código de 6 dígitos para confirmar y activar 2FA:'
+              : '3. Enter the 6-digit code to verify and enable 2FA:'}
+          </label>
+          <div class="flex-row">
+            <input
+              id="input-totp-verify-code"
+              type="text"
+              required
+              class="input-field input-mono"
+              style="max-width:200px;"
+              placeholder="123456"
+            />
+            <button type="submit" class="btn btn-emerald">
+              {t(locale, 'twoFactorVerifyEnableBtn')}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { initAccountPage } from '../../scripts/accountClient';
+  initAccountPage();
+</script>

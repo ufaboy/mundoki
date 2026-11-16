@@ -1,0 +1,35 @@
+---
+import type { Locale } from '../../math/core/types';
+import { ROAD_MISSIONS, ROAD_CHAPTERS } from '../../content/grade2/roadTrip';
+import { GRADE_TWO_LESSONS, GRADE_TWO_PACKAGES, GRADE_TWO_PROJECT } from '../../content/grade2';
+import { buildCatalogUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import RoadTripCar from './RoadTripCar.astro';
+const { locale } = Astro.props as {locale:Locale};
+const es=locale==='es-AR';
+---
+<div class="road-trip road-map" data-road-map>
+ <nav class="road-top"><a href={buildCatalogUrl(locale)}>← {es?'Todos los grados':'All grades'}</a><span>{es?'2.º GRADO':'GRADE 2'}</span><a href="#road-grownups">{es?'Para familias':'For grown-ups'}</a></nav>
+ <header class="road-map-hero"><div class="road-map-copy"><p class="road-eyebrow">{es?'TU PRÓXIMA GRAN AVENTURA':'YOUR NEXT BIG ADVENTURE'}</p><h1>{es?'¡Tu garaje, tu aventura!':'Your garage. Your adventure!'}</h1><p>{es?'Comprá, repará y mejorá tu auto. ¡Cruzá en ferry hasta una isla!':'Buy, repair, and upgrade your car. Take a ferry to an island!'}</p><a class="road-primary" href={buildSchoolLessonUrl(locale,'grade-2',ROAD_MISSIONS[0].id)}><span aria-hidden="true">🔧</span> {es?'Elegir mi primer auto':'Choose my first car'} →</a><a class="road-map-pick" href="#road-missions">{es?'O elegí una misión ↓':'Or choose a mission ↓'}</a></div><div class="road-map-art" aria-hidden="true"><div class="road-map-stamp">{es?'DESTINO: EL MAR':'DESTINATION: THE SEA'} <span>🌊</span></div><RoadTripCar complete/><span class="road-art-line"></span></div></header>
+ <div class="road-map-instructions"><span><b>1</b> {es?'Resolvé':'Solve'}</span><span><b>2</b> {es?'Mejorá':'Upgrade'}</span><span><b>3</b> {es?'¡Viajá!':'Travel!'}</span></div>
+ <section id="road-missions"><div class="road-map-section-heading"><h2>{es?'Tu hoja de ruta':'Your road map'}</h2><span>{es?'36 misiones · todas abiertas':'36 missions · all open'}</span></div>
+ {ROAD_CHAPTERS.map((chapter,i)=><details class="road-chapter" id={`road-${chapter.id}`} open={i===0}><summary><span class="road-chapter-number">{String(i+1).padStart(2,'0')}</span><span class="road-chapter-label"><span class="road-eyebrow">{es?'MISIONES':'MISSIONS'} {chapter.start+1}–{chapter.end}</span><strong>{chapter.title[locale]}</strong></span><span class="road-chapter-icon" aria-hidden="true">{chapter.icon}</span><span class="road-chapter-toggle" aria-hidden="true">⌄</span></summary><ol class="road-mission-grid" start={chapter.start+1}>{ROAD_MISSIONS.slice(chapter.start,chapter.end).map((mission,offset)=>{
+  const n=chapter.start+offset;
+  const lesson=GRADE_TWO_LESSONS[n];
+  return <li id={GRADE_TWO_LESSONS[n-1]?.packageId!==lesson.packageId?lesson.packageId.toLowerCase():undefined}><a data-road-mission-link={mission.id} href={buildSchoolLessonUrl(locale,'grade-2',mission.id)}><span class="road-mission-number">{n+1}</span><span class="road-mission-symbol" aria-hidden="true">{chapter.icon}</span><strong>{mission.title[locale]}</strong><span class="road-mission-play">{es?'Jugar':'Play'} →</span></a></li>;
+ })}</ol></details>)}
+ </section>
+ <aside class="road-map-destination"><span aria-hidden="true">🏫 🌊</span><div><h2>{es?'Nos esperan junto al mar':'They’re waiting by the sea'}</h2><p>{es?'Un viaje para construir, pensar y ayudar.':'A journey to build, think, and help.'}</p></div></aside>
+ <details class="road-workbook" id="road-grownups"><summary>{es?'Para familias: el aprendizaje detrás del juego':'For grown-ups: the learning behind the game'}</summary><div class="road-workbook-body"><p>{es?'Cada misión tiene dos desafíos. Un adulto conduce el auto imaginario; el niño construye, calcula y organiza el viaje. Se puede abrir cualquier misión. Las respuestas no se guardan entre visitas.':'Each mission has two challenges. A grown-up drives the imaginary car; the child builds, calculates, and plans the trip. Any mission can be opened. Answers are not saved between visits.'}</p><p>{es?'El cuaderno de cada misión conserva el ejemplo guiado, los modelos y las actividades para explicar. Al final de cada unidad hay cinco preguntas adicionales.':'Each mission’s notebook includes the worked example, models, and activities to explain your thinking. Each unit ends with five additional questions.'}</p><ul>{GRADE_TWO_PACKAGES.map(pack=><li><a href={buildSchoolLessonUrl(locale,'grade-2',GRADE_TWO_LESSONS.find(l=>l.packageId===pack.id)!.id)}>{pack.title[locale]}</a></li>)}</ul><section id="project"><h2>{GRADE_TWO_PROJECT.title[locale]}</h2><p>{GRADE_TWO_PROJECT.introduction[locale]}</p><ol>{GRADE_TWO_PROJECT.tasks.map(task=><li>{task[locale]}</li>)}</ol><details><summary>{es?'Cómo acompañar':'How to help'}</summary><ul>{GRADE_TWO_PROJECT.rubric.map(item=><li>{item[locale]}</li>)}</ul></details></section></div></details>
+</div>
+<script>
+ function revealRoadAnchor() {
+  let id:string;
+  try { id=decodeURIComponent(location.hash.slice(1)); } catch {return;}
+  const target=document.getElementById(id);
+  if(!target?.closest('[data-road-map]')) return;
+  let parent:HTMLElement|null=target;
+  while(parent){if(parent instanceof HTMLDetailsElement) parent.open=true;parent=parent.parentElement;}
+  requestAnimationFrame(()=>target.scrollIntoView({block:'start'}));
+ }
+ revealRoadAnchor();window.addEventListener('hashchange',revealRoadAnchor);
+</script>

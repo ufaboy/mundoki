@@ -1,0 +1,42 @@
+---
+import type { Locale } from '../../math/core/types';
+import { GRADE_FOUR_LESSONS, GRADE_FOUR_PROJECT } from '../../content/grade4';
+import { GRADE_FOUR_ASSESSMENTS } from '../../content/grade4/assessments';
+import { ISLAND_MISSIONS, ISLAND_CHAPTERS } from '../../content/grade4/islandAdventure';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import { getGradeFourHints } from '../../content/grade4/hints';
+import IslandWorkedDiagram from './IslandWorkedDiagram.astro';
+import IslandModel from './IslandModel.astro';
+import IslandScene from './IslandScene.astro';
+import IslandChoices from './IslandChoices.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+import UpperPrimaryLab from './UpperPrimaryLab.astro';
+const {locale,lessonId}=Astro.props as {locale:Locale;lessonId:string};
+const es=locale==='es-AR';
+const index=GRADE_FOUR_LESSONS.findIndex(l=>l.id===lessonId);
+const lesson=GRADE_FOUR_LESSONS[index],mission=ISLAND_MISSIONS[index];
+if(!lesson||mission.id!==lesson.id)throw new Error(`Missing island mission: ${lessonId}`);
+const hints=getGradeFourHints(lesson.id);
+const chapter=ISLAND_CHAPTERS.find(c=>c.id===lesson.packageId)!;
+const next=GRADE_FOUR_LESSONS[index+1];
+const lastInPackage=!next||next.packageId!==lesson.packageId;
+---
+<article class="city-adventure city-lesson island-adventure" data-island-root data-island-lesson data-island-index={index} data-locale={locale}>
+ <nav class="city-top"><a href={`${buildGradeUrl(locale,'grade-4')}#${lesson.packageId.toLowerCase()}`}>← {es?'Mapa de la isla':'Island map'}</a><span>{es?'MISIÓN':'MISSION'} {index+1} / {GRADE_FOUR_LESSONS.length}</span></nav>
+ <header class="city-heading"><p class="city-kicker">{chapter.icon} {chapter.title[locale]}</p><h1>{mission.title[locale]}</h1><p>{mission.introduction[locale]}</p></header>
+ <div class="city-scene-frame"><div class="city-scene-top"><span data-island-name-display>{es?'Mi expedición':'My expedition'}</span><div aria-label={es?'Pasos de esta misión':'Mission steps'}>{lesson.checks.map((_,i)=><span data-island-badge={i}>{i+1}</span>)}</div></div><IslandScene kind={mission.scene}/><p class="island-scene-caption">{es?'Escena de la historia · los datos del desafío están abajo.':'Story scene · challenge data are below.'}</p><p class="city-reward" data-island-reward role="status" aria-live="polite" hidden></p></div>
+ <IslandChoices locale={locale}/>
+ <section class="city-notebook island-worked-example" aria-label={es?'Ejemplo paso a paso':'Step-by-step example'}><p class="city-example-heading">{es?'Miremos un ejemplo':'Let’s try an example'}</p><div><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><h3>{es?'Ejemplo guiado (otros datos)':'Worked example (different data)'}</h3>{lesson.id!=='G04-13-L03' && <figure class="city-example" data-scene><div>{lesson.scene.items.map((item,i)=><button type="button" data-scene-item aria-pressed="false" aria-label={`${es?'Tarjeta':'Card'} ${i+1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="city-secondary" data-scene-reset>{es?'Borrar marcas':'Clear marks'}</button></figure>}<ol>{lesson.steps.map(step=><li>{step[locale]}</li>)}</ol><IslandWorkedDiagram locale={locale} lessonId={lesson.id}/><p>{lesson.misconception[locale]}</p><UpperPrimaryLab locale={locale} packageId={lesson.packageId}/></div></section>
+ <section class="city-challenge">
+ <p>{es?'Ahora te toca. Leé la pregunta y probá.':'Now it’s your turn. Read the question and try it.'}</p>
+ {lesson.checks.map((check,i)=><div data-island-question={i} hidden={i!==0} data-answer={check.answer} data-reward={mission.rewards[i][locale]}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / {lesson.checks.length}</p><h2 tabindex="-1" data-island-question-title>{check.prompt[locale]}</h2>
+ <IslandModel locale={locale} lessonId={lesson.id} question={i}/>
+ <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option,j)=><button type="button" data-island-answer={j}>{option[locale]}</button>)}</div><p class="city-hint" data-island-hint hidden>{hints[i][locale]}</p><p class="city-hint" data-island-explanation hidden>{check.explanation[locale]}</p></div>)}
+ <p class="city-feedback" data-island-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-island-help>{es?'Una pista':'A hint'}</button><button type="button" class="city-secondary" data-island-reset>{es?'Volver a jugar':'Play again'}</button><button type="button" class="city-primary" data-island-next hidden>{es?'Siguiente desafío':'Next challenge'} →</button><a class="city-primary" data-island-finish hidden href={next?buildSchoolLessonUrl(locale,'grade-4',next.id):'#island-celebration'}>{next?(es?'Siguiente misión':'Next mission'):(es?'¡Abrir la muestra!':'Open the exhibition!')} →</a></div>
+ </section>
+ {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es?'Un desafío extra: cinco preguntas':'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_FOUR_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-city-check`} assessment/></div></details>}
+ <details class="city-notebook"><summary>{es?'Para explorar con un adulto':'Explore with a grown-up'}</summary><div><p>{lesson.warmup[locale]}</p><p>{lesson.exit[locale]}</p><p>{es?'Revisen juntos el dibujo y la explicación. Cada misión muestra una etapa de la historia; las respuestas no se guardan ni otorgan puntos de dominio. El nombre y el color de la expedición se guardan solo en este navegador.':'Review the drawing and explanation together. Each mission shows a stage of the story; answers are not saved and do not award mastery points. The expedition name and color are saved only in this browser.'}</p></div></details>
+ {!next && <section class="city-celebration" id="island-celebration" data-island-celebration hidden><p class="city-kicker">{es?'LA MUESTRA DE INVENTOS':'THE INVENTION EXHIBITION'}</p><h2>{es?'¡La isla está llena de ideas!':'The island is full of ideas!'}</h2><IslandScene kind="exhibition" preview/><p>{es?'Una base, energía solar, un explorador, un faro, un puente y un dron. ¡Los vecinos de la ciudad vienen a conocerlos!':'A base, solar energy, a rover, a lighthouse, a bridge, and a drone. Visitors from the city have come to see them!'}</p><a class="city-primary" href={buildGradeUrl(locale,'grade-4')}>{es?'Volver a la isla':'Back to the island'} →</a><details class="city-notebook"><summary>{es?'Proyecto en familia: nuestra muestra':'Family project: our exhibition'}</summary><div><p>{GRADE_FOUR_PROJECT.introduction[locale]}</p><ol>{GRADE_FOUR_PROJECT.tasks.map(task=><li>{task[locale]}</li>)}</ol><ul>{GRADE_FOUR_PROJECT.rubric.map(item=><li>{item[locale]}</li>)}</ul></div></details></section>}
+ <noscript><p>{es?'Activá JavaScript para construir. Podés leer los ejemplos del cuaderno sin activarlo.':'Enable JavaScript to build. You can read the notebook examples without it.'}</p></noscript>
+</article>
+<script>import '../../scripts/islandAdventure';</script>

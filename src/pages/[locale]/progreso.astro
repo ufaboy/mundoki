@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProgressDashboard from '../../components/shared/ProgressDashboard.astro';
+import { buildProgressUrl, normalizeUrlLocale } from '../../i18n/routes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: { locale: 'es-ar' } }, { params: { locale: 'en-us' } }];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+---
+
+<BaseLayout
+  title={locale === 'es-AR' ? 'Mi Progreso' : 'My Progress'}
+  locale={locale}
+  activeNav="progress"
+  switchLocaleHref={buildProgressUrl(otherLocale)}
+>
+  <ProgressDashboard locale={locale} />
+</BaseLayout>
