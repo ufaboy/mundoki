@@ -1,0 +1,18 @@
+---
+import type { Locale } from '../../math/core/types';
+const {locale,lessonId}=Astro.props as {locale:Locale;lessonId:string};
+const es=locale==='es-AR';
+const places=es?['Enteros','Décimos','Centésimos','Milésimos']:['Wholes','Tenths','Hundredths','Thousandths'];
+---
+{lessonId==='G05-06-L01' && <div class="moon-worked-table" tabindex="0" role="region" aria-label={es?'Tabla de posiciones':'Place-value table'}>
+ <table><caption>{es?'El valor de cada cifra en 2,347':'The value of each digit in 2.347'}</caption><thead><tr>{places.map(p=><th scope="col">{p}</th>)}</tr></thead><tbody><tr>{[2,3,4,7].map(n=><td>{n}</td>)}</tr><tr>{['2','3/10','4/100','7/1000'].map(n=><td>{n}</td>)}</tr></tbody></table>
+ <p>{es?'Diez milésimos forman un centésimo; diez centésimos forman un décimo.':'Ten thousandths make one hundredth; ten hundredths make one tenth.'}</p>
+ </div>}
+{lessonId==='G05-08-L02' && <div class="moon-worked-table" tabindex="0" role="region" aria-label={es?'Intercambios para restar':'Regrouping to subtract'}>
+ <table><caption>{es?'Tres formas de escribir 3 antes de restar 1,47':'Three ways to write 3 before subtracting 1.47'}</caption><thead><tr><th scope="col">{es?'Paso':'Step'}</th>{places.slice(0,3).map(p=><th scope="col">{p}</th>)}</tr></thead><tbody>
+ {[[es?'Inicio':'Start',3,0,0],[es?'Un entero → diez décimos':'One whole → ten tenths',2,10,0],[es?'Un décimo → diez centésimos':'One tenth → ten hundredths',2,9,10],[es?'Quitamos':'Subtract',1,4,7],[es?'Queda':'Remaining',1,5,3]].map(([label,...values])=><tr><th scope="row">{label}</th>{values.map(n=><td>{n}</td>)}</tr>)}
+ </tbody></table></div>}
+{lessonId==='G05-12-L02' && <div class="moon-worked-table" tabindex="0" role="region" aria-label={es?'Respuestas y frecuencias':'Answers and frequencies'}>
+ <table><caption>{es?'Ocho personas: 0, 1, 1, 2, 2, 2, 3, 3 libros leídos':'Eight people: 0, 1, 1, 2, 2, 2, 3, 3 books read'}</caption><thead><tr><th scope="col">{es?'Libros leídos por persona':'Books read per person'}</th><th scope="col">{es?'Personas (frecuencia)':'People (frequency)'}</th></tr></thead><tbody>{[1,2,3,2].map((n,i)=><tr><th scope="row">{i}</th><td>{n}</td></tr>)}</tbody></table>
+ <p>{es?'Tres personas respondieron «dos libros». El 2 cuenta libros; el 3 cuenta personas.':'Three people answered “two books.” The 2 counts books; the 3 counts people.'}</p>
+ </div>}

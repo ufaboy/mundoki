@@ -7,7 +7,7 @@ const kind=['G05-02','G05-03','G05-04','G05-05'].includes(packageId)?'fractions'
 {kind && <section class="card stack-md g5-lab" data-g5-lab={kind} data-locale={locale}>
  <h2>{es?'Explorá y justificá':'Explore and justify'}</h2>
  {kind==='fractions' && <>
-  <p>{es?'Cada fila completa representa un entero del mismo tamaño. Cambiá A y B: las nuevas particiones conservan sus valores.':'Each complete row represents a whole of the same size. Change A and B: the new partitions preserve their values.'}</p>
+  <p>{es?'Cada fila completa representa un entero del mismo tamaño. Elegí las fracciones A y B. El modelo las muestra también con partes del mismo tamaño para compararlas.':'Each complete row represents a whole of the same size. Choose fractions A and B. The model also shows them with same-sized parts so you can compare them.'}</p>
   {['A','B'].map((name,i)=><fieldset class="stack-sm"><legend>{es?'Fracción':'Fraction'} {name}</legend>
    <label>{es?'Denominador':'Denominator'} {name} <select data-den={i}>{[2,3,4,6,8,12].map(d=><option value={d} selected={d===(i===0?3:4)}>{d}</option>)}</select></label>
    <label>{es?'Numerador':'Numerator'} {name} <input type="range" min="0" max={i===0?6:8} value={i===0?2:3} step="1" data-num={i}/></label>

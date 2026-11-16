@@ -7,22 +7,13 @@ import SchoolCourseCatalog from '../../../../components/learn/SchoolCourseCatalo
 import IslandMap from '../../../../components/learn/IslandMap.astro';
 import CityMap from '../../../../components/learn/CityMap.astro';
 import RoadTripMap from '../../../../components/learn/RoadTripMap.astro';
-import TomiAdventureMap from '../../../../components/learn/TomiAdventureMap.astro';
+import DayMap from '../../../../components/learn/DayMap.astro';
+import GradeHub from '../../../../components/learn/GradeHub.astro';
+import MascotSvg from '../../../../components/play/MascotSvg.astro';
 import { SCHOOL_COURSES } from '../../../../content/schoolCourses';
 import { t } from '../../../../i18n/translations';
-import {
-  buildCatalogUrl,
-  buildGradeUrl,
-  buildLearnTopicUrl,
-  buildPlayUrl,
-  normalizeUrlLocale,
-} from '../../../../i18n/routes';
-import {
-  getBlockById,
-  GRADES_CATALOG,
-  resolveGradeFromSlug,
-  SCHOOL_BLOCKS,
-} from '../../../../math/curriculum';
+import { buildGradeUrl, buildLearnTopicUrl, buildPlayUrl, normalizeUrlLocale } from '../../../../i18n/routes';
+import { getBlockById, GRADES_CATALOG, resolveGradeFromSlug } from '../../../../math/curriculum';
 
 export const prerender = true;
 
@@ -75,16 +66,17 @@ export function getStaticPaths() {
 const locale = normalizeUrlLocale(Astro.params.locale);
 const currentGrade = resolveGradeFromSlug(Astro.params.grade || '');
 const currentBlock = getBlockById(currentGrade.stage);
-const course = SCHOOL_COURSES.find(c => c.gradeId === currentGrade.id);
+const course = SCHOOL_COURSES.find((c) => c.gradeId === currentGrade.id);
 const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
 const switchHref = buildGradeUrl(otherLocale, currentGrade.id);
+const n = currentGrade.gradeNumber;
 
-const prevGrade = GRADES_CATALOG.find(
-  (g) => g.gradeNumber === currentGrade.gradeNumber - 1
-);
-const nextGrade = GRADES_CATALOG.find(
-  (g) => g.gradeNumber === currentGrade.gradeNumber + 1
-);
+// Pages already on the design system: grade 1 (a day with the hero), grade 3 (city world) and every grade
+// without a world of its own (secundaria), which share the topic template.
+// The other worlds still render their legacy pages until they are moved.
+const onSystem = n === 1 || n === 3 || (n > 7 && !course);
+const gradeLabel = currentGrade.labelShort[locale].replace('.°', '.º');
+const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentGrade.summary[locale];
 ---
 
 <BaseLayout
@@ -93,290 +85,36 @@ const nextGrade = GRADES_CATALOG.find(
   locale={locale}
   activeNav="learn"
   switchLocaleHref={switchHref}
+  system={onSystem}
 >
-  {currentGrade.gradeNumber === 1 ? <TomiAdventureMap locale={locale} /> : currentGrade.gradeNumber === 2 ? <RoadTripMap locale={locale} /> : currentGrade.gradeNumber === 3 ? <CityMap locale={locale} /> : currentGrade.gradeNumber === 4 ? <IslandMap locale={locale} /> : currentGrade.gradeNumber === 5 ? <MoonMap locale={locale} /> : currentGrade.gradeNumber === 6 ? <OceanMap locale={locale} /> : currentGrade.gradeNumber === 7 ? <ParkMap locale={locale} /> : course ? <SchoolCourseCatalog locale={locale} course={course} /> : (
-  <div class="stack-lg" id="grade-page-root">
-    <!-- Breadcrumb & Block Switcher -->
-    <nav class="card-subtle stack-sm" aria-label={locale === 'es-AR' ? 'Navegación por bloques y grados' : 'Block and grade navigation'}>
-      <div class="flex-between text-xs text-mono">
-        <div class="flex-row">
-          <a href={buildCatalogUrl(locale)}>
-            ← {locale === 'es-AR' ? 'Catálogo por Bloques y Grados' : 'Blocks & Grades Catalog'}
-          </a>
-          <span class="text-muted">/</span>
-          <span style={`color:${currentBlock.badgeColorVar};font-weight:700;`}>
-            {currentBlock.title[locale]} ({currentBlock.gradeRangeLabel[locale]})
-          </span>
-          <span class="text-muted">/</span>
-          <strong>{currentGrade.labelShort[locale]}</strong>
-        </div>
-        <span class="text-muted">
-          {currentGrade.ageRange[locale]} · 🪐 {currentGrade.planetSector[locale]}
-        </span>
-      </div>
-
-      <!-- All 3 Blocks + 12 Grades Quick Selector -->
-      <div class="stack-sm" style="padding-top:6px;border-top:1px solid var(--border-subtle);">
-        {SCHOOL_BLOCKS.map((block) => {
-          const gradesInBlock = GRADES_CATALOG.filter((g) => g.stage === block.id);
-          return (
-            <div class="flex-row" style="gap:8px;">
-              <span
-                class="text-xs text-mono"
-                style={`min-width:190px;font-weight:700;color:${block.badgeColorVar};`}
-              >
-                {block.title[locale]}:
-              </span>
-              <div class="flex-row" style="gap:6px;">
-                {gradesInBlock.map((g) => (
-                  <a
-                    href={buildGradeUrl(locale, g.id)}
-                    class:list={['grade-pill', { active: g.id === currentGrade.id }]}
-                  >
-                    {g.labelShort[locale]}
-                  </a>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </nav>
-
-    <!-- Grade Hero Banner -->
-    <header class="card hero-split">
-      <div class="stack-md">
-        <div class="flex-row">
-          <span
-            class="grade-pill"
-            style={`background:${currentBlock.badgeColorVar};color:#fff;border-color:transparent;`}
-          >
-            {currentBlock.title[locale]}
-          </span>
-          <span class="grade-pill">
-            {currentGrade.labelShort[locale]} · {currentGrade.ageRange[locale]}
-          </span>
-        </div>
-
-        <h1 class="hero-title" style="font-size:2.05rem;margin-bottom:4px;">
-          {currentGrade.title[locale]}
-        </h1>
-        <p class="subtitle" style="margin-bottom:0;">
-          {currentGrade.summary[locale]}
-        </p>
-
-        <div class="flex-row">
-          <a
-            href={buildLearnTopicUrl(locale, currentGrade.primaryTopicId)}
-            class="btn btn-primary"
-          >
-            📖 {locale === 'es-AR' ? 'Empezar Primera Lección' : 'Start First Lesson'} →
-          </a>
-          <a
-            href={buildPlayUrl(locale, currentGrade.primaryTopicId)}
-            class="btn btn-emerald"
-          >
-            🚀 {locale === 'es-AR' ? 'Abrir Entrenador del Grado' : 'Open Grade Trainer'}
-          </a>
-        </div>
-      </div>
-
-      <div class="space-panel stack-sm">
-        <div class="text-xs text-mono" style="color:#38BDF8;">
-          {locale === 'es-AR' ? 'SECTOR ESPACIAL DEL GRADO' : 'GRADE SPACE SECTOR'}
-        </div>
-        <h2 style="color:#fff;font-size:1.25rem;margin:0;">
-          🪐 {currentGrade.planetSector[locale]}
-        </h2>
-        <p class="text-xs" style="color:#CBD5E1;margin:0;">
-          {locale === 'es-AR' ? 'Guardián asignado:' : 'Assigned Guardian:'}{' '}
-          <strong style="color:#34D399;">{currentGrade.guardianTitle[locale]}</strong>
-        </p>
-        <div class="space-subcard flex-between text-xs text-mono">
-          <span>
-            📖 {currentGrade.lessons.length}{' '}
-            {locale === 'es-AR' ? 'Lecciones Visuales' : 'Visual Lessons'}
-          </span>
-          <span>
-            🚀 {currentGrade.lessons.length}{' '}
-            {locale === 'es-AR' ? 'Entrenadores Activos' : 'Active Trainers'}
-          </span>
-        </div>
-      </div>
-    </header>
-
-    <!-- Filter Bar: Lessons vs Trainers -->
-    <section class="stack-md">
-      <div class="flex-between">
-        <div>
-          <h2 class="section-title" style="margin-bottom:4px;">
-            {locale === 'es-AR'
-              ? `Programa de Lecciones y Entrenadores · ${currentGrade.labelShort[locale]}`
-              : `Lessons & Practice Trainers Syllabus · ${currentGrade.labelShort[locale]}`}
-          </h2>
-          <p class="text-sm text-muted" style="margin:0;">
-            {locale === 'es-AR'
-              ? 'Cada unidad combina una lección visual interactiva y un entrenador práctico con ejercicios determinísticos.'
-              : 'Every unit pairs an interactive visual lesson with a deterministic math trainer.'}
-          </p>
-        </div>
-
-        <div class="flex-row" role="group" aria-label="View mode filter">
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            data-grade-filter="all"
-          >
-            {locale === 'es-AR' ? 'Todo (Lecciones + Entrenadores)' : 'All (Lessons + Trainers)'}
-          </button>
-          <button
-            type="button"
-            class="btn btn-outline btn-sm"
-            data-grade-filter="lessons"
-          >
-            📖 {locale === 'es-AR' ? 'Solo Lecciones' : 'Lessons Only'}
-          </button>
-          <button
-            type="button"
-            class="btn btn-outline btn-sm"
-            data-grade-filter="trainers"
-          >
-            🚀 {locale === 'es-AR' ? 'Solo Entrenadores' : 'Trainers Only'}
-          </button>
-        </div>
-      </div>
-
-      <!-- Ordered Units List for this Grade -->
-      <div class="stack-md" id="grade-units-list">
-        {currentGrade.lessons.map((unit) => (
-          <article class="card stack-md" data-unit-item={unit.id}>
-            <div class="flex-between text-xs text-mono">
-              <div class="flex-row">
-                <span
-                  class="grade-pill"
-                  style="background:var(--text-primary);color:#fff;border-color:transparent;"
-                >
-                  {unit.unitCode}
-                </span>
-                <span
-                  style={`color:${
-                    unit.accessLevel === 'free'
-                      ? 'var(--accent-emerald)'
-                      : 'var(--accent-amber)'
-                  };font-weight:700;`}
-                >
-                  {unit.accessLevel === 'free'
-                    ? t(locale, 'badgeFree')
-                    : t(locale, 'badgePremium')}{' '}
-                  · ~{unit.estimatedMinutes} min
-                </span>
-              </div>
-              <span class="text-muted">🪐 {unit.planetSector[locale]}</span>
-            </div>
-
-            <div class="grid-2">
-              <!-- Visual Lesson Card -->
-              <div class="card-subtle stack-sm" data-unit-part="lesson">
-                <div class="kicker" style="margin:0;">
-                  📖 {locale === 'es-AR' ? 'Lección Visual Ilustrada' : 'Illustrated Visual Lesson'}
-                </div>
-                <h3 style="font-size:1.15rem;margin:0;">{unit.title[locale]}</h3>
-                <p class="text-sm text-muted" style="margin:0;">
-                  {unit.summary[locale]}
-                </p>
-                <div style="padding-top:6px;">
-                  <a
-                    href={buildLearnTopicUrl(locale, unit.linkedTopicId)}
-                    class="btn btn-primary btn-sm"
-                  >
-                    📖 {t(locale, 'actionLearn')} →
-                  </a>
-                </div>
-              </div>
-
-              <!-- Practice Trainer Card -->
-              <div class="space-panel stack-sm" data-unit-part="trainer" style="padding:18px;">
-                <div class="text-xs text-mono" style="color:#38BDF8;">
-                  🚀 {locale === 'es-AR' ? 'ENTRENADOR PRÁCTICO (MODO JUGAR)' : 'PRACTICE TRAINER (PLAY MODE)'}
-                </div>
-                <h4 style="color:#fff;font-size:1.08rem;margin:0;">
-                  {unit.trainerTitle[locale]}
-                </h4>
-                <p class="text-xs" style="color:#CBD5E1;margin:0;">
-                  {locale === 'es-AR'
-                    ? 'Generador infinito con 3 niveles de dificultad (★ a ★★★), pistas progresivas y validación en servidor.'
-                    : 'Infinite deterministic generator with 3 difficulty tiers (★ to ★★★), progressive hints, and server verification.'}
-                </p>
-                <div style="padding-top:6px;">
-                  <a
-                    href={buildPlayUrl(locale, unit.linkedTopicId)}
-                    class="btn btn-emerald btn-sm"
-                  >
-                    🚀 {t(locale, 'actionPlay')} →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <!-- Prev / Next Grade Navigation -->
-    <section class="card flex-between">
-      <div>
-        {prevGrade ? (
-          <a href={buildGradeUrl(locale, prevGrade.id)} class="btn btn-outline btn-sm">
-            ← {prevGrade.labelShort[locale]} ({prevGrade.title[locale].split('·')[1]?.trim() || ''})
-          </a>
-        ) : (
-          <span class="text-xs text-muted">
-            {locale === 'es-AR' ? 'Primer grado del plan escolar' : 'First grade in curriculum'}
-          </span>
-        )}
-      </div>
-
-      <a href={buildCatalogUrl(locale)} class="btn btn-outline btn-sm">
-        {locale === 'es-AR' ? 'Ver los 3 Bloques y 12 Grados' : 'View All 3 Blocks & 12 Grades'}
-      </a>
-
-      <div>
-        {nextGrade ? (
-          <a href={buildGradeUrl(locale, nextGrade.id)} class="btn btn-primary btn-sm">
-            {nextGrade.labelShort[locale]} ({nextGrade.title[locale].split('·')[1]?.trim() || ''}) →
-          </a>
-        ) : (
-          <span class="text-xs text-muted">
-            {locale === 'es-AR' ? 'Último grado del bloque superior' : 'Final grade of High School block'}
-          </span>
-        )}
-      </div>
-    </section>
-  </div>
+  {n === 1 ? <DayMap locale={locale} /> : n === 2 ? <RoadTripMap locale={locale} /> : n === 3 ? <CityMap locale={locale} /> : n === 4 ? <IslandMap locale={locale} /> : n === 5 ? <MoonMap locale={locale} /> : n === 6 ? <OceanMap locale={locale} /> : n === 7 ? <ParkMap locale={locale} /> : course ? <SchoolCourseCatalog locale={locale} course={course} /> : (
+    <GradeHub
+      locale={locale}
+      gradeId={currentGrade.id}
+      gradeLabel={gradeLabel}
+      accent="var(--mk-grape)"
+      title={gradeLabel}
+      intro={gradeTheme}
+      startHref={buildLearnTopicUrl(locale, currentGrade.primaryTopicId)}
+      startLabel={t(locale, 'gradeStart')}
+    >
+      <MascotSvg slot="art" mood="happy" size={180} idPrefix="grade-atomo" />
+      {currentGrade.lessons.map((unit, index) => (
+        <article class="mk-card mk-unit">
+          <span class="mk-mission__num" aria-hidden="true">{index + 1}</span>
+          <div class="mk-stack mk-stack--tight">
+            <h3 class="mk-heading">{unit.title[locale]}</h3>
+            {unit.accessLevel !== 'free' && <span class="mk-chip mk-chip--grape" style="align-self:flex-start;">{t(locale, 'badgePremium')}</span>}
+          </div>
+          <div class="mk-unit__actions">
+            <a class="mk-btn" href={buildLearnTopicUrl(locale, unit.linkedTopicId)}>{t(locale, 'gradeLearn')}</a>
+            <a class="mk-btn" href={buildPlayUrl(locale, unit.linkedTopicId)}>
+              <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+              {t(locale, 'gradePractice')}
+            </a>
+          </div>
+        </article>
+      ))}
+    </GradeHub>
   )}
-
-  <script>
-    // Vanilla TypeScript interactive filter for Grade Lessons vs Trainers
-    const filterButtons = document.querySelectorAll<HTMLButtonElement>('[data-grade-filter]');
-    const lessonParts = document.querySelectorAll<HTMLElement>('[data-unit-part="lesson"]');
-    const trainerParts = document.querySelectorAll<HTMLElement>('[data-unit-part="trainer"]');
-
-    filterButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const mode = btn.getAttribute('data-grade-filter') || 'all';
-        filterButtons.forEach((b) => {
-          const isSelected = b.getAttribute('data-grade-filter') === mode;
-          b.classList.toggle('btn-primary', isSelected);
-          b.classList.toggle('btn-outline', !isSelected);
-        });
-
-        lessonParts.forEach((el) => {
-          el.style.display = mode === 'trainers' ? 'none' : '';
-        });
-        trainerParts.forEach((el) => {
-          el.style.display = mode === 'lessons' ? 'none' : '';
-        });
-      });
-    });
-  </script>
 </BaseLayout>

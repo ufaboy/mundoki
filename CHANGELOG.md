@@ -3,6 +3,14 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [1.0.2] - 2026-11-16
+
+### Added
+- Grade 1 "Day" interactive story adventure (`DayLesson` and `DayMap`) with bilingual missions, hints, and replayable practice.
+- Worked visual diagrams and step-by-step hints across Grades 5–7 adventures (Moon, Ocean, and Park).
+- Deterministic practice exercise generators across 41 skills and server-side mission attempt verification in progress sync.
+- Unified grade hub experience and updated lesson-authoring guidelines.
+
 ## [1.0.1] - 2026-11-16
 
 ### Changed

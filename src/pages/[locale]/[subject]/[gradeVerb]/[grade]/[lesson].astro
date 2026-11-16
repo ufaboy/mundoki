@@ -8,12 +8,7 @@ import GradeOneChecks from '../../../../../components/learn/GradeOneChecks.astro
 import IslandLesson from '../../../../../components/learn/IslandLesson.astro';
 import CityLesson from '../../../../../components/learn/CityLesson.astro';
 import RoadTripLesson from '../../../../../components/learn/RoadTripLesson.astro';
-import TomiStoryAdventure from '../../../../../components/learn/TomiStoryAdventure.astro';
-import TomiFirstAdventure from '../../../../../components/learn/TomiFirstAdventure.astro';
-import TomiBackpackAdventure from '../../../../../components/learn/TomiBackpackAdventure.astro';
-import TomiMoldsAdventure from '../../../../../components/learn/TomiMoldsAdventure.astro';
-import TomiStickersAdventure from '../../../../../components/learn/TomiStickersAdventure.astro';
-import TomiChalkAdventure from '../../../../../components/learn/TomiChalkAdventure.astro';
+import DayLesson from '../../../../../components/learn/DayLesson.astro';
 import GradeSixLab from '../../../../../components/learn/GradeSixLab.astro';
 import GradeSevenLab from '../../../../../components/learn/GradeSevenLab.astro';
 import GradeFiveLab from '../../../../../components/learn/GradeFiveLab.astro';
@@ -45,10 +40,12 @@ const previous = all[position - 1];
 const next = all[position + 1];
 const isLastInPackage = !next || next.data.packageId !== lesson.packageId;
 const horizontalScene = lesson.scene.layout === 'row' || ['G01-03-L02', 'G01-03-L03', 'G01-04-L01', 'G01-04-L02', 'G01-05-L03', 'G01-06-L03', 'G01-08-L01', 'G01-09-L01', 'G01-10-L01', 'G01-10-L02'].includes(entry.id);
+// Grade 1 ("A day with {name}") runs on the design system: content/grade1/day.ts.
+const onDayPage = course.gradeNumber === 1;
 const alignedScene = lesson.scene.layout === 'aligned' || lesson.packageId === 'G01-11' || entry.id === 'G01-09-L02';
 ---
-<BaseLayout title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)}>
-  {entry.id === 'G01-01-L01' ? <TomiFirstAdventure locale={locale} /> : entry.id === 'G01-01-L02' ? <TomiBackpackAdventure locale={locale} /> : entry.id === 'G01-01-L03' ? <TomiMoldsAdventure locale={locale} /> : entry.id === 'G01-02-L01' ? <TomiChalkAdventure locale={locale} /> : entry.id === 'G01-02-L02' ? <TomiStickersAdventure locale={locale} /> : course.gradeNumber === 1 ? <TomiStoryAdventure locale={locale} lessonId={entry.id} /> : course.gradeNumber === 2 ? <RoadTripLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 3 ? <CityLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 4 ? <IslandLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 5 ? <MoonLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 6 ? <OceanLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 7 ? <ParkLesson locale={locale} lessonId={entry.id} /> : <article class="stack-lg grade-one" data-grade-one-lesson>
+<BaseLayout title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)} system={onDayPage}>
+  {onDayPage ? <DayLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 2 ? <RoadTripLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 3 ? <CityLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 4 ? <IslandLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 5 ? <MoonLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 6 ? <OceanLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 7 ? <ParkLesson locale={locale} lessonId={entry.id} /> : <article class="stack-lg grade-one" data-grade-one-lesson>
     <nav class="flex-between" aria-label={es ? 'Navegación de la lección' : 'Lesson navigation'}>
       <a href={`${buildGradeUrl(locale, course.gradeId)}#${pack.id.toLowerCase()}`}>← {pack.title[locale]}</a>
       <span>{position + 1} / {all.length} · {course.gradeNumber >= 4 ? '12–18' : '8–12'} min</span>
@@ -96,4 +93,5 @@ const alignedScene = lesson.scene.layout === 'aligned' || lesson.packageId === '
   <script>import '../../../../../scripts/gradeFiveLabs';</script>
   <script>import '../../../../../scripts/gradeSixLabs';</script>
   <script>import '../../../../../scripts/gradeSevenLabs';</script>
+  <script>import '../../../../../scripts/replayButton';</script>
 </BaseLayout>

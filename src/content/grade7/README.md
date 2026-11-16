@@ -33,3 +33,5 @@ English: http://localhost:3333/en-us/mathematics/grade/grade-7/
 
 Validation: `npm run lint`, `npm test`, `npm run build:worker`, plus browser checks
 of controls, answer feedback, both locales, and generated lesson/prerequisite links.
+
+Readability revision: visible worked examples precede challenges; 66 bilingual action hints are separate from answer explanations. Clarified unit price, algebraic steps, scaling notation, relative frequency and independent trials. Added diagrams for a quadrilateral diagonal, compass construction, a cube net, and truncated versus zero-based bars. Editorial review does not replace classroom usability testing.

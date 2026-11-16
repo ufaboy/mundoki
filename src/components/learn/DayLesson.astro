@@ -1,0 +1,208 @@
+---
+// Grade 1 mission page on the design system: "A day with {name}".
+// One frame for every mission: the hero says what they need, the child solves
+// two challenges on a picture they can touch, and each right answer changes
+// the story (the hero's bubble shows the reward). Story and rules:
+// .agents/skills/grade-1-lesson-authoring/SKILL.md
+import type { Locale } from '../../math/core/types';
+import { GRADE_ONE_LESSONS } from '../../content/grade1';
+import { GRADE_ONE_ASSESSMENTS } from '../../content/grade1/assessments';
+import { getGradeOneAdventure } from '../../content/grade1/adventures';
+import { getGradeOneHints } from '../../content/grade1/hints';
+import { dayPlaceOf } from '../../content/grade1/day';
+import { MISSION_PRACTICE, MISSION_PRACTICE_CHECK } from '../../math/practice/generators';
+import { GRADES_CATALOG } from '../../math/curriculum';
+import { buildGradeUrl, buildGradeOneLessonUrl } from '../../i18n/routes';
+import { t } from '../../i18n/translations';
+import { localizeScene, storySceneHtml } from '../../lib/storyScene';
+import HeroCharacter from '../shared/HeroCharacter.astro';
+import HeroText from '../shared/HeroText.astro';
+import MascotSvg from '../play/MascotSvg.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+
+interface Props {
+  locale: Locale;
+  lessonId: string;
+}
+
+const { locale, lessonId } = Astro.props;
+const es = locale === 'es-AR';
+const L = (spanish: string, english: string) => (es ? spanish : english);
+
+const index = GRADE_ONE_LESSONS.findIndex((item) => item.id === lessonId);
+const lesson = GRADE_ONE_LESSONS[index];
+const adventure = getGradeOneAdventure(lessonId);
+if (!lesson || !adventure) throw new Error(`Missing Grade 1 mission: ${lessonId}`);
+const hints = getGradeOneHints(lesson.id);
+const { place, number: placeNumber } = dayPlaceOf(index);
+const next = GRADE_ONE_LESSONS[index + 1];
+const lastInPackage = !next || next.packageId !== lesson.packageId;
+const practiceSkill = MISSION_PRACTICE[lesson.id];
+const topicId = GRADES_CATALOG.find((grade) => grade.id === 'grade-1')!.primaryTopicId;
+const intro = adventure.intro ?? adventure.steps[0].introduction;
+const mapHref = `${buildGradeUrl(locale, 'grade-1')}#${place.id}`;
+const isLong = (check: (typeof lesson.checks)[number]) => check.options.some((option) => option[locale].length > 7);
+
+const icons = {
+  check: 'M5 12.5l4.5 4.5L19 7.5',
+  retry: 'M4 12a8 8 0 1 0 2.6-5.9M4 4v4.5h4.5',
+  hint: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z',
+  sound: 'M4 10v4h4l5 4V6l-5 4zM16.5 9a4 4 0 0 1 0 6',
+  shuffle: 'M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M17 4l3 3-3 3M17 14l3 3-3 3',
+  arrow: 'M5 12h14M13 6l6 6-6 6',
+  back: 'M19 12H5M11 6l-6 6 6 6',
+};
+---
+
+<article
+  class="mk-lesson mk-stack mk-day"
+  data-stage="1"
+  data-day-lesson
+  data-locale={locale}
+  data-lesson-id={lesson.id}
+  data-topic-id={topicId}
+  data-intro={intro[locale]}
+>
+  <nav class="mk-crumb" aria-label={L('La aventura', 'The adventure')}>
+    <a class="mk-back" href={mapHref}>
+      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.back} /></svg>
+      <HeroText text={L('El día de {name}', '{name}’s day')} />
+    </a>
+    <span class="mk-chip mk-chip--sky">{index + 1} / {GRADE_ONE_LESSONS.length}</span>
+  </nav>
+
+  <header class="mk-stack mk-stack--tight">
+    <p class="mk-label">{place.icon} {L('Lugar', 'Place')} {placeNumber} · {place.name[locale]}</p>
+    <h1 class="mk-title">{adventure.title[locale]}</h1>
+  </header>
+
+  <section class="mk-day__story" aria-label={L('Lo que pasa', 'What is happening')}>
+    <div class="mk-day__hero"><HeroCharacter /></div>
+    <div class="mk-day__say">
+      <p class="mk-bubble" id="day-speech" data-day-speech><HeroText text={intro[locale]} /></p>
+      <button type="button" class="mk-btn mk-btn--icon" data-speak-target="#day-speech" aria-label={L('Escuchar', 'Listen')}>
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.sound} /></svg>
+      </button>
+    </div>
+  </section>
+
+  <details class="mk-details mk-day__example" open>
+    <summary>{L('Miremos un ejemplo', 'Let’s look at an example')}</summary>
+    <div class="mk-card mk-stack">
+      <p class="mk-text"><HeroText text={lesson.story[locale]} /></p>
+      <div class="mk-day__example-items" aria-label={lesson.scene.caption[locale]}>
+        {lesson.scene.items.map((item) => <span>{item}</span>)}
+      </div>
+      <ol class="mk-list mk-day__steps">
+        {lesson.steps.map((line) => <li><HeroText text={line[locale]} /></li>)}
+      </ol>
+      <p class="mk-text mk-day__careful"><HeroText text={lesson.misconception[locale]} /></p>
+    </div>
+  </details>
+
+  <section class="mk-card mk-stack mk-day__challenge" aria-labelledby="day-question-0">
+    <div class="mk-row mk-row--between">
+      <ol class="mk-steps mk-day__progress" aria-label={L('Desafíos de esta misión', 'Challenges in this mission')}>
+        {lesson.checks.map((_, i) => <li class:list={{ 'is-now': i === 0 }} data-day-step={i}></li>)}
+      </ol>
+      <span class="mk-chip mk-chip--sun" data-mission-stars hidden><span aria-hidden="true">★</span> <span data-mission-stars-value></span></span>
+    </div>
+
+    {lesson.checks.map((check, i) => {
+      const step = adventure.steps[i];
+      const scene = storySceneHtml(localizeScene(step, locale), locale);
+      return (
+        <div
+          class="mk-stack"
+          data-day-question={i}
+          data-answer={check.answer}
+          data-reward={step.reward[locale]}
+          data-practice-skill={i === MISSION_PRACTICE_CHECK ? practiceSkill : undefined}
+          hidden={i !== 0}
+        >
+          <p class="mk-label">{L('Desafío', 'Challenge')} {i + 1} / {lesson.checks.length}</p>
+          <p class="mk-text mk-day__instruction" data-day-step-text><HeroText text={step.introduction[locale]} /></p>
+          <div data-day-scene set:html={scene} />
+          <div class="mk-day__ask">
+            <h2 class="mk-heading" id={`day-question-${i}`} tabindex="-1" data-day-title><HeroText text={check.prompt[locale]} /></h2>
+            <button type="button" class="mk-btn mk-btn--icon" data-speak-target={`#day-question-${i}`} aria-label={L('Escuchar la pregunta', 'Listen to the question')}>
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.sound} /></svg>
+            </button>
+          </div>
+          <div class:list={['mk-choices', { 'mk-choices--stack': isLong(check) }]} role="group" aria-labelledby={`day-question-${i}`}>
+            {check.options.map((option, j) => (
+              <button type="button" class:list={['mk-choice', { 'mk-choice--text': isLong(check) }]} data-day-answer={j}>
+                <span data-day-option><HeroText text={option[locale]} /></span>
+                <svg class="mk-icon mk-icon--correct" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.check} /></svg>
+                <svg class="mk-icon mk-icon--retry" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.retry} /></svg>
+              </button>
+            ))}
+          </div>
+          {i === MISSION_PRACTICE_CHECK && practiceSkill && (
+            <button type="button" class="mk-btn mk-new-numbers" data-day-new-numbers>
+              <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.shuffle} /></svg>
+              {t(locale, 'practiceNew')}
+            </button>
+          )}
+          <div class="mk-feedback mk-feedback--hint" data-day-hint hidden>
+            <span class="mk-day__fox" aria-hidden="true"><MascotSvg mood="thinking" size={56} idPrefix={`day-hint-${i}`} /></span>
+            <span class="mk-feedback__text" data-day-hint-text>{hints[i][locale]}</span>
+          </div>
+          <div class="mk-feedback mk-feedback--correct" data-day-explanation hidden>
+            <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.check} /></svg>
+            <span class="mk-feedback__text" data-day-explanation-text><HeroText text={check.explanation[locale]} /></span>
+          </div>
+        </div>
+      );
+    })}
+
+    <div class="mk-feedback mk-feedback--retry" data-day-retry hidden role="status">
+      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.retry} /></svg>
+      <span class="mk-feedback__text">{L('Casi. Mirá el dibujo y probá otra vez.', 'Almost. Look at the picture and try again.')}</span>
+    </div>
+    <p class="mk-day__sr" data-day-status role="status" aria-live="polite"></p>
+
+    <div class="mk-row mk-day__controls">
+      <button type="button" class="mk-btn mk-btn--quiet" data-day-help>
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.hint} /></svg>
+        {L('Una pista', 'A hint')}
+      </button>
+      <button type="button" class="mk-btn mk-btn--go" data-day-next hidden>
+        {L('Siguiente desafío', 'Next challenge')}
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.arrow} /></svg>
+      </button>
+      <a class="mk-btn mk-btn--primary" data-day-finish hidden href={next ? buildGradeOneLessonUrl(locale, next.id) : mapHref}>
+        {next ? L('Siguiente misión', 'Next mission') : L('Volver al mapa', 'Back to the map')}
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.arrow} /></svg>
+      </a>
+    </div>
+  </section>
+
+  {lastInPackage && (
+    <details class="mk-details" id="package-check">
+      <summary>{L('Más práctica: cinco preguntas nuevas', 'More practice: five new questions')}</summary>
+      <div class="mk-card mk-stack">
+        <GradeOneChecks locale={locale} checks={GRADE_ONE_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-day-check`} assessment />
+      </div>
+    </details>
+  )}
+
+  <details class="mk-details">
+    <summary>{L('Para acompañar en casa', 'For a grown-up')}</summary>
+    <div class="mk-card mk-stack">
+      <p class="mk-text"><strong>{lesson.title[locale]}.</strong> {lesson.objective[locale]}</p>
+      <p class="mk-text">{lesson.warmup[locale]}</p>
+      <p class="mk-text">{lesson.exit[locale]}</p>
+      <p class="mk-text">{L(
+        'Las respuestas correctas suman estrellas. Con una cuenta de familia, el servidor revisa cada respuesta antes de contarla. «Números nuevos» cambia el primer desafío para seguir practicando.',
+        'Right answers add stars. With a family account, the server checks every answer before it counts. “New numbers” changes the first challenge for more practice.'
+      )}</p>
+    </div>
+  </details>
+
+  <noscript><p class="mk-text">{L('Activá JavaScript para jugar. También podés leer el ejemplo con un adulto.', 'Enable JavaScript to play. You can also read the example with a grown-up.')}</p></noscript>
+</article>
+
+<script>
+  import '../../scripts/dayLesson';
+</script>

@@ -28,8 +28,8 @@ document.querySelectorAll<HTMLElement>('[data-moon-root]').forEach(root=>{
  questions.forEach((q,i)=>q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(b=>b.addEventListener('click',()=>{
   if(i!==state.current||state.solved!==state.current)return;
   const updated=answerMoon(state,i,Number(b.dataset.moonAnswer)===Number(q.dataset.answer));
-  if(updated===state){get('feedback').textContent=es?'Probá otra vez. Tu nave está bien. Podés pedir una pista.':'Try again. Your spacecraft is safe. You can ask for a hint.';return;}
-  state=updated;q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(button=>{button.disabled=true;});b.classList.add('is-correct');q.querySelector<HTMLElement>('[data-moon-hint]')!.hidden=false;
+  if(updated===state){get('feedback').textContent=es?'Probá otra vez. Mirá el ejemplo de arriba o pedí una pista.':'Try again. Look at the example above or ask for a hint.';return;}
+  state=updated;q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(button=>{button.disabled=true;});b.classList.add('is-correct');q.querySelector<HTMLElement>('[data-moon-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-moon-explanation]')!.hidden=false;
   get('reward').textContent=q.dataset.reward!;get('reward').hidden=false;
   get('feedback').textContent=es?'¡Lo lograste! Mirá qué cambió en la misión.':'You did it! Look at what changed in the mission.';
   get('next').hidden=state.solved===state.count;get('finish').hidden=state.solved!==state.count;render();
@@ -38,9 +38,9 @@ document.querySelectorAll<HTMLElement>('[data-moon-root]').forEach(root=>{
   const updated=nextMoon(state);if(updated===state)return;state=updated;
   questions.forEach((q,i)=>{q.hidden=i!==state.current;});get('next').hidden=true;get('reward').hidden=true;get('feedback').textContent='';questions[state.current].querySelector<HTMLElement>('[data-moon-question-title]')!.focus();
  });
- get('help').addEventListener('click',()=>{questions[state.current].querySelector<HTMLElement>('[data-moon-hint]')!.hidden=false;});
+ get('help').addEventListener('click',()=>{if(state.solved>state.current)return;questions[state.current].querySelector<HTMLElement>('[data-moon-hint]')!.hidden=false;});
  get('reset').addEventListener('click',()=>{
-  state=initialMoonState(questions.length);questions.forEach((q,i)=>{q.hidden=i!==0;q.querySelector<HTMLElement>('[data-moon-hint]')!.hidden=true;q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(b=>{b.disabled=false;b.classList.remove('is-correct');});});
+  state=initialMoonState(questions.length);questions.forEach((q,i)=>{q.hidden=i!==0;q.querySelector<HTMLElement>('[data-moon-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-moon-explanation]')!.hidden=true;q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(b=>{b.disabled=false;b.classList.remove('is-correct');});});
   ['next','finish','reward'].forEach(name=>{get(name).hidden=true;});get('reward').textContent='';get('feedback').textContent='';render();questions[0].querySelector<HTMLElement>('[data-moon-question-title]')!.focus();
  });render();
 });

@@ -260,6 +260,16 @@ export interface AttemptRecord {
   isCorrect: boolean;
   timestamp: string;
   syncedToServer: boolean;
+  /**
+   * Where the answer was given. Absent: the "Jugar" trainer.
+   * "practice": a generated "new numbers" exercise inside a mission (`skill` + `seed`).
+   * "mission": the mission's own authored question (`lessonId` + `checkIndex`).
+   * For both, `userAnswer` is the index of the chosen option.
+   */
+  source?: 'practice' | 'mission';
+  skill?: string;
+  lessonId?: string;
+  checkIndex?: number;
 }
 
 export interface PlayerGameState {

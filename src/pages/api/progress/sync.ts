@@ -10,6 +10,7 @@ import {
   jsonResponse,
   saveGameStateInStore,
 } from '../../../lib/db/d1Store';
+import { resolveMissionAttempt } from '../../../lib/server/missionAttempts';
 import { getRuntimeEnv } from '../../../lib/server/runtimeEnv';
 import { TopicId } from '../../../math/core/types';
 import { validateMathAnswer } from '../../../math/core/validator';
@@ -23,6 +24,9 @@ export const prerender = false;
  * - Recomputes every exercise deterministically on the server from `(topicId, difficulty, seed)`
  *   and validates `userAnswer` before awarding energy, stars, or rewards.
  * - Enforces deduplication via `attemptId`.
+ * - Answers given inside a mission (`source: "practice" | "mission"`) are checked the same
+ *   way: a generated exercise is re-created from `(skill, seed)`, an authored question is
+ *   looked up in the answer key. Each such exercise earns credit once per child.
  */
 export const POST: APIRoute = async ({ request }) => {
   const env = await getRuntimeEnv();
@@ -50,6 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
   const newlyProcessedIds: string[] = [];
   const verifiedAttempts: AttemptRecord[] = [];
   const seen = new Set<string>();
+  const credited = new Set<string>();
 
   for (const raw of incomingAttempts.slice(0, 50)) {
     if (!raw || typeof raw !== 'object') continue;
@@ -60,9 +65,54 @@ export const POST: APIRoute = async ({ request }) => {
     const difficulty = (Number(item.difficulty) || 1) as 1 | 2 | 3;
     const userAnswer = String(item.userAnswer ?? '');
 
-    if (!attemptId || attemptId.length > 200 || seen.has(attemptId)) continue;
+    // "practice:" / "mission:" ids are minted here only (see creditId), never accepted from a client.
+    if (!attemptId || attemptId.length > 200 || seen.has(attemptId) || /^(practice|mission):/.test(attemptId)) continue;
     seen.add(attemptId);
     if (await isAttemptProcessedInStore(attemptId, env)) {
+      newlyProcessedIds.push(attemptId);
+      continue;
+    }
+
+    if (item.source === 'practice' || item.source === 'mission') {
+      const resolved = resolveMissionAttempt(item, user.id);
+      if (!resolved) continue;
+      const missionTopic = TOPICS_CATALOG.find((t) => t.id === resolved.topicId);
+      if (!missionTopic || (missionTopic.accessLevel === 'premium' && !isPremium)) continue;
+
+      // An authored question only counts when solved; a miss there is not recorded.
+      if (!resolved.isCorrect && resolved.source === 'mission') {
+        newlyProcessedIds.push(attemptId);
+        continue;
+      }
+      // A right answer is stored under an id fixed by the exercise, so repeating
+      // the same exercise (whose answer is now known) earns nothing more.
+      const storedId = resolved.isCorrect ? resolved.creditId : attemptId;
+      if (resolved.isCorrect && (credited.has(storedId) || (await isAttemptProcessedInStore(storedId, env)))) {
+        newlyProcessedIds.push(attemptId);
+        continue;
+      }
+      credited.add(storedId);
+
+      const missionAttempt: AttemptRecord = {
+        attemptId: storedId,
+        exerciseId: resolved.exerciseId,
+        topicId: resolved.topicId,
+        seed: resolved.seed,
+        difficulty: 1,
+        userAnswer,
+        isCorrect: resolved.isCorrect,
+        timestamp: new Date().toISOString(),
+        syncedToServer: true,
+        source: resolved.source,
+        skill: resolved.skill,
+        lessonId: resolved.lessonId,
+        checkIndex: resolved.checkIndex,
+      };
+      currentState = {
+        ...applyExerciseOutcome(currentState, missionAttempt, isPremium).nextState,
+        pendingSyncAttempts: [],
+      };
+      verifiedAttempts.push(missionAttempt);
       newlyProcessedIds.push(attemptId);
       continue;
     }

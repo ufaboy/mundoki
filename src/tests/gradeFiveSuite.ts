@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { GRADE_FIVE_LESSONS, GRADE_FIVE_PACKAGES, GRADE_FIVE_PROJECT } from '../content/grade5';
 import { GRADE_FIVE_ASSESSMENTS } from '../content/grade5/assessments';
+import { getGradeFiveHints } from '../content/grade5/hints';
 import { SCHOOL_COURSES, getSchoolPackage } from '../content/schoolCourses';
 import { GRADES_CATALOG, SCHOOL_BLOCKS, getGradeById } from '../math/curriculum';
 import { buildSchoolLessonUrl } from '../i18n/routes';
@@ -13,6 +14,11 @@ export function runGradeFiveTests(){
  function graph(id:string,path=new Set<string>()){assert(!path.has(id),`Cycle: ${id}`);if(complete.has(id))return;path.add(id);getSchoolPackage(id).prerequisites.forEach(dep=>graph(dep,path));path.delete(id);complete.add(id);}
  function localized(v:unknown){if(!v||typeof v!=='object')return;if('es-AR' in v||'en-US' in v)for(const locale of ['es-AR','en-US']){const s=(v as Record<string,unknown>)[locale];assert(typeof s==='string'&&s.trim()&&!s.includes('|')&&!/[\u0400-\u04ff]/u.test(s));}Object.values(v).forEach(localized);}
  localized([GRADE_FIVE_LESSONS,GRADE_FIVE_PACKAGES,GRADE_FIVE_PROJECT,GRADE_FIVE_ASSESSMENTS]);
+ for(const lesson of GRADE_FIVE_LESSONS){
+  const hints=getGradeFiveHints(lesson.id);localized(hints);
+  assert.equal(hints.length,lesson.checks.length);
+  hints.forEach((hint,i)=>{for(const locale of ['es-AR','en-US'] as const)assert.notEqual(hint[locale],lesson.checks[i].explanation[locale],`Separate hint and feedback: ${lesson.id}`);});
+ }
  for(const [i,p] of GRADE_FIVE_PACKAGES.entries()){
   graph(p.id);const lessons=GRADE_FIVE_LESSONS.filter(l=>l.packageId===p.id);assert.equal(lessons.length,i===12?2:3);
   assert.deepEqual(lessons.map(l=>l.id),lessons.map((_,j)=>`${p.id}-L0${j+1}`));

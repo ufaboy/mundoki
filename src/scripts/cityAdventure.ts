@@ -1,4 +1,6 @@
 import {citySceneState,cleanCityPreferences,type CityColor} from './cityState';
+import {applyNewNumbers,recordAnswer,showStars} from './missionPractice';
+import type {TopicId} from '../math/core/types';
 
 document.querySelectorAll<HTMLElement>('[data-city-root]').forEach(root=>{
  const es=root.dataset.locale==='es-AR';
@@ -34,9 +36,19 @@ document.querySelectorAll<HTMLElement>('[data-city-root]').forEach(root=>{
   get('place-result').textContent=button.dataset.cityPlace!;
  }));
  questions.forEach((question,i)=>question.querySelectorAll<HTMLButtonElement>('[data-city-answer]').forEach(button=>button.addEventListener('click',()=>{
-  if(i!==current||solved>i)return;
-  if(Number(button.dataset.cityAnswer)!==Number(question.dataset.answer)){
+  // After "new numbers" on a solved challenge the child may answer again: it counts, the mission step stays done.
+  const replay=question.dataset.replay==='true';
+  if(i!==current||(solved>i&&!replay))return;
+  const correct=Number(button.dataset.cityAnswer)===Number(question.dataset.answer);
+  const stars=recordAnswer(question,Number(button.dataset.cityAnswer),correct,{lessonId:root.dataset.lessonId!,checkIndex:i,topicId:root.dataset.topicId as TopicId});
+  if(correct)showStars(root,stars);
+  if(!correct){
    get('feedback').textContent=es?'Probá otra vez. Mirá el ejemplo de arriba o pedí una pista.':'Try again. Look at the example above or ask for a hint.';return;
+  }
+  if(replay){
+   delete question.dataset.replay;question.querySelectorAll<HTMLButtonElement>('[data-city-answer]').forEach(b=>{b.disabled=true;});button.classList.add('is-correct');
+   question.querySelector<HTMLElement>('[data-city-hint]')!.hidden=true;question.querySelector<HTMLElement>('[data-city-explanation]')!.hidden=false;
+   get('feedback').textContent=es?'¡Muy bien!':'Well done!';return;
   }
   solved++;question.querySelectorAll<HTMLButtonElement>('[data-city-answer]').forEach(b=>{b.disabled=true;});button.classList.add('is-correct');
   question.querySelector<HTMLElement>('[data-city-hint]')!.hidden=true;
@@ -51,8 +63,21 @@ document.querySelectorAll<HTMLElement>('[data-city-root]').forEach(root=>{
   questions[current].querySelector<HTMLElement>('[data-city-question-title]')!.focus();
  });
  get('help').addEventListener('click',()=>{if(solved>current)return;questions[current].querySelector<HTMLElement>('[data-city-hint]')!.hidden=false;});
+ // "New numbers": the same question with fresh numbers, always available.
+ questions.forEach((question,i)=>question.querySelector<HTMLButtonElement>('[data-city-new-numbers]')?.addEventListener('click',()=>{
+  if(i!==current)return;
+  const title=question.querySelector<HTMLElement>('[data-city-question-title]')!;
+  const hint=question.querySelector<HTMLElement>('[data-city-hint]')!,explanation=question.querySelector<HTMLElement>('[data-city-explanation]')!;
+  const answers=[...question.querySelectorAll<HTMLButtonElement>('[data-city-answer]')];
+  if(!applyNewNumbers(question,{title,answers,hint,explanation},es?'es-AR':'en-US'))return;
+  if(solved>i)question.dataset.replay='true';
+  answers.forEach(b=>{b.disabled=false;b.classList.remove('is-correct');});hint.hidden=true;explanation.hidden=true;
+  // The tap-a-digit model belongs to the original number only.
+  const model=question.querySelector<HTMLElement>('.city-place-model');if(model)model.hidden=true;
+  get('feedback').textContent='';title.focus();
+ }));
  get('reset').addEventListener('click',()=>{
-  current=0;solved=0;questions.forEach((q,i)=>{q.hidden=i!==0;q.querySelector<HTMLElement>('[data-city-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-city-explanation]')!.hidden=true;q.querySelectorAll<HTMLButtonElement>('[data-city-answer]').forEach(b=>{b.disabled=false;b.classList.remove('is-correct');});});
+  current=0;solved=0;questions.forEach((q,i)=>{delete q.dataset.replay;q.hidden=i!==0;q.querySelector<HTMLElement>('[data-city-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-city-explanation]')!.hidden=true;q.querySelectorAll<HTMLButtonElement>('[data-city-answer]').forEach(b=>{b.disabled=false;b.classList.remove('is-correct');});});
   ['next','finish','reward'].forEach(name=>{get(name).hidden=true;});get('feedback').textContent='';
   root.querySelectorAll('[data-city-place]').forEach(b=>b.setAttribute('aria-pressed','false'));
   const place=root.querySelector('[data-city-place-result]');if(place)place.textContent='';
