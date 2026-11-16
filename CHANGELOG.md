@@ -3,6 +3,12 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [1.1.0] - 2026-11-16
+
+### Changed
+- Replaced Grade 2’s disconnected road-trip framing with a six-chapter wizard adventure. Lesson tasks now help the learner advance the story, free friends, and see a clear result from correct answers.
+- Reworked Grade 2 lesson prompts and hints to fit the new story while preserving the mathematics and bilingual course.
+
 ## [1.0.2] - 2026-11-16
 
 ### Added
