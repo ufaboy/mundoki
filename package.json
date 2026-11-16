@@ -1,7 +1,7 @@
 {
   "name": "mundoki",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
@@ -19,7 +19,10 @@
     "clean": "rm -rf dist .astro",
     "lint": "tsc --noEmit",
     "promo:deploy:check": "wrangler deploy --config wrangler.promo.jsonc --dry-run",
-    "promo:deploy": "wrangler deploy --config wrangler.promo.jsonc"
+    "promo:deploy": "wrangler deploy --config wrangler.promo.jsonc",
+    "prepare": "git config core.hooksPath .githooks",
+    "version:bump": "node scripts/bump-version.mjs",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.7",

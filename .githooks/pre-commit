@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+set -e
+
+if [ "${SKIP_VERSION_BUMP:-0}" = "1" ]; then
+  exit 0
+fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$BRANCH" = "main" ]; then
+  if ! node scripts/bump-version.mjs --check-staged >/dev/null 2>&1; then
+    node scripts/bump-version.mjs --patch
+    git add package.json
+  fi
+fi

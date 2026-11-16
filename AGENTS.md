@@ -72,3 +72,12 @@ npm run deploy
 ```
 
 Before finishing any code change, always run `npm run lint` and `npm test` (and also `npm run build:worker` when modifying server code, routes, or Wrangler configuration).
+
+## 6. Versioning, Release & Deployment Workflow
+
+- **Commit to `main`:** Every commit on `main` must bump the `package.json` version (automated via `.githooks/pre-commit`, which runs `node scripts/bump-version.mjs --patch` if `package.json` version was not already bumped).
+- **Pull Requests to `main`:** Before creating a PR targeting `main` from any branch, bump `package.json` version (`npm run version:bump`, or `--minor` / `--major`) and commit it. `.githooks/pre-push` verifies that the branch's `package.json` version is greater than `origin/main` before pushing.
+- **Release & Wrangler Deploy (Mandatory after `main` updates):** After any commit to `main` or merge into `main`, always create a release and deploy with Wrangler:
+  - Update `CHANGELOG.md` with a `## [<version>] - YYYY-MM-DD` section containing a **product-level explanation** of changes (not raw commit logs). Never include secrets, keys, tokens, credentials, or sensitive operational details in `CHANGELOG.md`.
+  - Run `npm run release` (extracts and secret-checks the `CHANGELOG.md` entry, creates git tag `v<version>`, pushes `main` and the tag, creates a GitHub Release via `gh release create`, and runs `npm run deploy`).
+  - If `wrangler.promo.jsonc`, `src/workers/promoScheduler.ts`, or `src/lib/promos/` changed, also run `npm run promo:deploy` (or `npm run release -- --with-promo`).

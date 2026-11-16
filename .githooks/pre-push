@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -e
+
+if [ "${SKIP_VERSION_CHECK:-0}" = "1" ]; then
+  exit 0
+fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ -n "$BRANCH" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "HEAD" ]; then
+  if git rev-parse --verify origin/main >/dev/null 2>&1; then
+    if ! node scripts/bump-version.mjs --check-against origin/main; then
+      echo "[pre-push] Bump package.json version before pushing a branch for a PR to main:" >&2
+      echo "  npm run version:bump && git add package.json && git commit -m \"chore: bump version\"" >&2
+      echo "  (Use SKIP_VERSION_CHECK=1 git push ... to bypass for WIP pushes)" >&2
+      exit 1
+    fi
+  fi
+fi
