@@ -1,7 +1,7 @@
 {
   "name": "mundoki",
   "private": true,
-  "version": "2.2.1",
+  "version": "2.2.2",
   "type": "module",
   "scripts": {
     "dev": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
@@ -15,6 +15,7 @@
     "cf:types": "wrangler types worker-configuration.d.ts --strict-vars=false",
     "db:migrate:local": "wrangler d1 migrations apply mundoki-d1 --local",
     "db:migrate:remote": "wrangler d1 migrations apply mundoki-d1 --remote",
+    "db:migrate:staging": "wrangler d1 migrations apply mundoki-d1-test --remote --env staging",
     "test": "tsx src/tests/runCliTests.ts && tsx src/tests/securityRegression.ts && tsx src/tests/promoSuite.ts && tsx src/tests/practiceGenerators.ts && tsx src/tests/missionProgress.ts && tsx src/tests/skillGamesSuite.ts && tsx src/tests/premiumAccessSuite.ts",
     "clean": "rm -rf dist .astro",
     "lint": "tsc --noEmit",
