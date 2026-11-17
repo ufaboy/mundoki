@@ -1,5 +1,5 @@
 ---
-import { buildTrainSkillUrl } from '../../i18n/routes';
+import { buildPremiumUrl, buildTrainSkillUrl } from '../../i18n/routes';
 import {
   getSkillGameMeta,
   SKILL_GAMES_META,
@@ -90,6 +90,10 @@ const isXY = meta.inputMode === 'xy';
             <button type="button" class="mk-btn" data-skill-diff="3" aria-pressed="false">3 ★★★</button>
           </div>
         </div>
+        <p id="skill-level-note" class="mk-label" role="status" hidden>
+          {es ? 'Los niveles 2 y 3 son parte de Premium.' : 'Levels 2 and 3 are part of Premium.'}
+          {' '}<a href={buildPremiumUrl(locale)}>{es ? 'Ver Premium' : 'See Premium'}</a>
+        </p>
 
         <form id="skill-answer-form" class="mk-stack mk-stack--tight">
           {isXY ? (

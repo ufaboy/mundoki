@@ -73,7 +73,7 @@ assert.equal(result.gameState.totalSolved, 2);
 assert.deepEqual(result.syncedAttemptIds, []);
 
 // The mission's own question: checked against the answer key, counted once per child.
-const lessonId = 'G03-02-L02';
+const lessonId = 'G03-01-L02'; // first chapter: free
 const key = findMissionCheck(lessonId, 0);
 assert.ok(key, 'grade 3 mission must be in the answer key');
 const mission = (attemptId: string, optionIndex: number) => ({
@@ -92,6 +92,24 @@ result = await post([practice('p-right', exercise.answerIndex), mission('m-right
 assert.equal(result.gameState.totalSolved, 2, 'another child earns their own credit for the same exercises');
 result = await post([practice('p-u2', exercise.answerIndex)], 'u2');
 assert.equal(result.gameState.totalSolved, 2, 'and only once each');
+
+// Missions after a grade's first chapter need Premium (content/premiumAccess.ts).
+const lockedId = 'G03-02-L02';
+const lockedKey = findMissionCheck(lockedId, 0)!;
+const locked = (attemptId: string) => ({
+  attemptId, source: 'mission', lessonId: lockedId, checkIndex: 0, userAnswer: String(lockedKey.answer), isCorrect: true,
+});
+result = await post([locked('locked-no-premium')]);
+assert.equal(result.gameState.totalSolved, 3, 'a Premium mission does not count without Premium');
+assert.deepEqual(result.syncedAttemptIds, []);
+const premiumDb = store.loadDb();
+premiumDb.subscriptions.u1 = {
+  id: 'sub-u1', userId: 'u1', provider: 'mercadopago', providerSubscriptionId: 'test', planCode: 'monthly_ars',
+  currency: 'ARS', amountArs: 4500, status: 'active', currentPeriodEnd: null, isDevMock: true, updatedAt: new Date().toISOString(),
+};
+store.saveDb(premiumDb);
+result = await post([locked('locked-premium')]);
+assert.equal(result.gameState.totalSolved, 4, 'with Premium the same mission counts');
 
 // Ids in the server's own credit namespace are refused from a client, so nobody
 // can pre-register another child's credit.

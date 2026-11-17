@@ -12,7 +12,7 @@ import GradeHub from '../../../../components/learn/GradeHub.astro';
 import MascotSvg from '../../../../components/play/MascotSvg.astro';
 import { SCHOOL_COURSES } from '../../../../content/schoolCourses';
 import { t } from '../../../../i18n/translations';
-import { buildGradeUrl, buildLearnTopicUrl, buildPlayUrl, normalizeUrlLocale } from '../../../../i18n/routes';
+import { buildGradeUrl, buildLearnTopicUrl, buildTrainHubUrl, normalizeUrlLocale } from '../../../../i18n/routes';
 import { getBlockById, GRADES_CATALOG, resolveGradeFromSlug } from '../../../../math/curriculum';
 
 export const prerender = true;
@@ -108,7 +108,7 @@ const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentG
           </div>
           <div class="mk-unit__actions">
             <a class="mk-btn" href={buildLearnTopicUrl(locale, unit.linkedTopicId)}>{t(locale, 'gradeLearn')}</a>
-            <a class="mk-btn" href={buildPlayUrl(locale, unit.linkedTopicId)}>
+            <a class="mk-btn" href={buildTrainHubUrl(locale)}>
               <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
               {t(locale, 'gradePractice')}
             </a>

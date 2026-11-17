@@ -3,6 +3,20 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.0] - 2026-11-17
+
+### Added
+- Server-enforced Premium access rules (`first chapter` of each grade and skill-game level 1 free; remaining missions and game levels 2–3 require Premium) with a dedicated lock screen and Premium badges on locked mission links.
+- Unified Pricing configuration (`9999` ARS/month) across the Premium page, Mercado Pago checkout, and promotional quotes.
+
+### Changed
+- Redesigned the Account, Progress (Stars), and Premium pages on the Mundoki design system, with automatic locale detection on `/`.
+- Hardened magic-link sign-in to prevent account enumeration and disallow implicit registration via magic link.
+- Separated Grade 1 and Grade 2 client story/evidence helpers from full lesson content so locked mission texts are not bundled to the browser.
+
+### Removed
+- Retired the legacy Play workspace and redirected `/es-ar/jugar/` and `/en-us/play/` routes to the skill-training hub.
+
 ## [2.1.0] - 2026-11-17
 
 ### Added

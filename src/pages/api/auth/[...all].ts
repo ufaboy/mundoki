@@ -454,6 +454,35 @@ export const ALL: APIRoute = async ({ request, params }) => {
       );
     }
 
+    const resendConfigured = Boolean(env.RESEND_API_KEY && env.RESEND_API_KEY.trim() !== '');
+    // Checked before the account lookup so a misconfigured server never reveals which emails exist.
+    if (!resendConfigured && !devSandbox) {
+      return jsonResponse(
+        {
+          error:
+            locale === 'es-AR'
+              ? 'Ahora no podemos enviar correos. Entrá con tu contraseña.'
+              : 'We cannot send emails right now. Sign in with your password.',
+        },
+        503
+      );
+    }
+
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 15).toISOString();
+    const deliveryMode = resendConfigured ? 'email_provider' : 'dev_preview';
+    // The same answer whether or not the account exists: the link only goes to registered
+    // emails, and the response must not tell a stranger which emails are registered.
+    const neutral = {
+      ok: true,
+      deliveryMode,
+      email,
+      expiresAt,
+      message:
+        locale === 'es-AR'
+          ? `Si hay una cuenta con ${email}, te enviamos un enlace para entrar. Revisá tu correo: el enlace vale 15 minutos.`
+          : `If there is an account for ${email}, we sent it a sign-in link. Check your email: the link works for 15 minutes.`,
+    };
+
     let capturedLink: DevMagicLinkPayload | null = null;
     const auth = createBetterAuthInstance(env, {
       baseURL: origin,
@@ -463,63 +492,32 @@ export const ALL: APIRoute = async ({ request, params }) => {
       },
     });
 
+    // Look the account up where Better Auth keeps it (D1 in production, its own store in dev).
+    if (!(await (await auth.$context).internalAdapter.findUserByEmail(email))) {
+      return jsonResponse(neutral);
+    }
+
     const localePrefix = locale === 'en-US' ? '/en-us/account' : '/es-ar/cuenta';
     try {
       await auth.api.signInMagicLink({
-        body: {
-          email,
-          name: email.split('@')[0] || 'Explorador',
-          callbackURL: `${origin}${localePrefix}`,
-        },
+        body: { email, callbackURL: `${origin}${localePrefix}` },
         headers: request.headers,
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to generate magic link.';
-      return jsonResponse({ error: msg }, 400);
+      console.error('Magic link generation failed:', err instanceof Error ? err.message : err);
+      return jsonResponse(neutral);
     }
 
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 15).toISOString();
-    const resendConfigured = Boolean(env.RESEND_API_KEY && env.RESEND_API_KEY.trim() !== '');
-
-    if (resendConfigured) {
-      return jsonResponse({
-        ok: true,
-        deliveryMode: 'email_provider',
-        email,
-        expiresAt,
-        message:
-          locale === 'es-AR'
-            ? `Enviamos un enlace mágico a ${email}. Revisá tu bandeja de entrada.`
-            : `We sent a magic link to ${email}. Check your inbox.`,
-      });
+    const magicToken = (capturedLink as DevMagicLinkPayload | null)?.token || '';
+    if (resendConfigured || !magicToken) {
+      return jsonResponse(neutral);
     }
 
-    if (!devSandbox) {
-      return jsonResponse(
-        {
-          error:
-            locale === 'es-AR'
-              ? 'El servicio de correo (Resend) no está configurado en producción.'
-              : 'Email delivery provider (Resend) is not configured in production.',
-        },
-        503
-      );
-    }
-
-    const magicToken = capturedLink?.token || '';
-    const magicUrl = `${origin}${localePrefix}?magic_token=${encodeURIComponent(magicToken)}`;
-
+    // Local development without an email provider: hand the link back so it can be opened here.
     return jsonResponse({
-      ok: true,
-      deliveryMode: 'dev_preview',
-      email,
+      ...neutral,
       magicToken,
-      magicUrl,
-      expiresAt,
-      message:
-        locale === 'es-AR'
-          ? `[MODO DESARROLLO — Bandeja Local]: RESEND_API_KEY no está configurado. Enlace mágico generado para ${email} (válido por 15 min).`
-          : `[DEV MODE — Local Outbox]: RESEND_API_KEY is not configured. Magic link generated for ${email} (valid for 15 min).`,
+      magicUrl: `${origin}${localePrefix}?magic_token=${encodeURIComponent(magicToken)}`,
     });
   }
 

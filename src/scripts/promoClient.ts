@@ -19,6 +19,8 @@ export function initPromoClient() {
     history.replaceState(null, '', location.pathname + location.search);
   }
   code.value = sessionStorage.getItem('mundoki_invite') || '';
+  // Invited families land with the code filled in, so open the (normally folded) code box.
+  if (code.value && root instanceof HTMLDetailsElement) root.open = true;
   function invalidate() { quote = null; consent.checked = false; accept.disabled = true; summary.textContent = ''; }
   code.addEventListener('input', invalidate);
   consent.addEventListener('change', () => { accept.disabled = !quote || !consent.checked; });
@@ -52,7 +54,7 @@ export function initPromoClient() {
       if (data.initPointUrl) location.assign(data.initPointUrl);
       else {
         status.textContent = locale === 'es-AR' ? 'Checkout de prueba creado. Usá el simulador de pago para activarlo.' : 'Test checkout created. Use the payment simulator to activate it.';
-        const panel = document.getElementById('premium-dev-webhook-panel'); if (panel) panel.style.display = 'block';
+        const panel = document.getElementById('premium-dev-webhook-panel'); if (panel) panel.hidden = false;
       }
     } catch (error) { status.textContent = tr(error instanceof Error ? error.message : 'request_failed'); }
     finally { review.disabled = false; code.disabled = false; accept.disabled = !consent.checked; }

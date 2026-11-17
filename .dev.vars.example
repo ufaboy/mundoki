@@ -20,7 +20,7 @@ EMAIL_FROM="Mundoki <no-reply@mundoki.app>"
 # Leave blank in local development to activate the labeled Development Mock Provider.
 MP_ACCESS_TOKEN=""
 MP_WEBHOOK_SECRET=""
-PREMIUM_MONTHLY_ARS="4500"
+PREMIUM_MONTHLY_ARS="9999"
 
 # Cloudflare D1 Local / Remote Binding
 D1_DATABASE_ID="00000000-0000-0000-0000-000000000000"

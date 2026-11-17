@@ -7,7 +7,7 @@ import {
   buildCatalogUrl,
   buildGradeUrl,
   buildLearnTopicUrl,
-  buildPlayUrl,
+  buildTrainHubUrl,
   normalizeUrlLocale,
   resolveTopicFromSlug,
 } from '../../../i18n/routes';
@@ -187,18 +187,18 @@ const gradeMeta = getGradeById(topicMeta.gradeId);
       <div id="masterclass-result-box" style="display:none;"></div>
     </section>
 
-    <!-- 06. Practice in Play Mode CTA -->
+    <!-- 06. Practice games CTA -->
     <section class="space-panel flex-between">
       <div>
         <div class="text-xs text-mono" style="color:#7DD3FC;">
           🪐 {topicMeta.planetName[locale]} · {topicMeta.guardianName[locale]}
         </div>
         <h2 style="color:#fff;margin:4px 0;font-size:1.35rem;">
-          {t(locale, 'lessonStartAdventure')}
+          {locale === 'es-AR' ? 'Practicar con juegos de cálculo' : 'Practice with skill games'}
         </h2>
       </div>
-      <a href={buildPlayUrl(locale, topicId)} class="btn btn-emerald">
-        {t(locale, 'actionPlay')} →
+      <a href={buildTrainHubUrl(locale)} class="btn btn-emerald">
+        {locale === 'es-AR' ? 'Entrenar' : 'Train'} →
       </a>
     </section>
   </article>

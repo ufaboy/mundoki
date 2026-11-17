@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { StoredSubscription } from '../db/d1Store';
 import { RuntimeEnv } from '../server/runtimeEnv';
+import { DEFAULT_PREMIUM_MONTHLY_ARS } from './pricing';
 
 export interface MercadoPagoSubscription {
   id: string;
@@ -71,7 +72,7 @@ export async function initiateMercadoPagoSubscription(params: {
   const envMonthlyArs =
     params.env?.PREMIUM_MONTHLY_ARS ||
     (typeof process !== 'undefined' ? process.env.PREMIUM_MONTHLY_ARS : undefined);
-  const amountArs = params.monthlyArs || Number(envMonthlyArs) || 4500;
+  const amountArs = params.monthlyArs || Number(envMonthlyArs) || DEFAULT_PREMIUM_MONTHLY_ARS;
   const now = new Date().toISOString();
 
   if (mpAccessToken && mpAccessToken.trim() !== '') {

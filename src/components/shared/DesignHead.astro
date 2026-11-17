@@ -43,5 +43,11 @@ const boot = {
     } catch (error) {
       // No saved grade: the home page shows its first-visit view.
     }
+    try {
+      // Last known plan, only for showing "Premium" badges; the server decides access.
+      if (localStorage.getItem('mundoki_premium') === 'true') data.premium = 'true';
+    } catch (error) {
+      // Unknown plan: badges show, and the mission page itself checks on the server.
+    }
   })();
 </script>

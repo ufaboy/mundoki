@@ -6,7 +6,7 @@
 import { applyExerciseOutcome, type AttemptRecord } from '../game/core/gameState';
 import { reconcileSyncedState } from '../game/core/syncState';
 import type { TopicId } from '../math/core/types';
-import { loadLocalGameState, saveLocalGameState } from './playClient';
+import { loadLocalGameState, saveLocalGameState } from './gameStateStorage';
 
 // Authored mission questions never change, so each one counts once per browser.
 const COUNTED_KEY = 'mundoki_mission_checks_v1';
@@ -19,7 +19,8 @@ function isPremium(): boolean {
   }
 }
 
-function readCounted(): string[] {
+/** Mission questions (`lessonId:checkIndex`) already answered right in this browser. */
+export function readCounted(): string[] {
   try {
     const parsed: unknown = JSON.parse(window.localStorage.getItem(COUNTED_KEY) ?? '[]');
     return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
@@ -34,7 +35,8 @@ function newAttemptId(): string {
 
 let syncing = false;
 
-async function syncNow(): Promise<void> {
+/** Sends answers still waiting for the server. Safe to call any time; does nothing when signed out. */
+export async function syncNow(): Promise<void> {
   if (syncing) return;
   let token: string | null = null;
   try {

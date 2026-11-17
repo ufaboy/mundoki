@@ -1,7 +1,6 @@
 ---
 import AppLayout from '../../../layouts/AppLayout.astro';
 import {
-  buildPlayUrl,
   buildTrainHubUrl,
   buildTrainSkillUrl,
   normalizeUrlLocale,
@@ -56,9 +55,6 @@ const icons: Record<string, string> = {
               : 'Pick an operation and solve each challenge to trigger the animated scene.'}
           </p>
         </div>
-        <a href={buildPlayUrl(locale)} class="mk-btn">
-          {es ? 'Ir a Aventura Espacial' : 'Open Space Adventure'}
-        </a>
       </div>
     </section>
 

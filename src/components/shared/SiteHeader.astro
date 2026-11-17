@@ -9,7 +9,6 @@ import {
   buildAccountUrl,
   buildCatalogUrl,
   buildHomeUrl,
-  buildPlayUrl,
   buildPremiumUrl,
   buildProgressUrl,
   buildTrainHubUrl,
@@ -38,13 +37,6 @@ const items = [
     current: activeNav === 'learn',
     icon: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5V21',
     fill: false,
-  },
-  {
-    href: buildPlayUrl(locale),
-    label: t(locale, 'navPlay'),
-    current: activeNav === 'play',
-    icon: 'M8 5.5v13l11-6.5z',
-    fill: true,
   },
   {
     href: buildTrainHubUrl(locale),

@@ -1,8 +1,15 @@
 ---
-import { promoText } from '../../i18n/promos';
+// Premium: tells parents why maths practice matters, how Mundoki helps, what is
+// free and what Premium adds, then lets an adult subscribe through Mercado Pago.
+// Checkout, cancellation and invitation codes are handled by premiumClient.ts
+// and promoClient.ts; the element ids below are their contract.
 import AppLayout from '../../layouts/AppLayout.astro';
-import { t } from '../../i18n/translations';
-import { buildAccountUrl, buildPremiumUrl, normalizeUrlLocale } from '../../i18n/routes';
+import HeroCharacter from '../../components/shared/HeroCharacter.astro';
+import { SCHOOL_COURSES } from '../../content/schoolCourses';
+import { promoText } from '../../i18n/promos';
+import { buildAccountUrl, buildHomeUrl, buildPremiumUrl, buildPrivacyUrl, normalizeUrlLocale } from '../../i18n/routes';
+import { SKILL_GAMES_META } from '../../math/arcade/skillGames';
+import { DEFAULT_PREMIUM_MONTHLY_ARS } from '../../lib/payments/pricing';
 
 export const prerender = true;
 
@@ -12,115 +19,376 @@ export function getStaticPaths() {
 
 const locale = normalizeUrlLocale(Astro.params.locale);
 const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
+
+// Real numbers from the catalogue, so the page never promises more than exists.
+const totalMissions = SCHOOL_COURSES.reduce((sum, course) => sum + course.lessons.length, 0);
+const freeMissions = Math.min(
+  ...SCHOOL_COURSES.map((course) => course.lessons.filter((lesson) => lesson.packageId === course.packages[0].id).length)
+);
+const gameCount = Object.keys(SKILL_GAMES_META).length;
+const priceNumber = new Intl.NumberFormat(locale).format(DEFAULT_PREMIUM_MONTHLY_ARS);
+const priceText = L(`$ ${priceNumber}`, `ARS ${priceNumber}`);
+
+const icons = {
+  check: 'M5 12.5l4.5 4.5L19 7.5',
+  dash: 'M7 12h10',
+  bulb: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z',
+  heart: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+  cart: 'M3 4h2l2.4 11h10.2L20 8H6.3M9 20h.01M17 20h.01',
+  mountain: 'M3 19l6-10 4 6 2-3 6 7z',
+  book: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5V21',
+  eye: 'M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z',
+  clock: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z',
+  spark: 'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18',
+  shield: 'M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z',
+  lock: 'M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3',
+  undo: 'M9 7L4 12l5 5M4 12h11a5 5 0 0 1 0 10h-2',
+  noads: 'M4 4l16 16M12 3a9 9 0 0 1 6.4 15.4M5.6 5.6A9 9 0 0 0 18.4 18.4',
+};
+
+const benefits = [
+  {
+    icon: icons.bulb,
+    title: L('Pensar con orden', 'Thinking clearly'),
+    text: L(
+      'Resolver un problema enseña a mirar los datos, probar un camino y revisar si tiene sentido. Eso sirve en todas las materias.',
+      'Solving a problem teaches children to look at the facts, try a path and check whether it makes sense. That helps in every subject.'
+    ),
+  },
+  {
+    icon: icons.heart,
+    title: L('Confianza en la escuela', 'Confidence at school'),
+    text: L(
+      'Cuando los números dejan de dar miedo, los chicos levantan la mano, preguntan y se animan con temas nuevos.',
+      'When numbers stop being scary, children raise their hand, ask questions and take on new topics.'
+    ),
+  },
+  {
+    icon: icons.cart,
+    title: L('Matemática de todos los días', 'Everyday maths'),
+    text: L(
+      'Contar el vuelto, repartir en partes iguales, leer la hora o medir una receta: la matemática está en la vida real.',
+      'Counting change, sharing equally, telling the time or measuring a recipe: maths is part of real life.'
+    ),
+  },
+  {
+    icon: icons.mountain,
+    title: L('Animarse a intentar', 'Daring to try'),
+    text: L(
+      'Equivocarse y volver a probar es parte de aprender. Con práctica corta y frecuente, el esfuerzo se vuelve costumbre.',
+      'Making a mistake and trying again is part of learning. Short, regular practice turns effort into a habit.'
+    ),
+  },
+];
+
+const helps = [
+  {
+    icon: icons.book,
+    title: L('Historias que dan ganas de seguir', 'Stories that make them want more'),
+    text: L(
+      'Cada grado es un mundo con su aventura: construir una casa, liberar amigos de un mago, resolver un misterio. Tomi o Lola acompañan al chico en cada misión.',
+      'Each grade is a world with its own adventure: building a house, freeing friends from a wizard, solving a mystery. Tomi or Lola go along on every mission.'
+    ),
+  },
+  {
+    icon: icons.eye,
+    title: L('Ver antes de calcular', 'Seeing before calculating'),
+    text: L(
+      'Los problemas se muestran con dibujos, grupos y medidas que se pueden mirar y mover, para entender la idea y no solo memorizar.',
+      'Problems come with pictures, groups and measures to look at and move, so children understand the idea instead of just memorising.'
+    ),
+  },
+  {
+    icon: icons.clock,
+    title: L('Misiones cortas', 'Short missions'),
+    text: L(
+      'Cada misión tiene pocos desafíos. Alcanza un ratito por día, y las estrellas muestran el avance.',
+      'Each mission has just a few challenges. A little time each day is enough, and stars show the progress.'
+    ),
+  },
+  {
+    icon: icons.spark,
+    title: L('Ayuda sin retos', 'Help without scolding'),
+    text: L(
+      'Si una respuesta no sale, Átomo, el zorro robot, da una pista y el chico vuelve a intentar. Nunca se marca como “mal”.',
+      'If an answer does not work out, Átomo the robot fox gives a hint and the child tries again. Nothing is ever marked “wrong”.'
+    ),
+  },
+];
+
+const rows = [
+  { label: L(`Primeras ${freeMissions} misiones de cada grado`, `First ${freeMissions} missions of each grade`), free: true, premium: true },
+  { label: L(`${gameCount} juegos, nivel fácil`, `${gameCount} games, easy level`), free: true, premium: true },
+  { label: L('Estrellas guardadas en la cuenta', 'Stars saved to the account'), free: true, premium: true },
+  { label: L(`Las ${totalMissions} misiones de 1.º a 7.º`, `All ${totalMissions} missions, Grades 1–7`), free: false, premium: true },
+  { label: L('Todos los niveles de juego', 'Every game level'), free: false, premium: true },
+  { label: L('Temas Premium de secundaria', 'Premium secondary topics'), free: false, premium: true },
+];
+
+const included = [
+  L(`Las ${totalMissions} misiones de primaria, de 1.º a 7.º grado`, `All ${totalMissions} primary missions, Grade 1 to Grade 7`),
+  L('Todos los niveles de los juegos de entrenamiento', 'Every level of the training games'),
+  L('Los temas Premium de secundaria', 'The Premium secondary topics'),
+  L('Sin publicidad, como siempre', 'No ads, as always'),
+];
+
+const trust = [
+  { icon: icons.noads, title: L('Sin publicidad', 'No ads'), text: L('Ningún anuncio ni enlace que distraiga, en ninguna parte.', 'No ads or distracting links anywhere.') },
+  { icon: icons.shield, title: L('No vendemos datos', 'We never sell data'), text: L('No compartimos información con redes publicitarias.', 'We never share information with ad networks.') },
+  { icon: icons.lock, title: L('Pago seguro', 'Secure payment'), text: L('Paga una persona adulta con Mercado Pago. Mundoki no ve los datos de la tarjeta.', 'An adult pays with Mercado Pago. Mundoki never sees card details.') },
+  { icon: icons.undo, title: L('Cancelás cuando quieras', 'Cancel any time'), text: L('Sin permanencia: se cancela desde esta página con un clic.', 'No commitment: cancel from this page in one click.') },
+];
+
+const faq = [
+  {
+    q: L('¿Puedo probar antes de pagar?', 'Can we try before paying?'),
+    a: L(
+      `Sí. La primera aventura de cada grado y los juegos en nivel fácil son gratis, sin tarjeta y sin cuenta. Así ven si a su hijo le gusta antes de suscribirse.`,
+      `Yes. The first adventure of every grade and the games on easy level are free, with no card and no account. You can see whether your child enjoys it before subscribing.`
+    ),
+  },
+  {
+    q: L('¿Cuánto cuesta y cómo se cobra?', 'How much is it and how is it charged?'),
+    a: L(
+      `${priceText} por mes, en pesos. Mercado Pago lo cobra automáticamente una vez por mes hasta que cancelen. No hay cargos extra.`,
+      `${priceText} per month, in Argentine pesos. Mercado Pago charges it automatically once a month until you cancel. There are no extra fees.`
+    ),
+  },
+  {
+    q: L('¿Qué pasa si cancelo?', 'What happens if I cancel?'),
+    a: L(
+      'No se hacen más cobros y Premium termina en ese momento. Las estrellas y el avance de su hijo quedan guardados, y la parte gratis sigue disponible.',
+      'No more charges are made and Premium ends right away. Your child’s stars and progress stay saved, and the free part stays available.'
+    ),
+  },
+  {
+    q: L('¿Sigue lo que ven en la escuela?', 'Does it follow what they learn at school?'),
+    a: L(
+      'Las misiones están ordenadas por grado según la escuela primaria de la Ciudad de Buenos Aires. Mundoki acompaña lo que se ve en clase; no reemplaza a la escuela.',
+      'Missions are organised by grade following primary school in the City of Buenos Aires. Mundoki supports what is taught in class; it does not replace school.'
+    ),
+  },
+  {
+    q: L('¿Mi hijo lo puede usar solo?', 'Can my child use it alone?'),
+    a: L(
+      'Sí. Los textos son cortos, hay botones grandes y, para quienes recién empiezan a leer, un botón lee las consignas en voz alta. En 1.º grado ayuda que un adulto acompañe las primeras veces.',
+      'Yes. Texts are short, buttons are big and, for early readers, a button reads the instructions aloud. In Grade 1 it helps if an adult sits with them the first few times.'
+    ),
+  },
+  {
+    q: L('¿En qué dispositivos funciona?', 'Which devices does it work on?'),
+    a: L(
+      'En el navegador de un celular, una tablet o una computadora. No hace falta instalar nada.',
+      'In the browser of a phone, tablet or computer. Nothing to install.'
+    ),
+  },
+];
 ---
 
-<AppLayout legacyContent
-  title={locale === 'es-AR' ? 'Suscripción Premium · Mercado Pago' : 'Premium Subscription · Mercado Pago'}
+<AppLayout
+  title={L('Mundoki Premium', 'Mundoki Premium')}
+  description={L(
+    'Matemática con historias para primaria: todas las misiones de 1.º a 7.º grado y todos los niveles de juego. Sin publicidad. Cancelás cuando quieras.',
+    'Story-based maths for primary school: every mission from Grade 1 to Grade 7 and every game level. No ads. Cancel any time.'
+  )}
   locale={locale}
   activeNav="premium"
   switchLocaleHref={buildPremiumUrl(otherLocale)}
 >
-  <div id="premium-page-root" data-locale={locale} class="article-container stack-lg">
-    <header class="card stack-sm">
-      <div class="kicker">Mercado Pago · ARS</div>
-      <h1 class="section-title" style="margin:0;">{t(locale, 'premiumTitle')}</h1>
-      <p class="text-sm text-muted" style="margin:0;">{t(locale, 'premiumSubtitle')}</p>
-      <div class="callout stack-sm" style="margin-top:10px;">
-        <strong id="premium-current-state">
-          {locale === 'es-AR' ? 'Plan Actual: Demo Gratis' : 'Current Plan: Free Demo'}
-        </strong>
+  <div id="premium-page-root" data-locale={locale} class="mk-stack mk-stack--loose mk-premium">
+    <!-- 1. Promise -->
+    <section class="mk-card mk-card--grape mk-hello mk-premium__hero" aria-labelledby="premium-title">
+      <div class="mk-hello__art"><HeroCharacter /></div>
+      <div class="mk-hello__body">
+        <span class="mk-chip mk-chip--grape mk-premium__badge" id="premium-current-state">Mundoki Premium</span>
+        <h1 class="mk-display" id="premium-title">{L('Que la matemática sea su aventura favorita', 'Make maths their favourite adventure')}</h1>
+        <p class="mk-text">
+          {L(
+            'Historias, dibujos y desafíos cortos para que su hijo entienda, practique y gane confianza de 1.º a 7.º grado.',
+            'Stories, pictures and short challenges so your child understands, practises and gains confidence from Grade 1 to Grade 7.'
+          )}
+        </p>
+        <div class="mk-row">
+          <a class="mk-btn mk-btn--premium" href="#plan">{L('Suscribirse', 'Subscribe')}</a>
+          <a class="mk-btn" href={buildHomeUrl(locale)}>{L('Probar gratis', 'Try it free')}</a>
+        </div>
+        <p class="mk-label">{L(`${priceText} por mes · Sin publicidad · Cancelás cuando quieras`, `${priceText} a month · No ads · Cancel any time`)}</p>
       </div>
-    </header>
-
-    <div id="premium-status-box" style="display:none;"></div>
-
-    <section id="promo-redeem" data-locale={locale} class="card stack-md">
-      <h2>{promoText(locale, 'code')}</h2>
-      <label class="form-label" for="promo-code">{locale === 'es-AR' ? 'Código personal' : 'Personal code'}</label>
-      <div class="flex-row" style="align-items:stretch;">
-        <input
-          id="promo-code"
-          type="text"
-          class="input-field input-mono"
-          style="flex:1;min-width:180px;"
-          maxlength="64"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder={locale === 'es-AR' ? 'Ej: MUND-1234' : 'e.g. MUND-1234'}
-        />
-        <button type="button" class="btn btn-outline" id="promo-review">{promoText(locale, 'review')}</button>
-      </div>
-      <p id="promo-summary" class="callout" aria-live="polite"></p>
-      <label class="flex-row"><input id="promo-consent" type="checkbox" /><span>{promoText(locale, 'consent')}</span></label>
-      <button type="button" class="btn btn-primary" id="promo-accept" disabled>{promoText(locale, 'accept')}</button>
-      <p id="promo-status" role="status" aria-live="polite"></p>
-      <a href={buildAccountUrl(locale)}>{promoText(locale, 'sign_in')}</a>
     </section>
 
-    <!-- Adult Billing & Mercado Pago Checkout Card -->
-    <section class="card stack-md">
-      <div class="flex-between">
-        <div>
-          <h2 style="margin:0;font-size:1.35rem;">Mundoki Premium</h2>
-          <div class="text-sm text-muted">
-            {locale === 'es-AR'
-              ? 'Acceso a lecciones protegidas en servidor, misiones avanzadas y guardado en D1.'
-              : 'Server-protected masterclasses, advanced missions, and Cloudflare D1 cloud sync.'}
-          </div>
-        </div>
-        <div class="text-mono font-bold" style="font-size:1.45rem;color:var(--accent-emerald);">
-          {t(locale, 'premiumPriceLabel')}
-        </div>
+    <div id="premium-status-box" class="mk-feedback" role="status" aria-live="polite" hidden>
+      <span class="mk-feedback__text"></span>
+    </div>
+
+    <!-- 2. Why maths matters -->
+    <section class="mk-stack" aria-labelledby="premium-why">
+      <div class="mk-stack mk-stack--tight">
+        <h2 class="mk-title" id="premium-why">{L('Por qué vale la pena practicar matemática', 'Why maths practice is worth it')}</h2>
+        <p class="mk-text">{L('Lo que se gana va mucho más allá de las cuentas.', 'What children gain goes far beyond sums.')}</p>
       </div>
-
-      <div class="callout callout-amber text-sm">
-        {t(locale, 'premiumAdultNotice')}
+      <div class="mk-grid">
+        {benefits.map((item) => (
+          <article class="mk-card mk-premium__point">
+            <span class="mk-premium__icon mk-premium__icon--sun"><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg></span>
+            <div class="mk-stack mk-stack--tight">
+              <h3 class="mk-heading">{item.title}</h3>
+              <p class="mk-text">{item.text}</p>
+            </div>
+          </article>
+        ))}
       </div>
+    </section>
 
-      <label class="flex-row text-sm" style="cursor:pointer;">
-        <input id="checkbox-adult-confirm" type="checkbox" style="width:18px;height:18px;" />
-        <span>{t(locale, 'premiumAdultCheckbox')}</span>
-      </label>
+    <!-- 3. How Mundoki helps -->
+    <section class="mk-stack" aria-labelledby="premium-how">
+      <div class="mk-stack mk-stack--tight">
+        <h2 class="mk-title" id="premium-how">{L('Cómo ayuda Mundoki', 'How Mundoki helps')}</h2>
+        <p class="mk-text">{L('Aprender jugando, con un método pensado para cada grado.', 'Learning through play, with a method built for each grade.')}</p>
+      </div>
+      <div class="mk-grid">
+        {helps.map((item) => (
+          <article class="mk-card mk-premium__point">
+            <span class="mk-premium__icon mk-premium__icon--sky"><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg></span>
+            <div class="mk-stack mk-stack--tight">
+              <h3 class="mk-heading">{item.title}</h3>
+              <p class="mk-text">{item.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
 
-      <div class="flex-row">
-        <button type="button" class="btn btn-primary" id="btn-start-checkout">
-          {t(locale, 'premiumCheckoutBtn')}
+    <!-- 4. Free vs Premium -->
+    <section class="mk-stack" aria-labelledby="premium-compare">
+      <h2 class="mk-title" id="premium-compare">{L('Gratis y Premium', 'Free and Premium')}</h2>
+      <div class="mk-card mk-table-wrap mk-premium__table-card">
+        <table class="mk-table mk-premium__table">
+          <thead>
+            <tr>
+              <th scope="col"><span class="mk-premium__sr">{L('Qué incluye', 'What is included')}</span></th>
+              <th scope="col" class="is-mark">{L('Gratis', 'Free')}</th>
+              <th scope="col" class="is-mark is-premium">Premium</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr>
+                <th scope="row">{row.label}</th>
+                {[row.free, row.premium].map((on) => (
+                  <td class:list={['is-mark', { 'is-on': on }]}>
+                    <svg class="mk-icon" viewBox="0 0 24 24" role="img" aria-label={on ? L('Incluido', 'Included') : L('No incluido', 'Not included')}><path d={on ? icons.check : icons.dash} /></svg>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. Plan and checkout -->
+    <section id="plan" class="mk-card mk-card--grape mk-stack mk-premium__plan" aria-labelledby="premium-plan-title">
+      <div class="mk-stack mk-stack--tight">
+        <h2 class="mk-title" id="premium-plan-title">Mundoki Premium</h2>
+        <p class="mk-premium__price"><span>{priceText}</span> {L('por mes', 'a month')}</p>
+        <p class="mk-label">{L('En pesos argentinos. Se renueva cada mes; cancelás cuando quieras.', 'In Argentine pesos. Renews monthly; cancel any time.')}</p>
+      </div>
+      <ul class="mk-premium__list">
+        {included.map((item) => (
+          <li><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.check} /></svg>{item}</li>
+        ))}
+      </ul>
+
+      <div class="mk-stack mk-stack--tight" id="premium-checkout-block">
+        <label class="mk-check" for="checkbox-adult-confirm">
+          <input id="checkbox-adult-confirm" type="checkbox" />
+          <span>{L('Soy una persona adulta (18 años o más) y voy a gestionar este pago.', 'I am an adult (18 or older) and I will manage this payment.')}</span>
+        </label>
+        <button type="button" class="mk-btn mk-btn--premium mk-btn--wide" id="btn-start-checkout">
+          {L('Suscribirse con Mercado Pago', 'Subscribe with Mercado Pago')}
         </button>
-        <button
-          type="button"
-          class="btn btn-outline"
-          id="btn-cancel-subscription"
-          style="display:none;"
-        >
-          {t(locale, 'premiumCancelBtn')}
-        </button>
-      </div>
-
-      <!-- Development Webhook Simulator Panel (Visible when MERCADOPAGO_ACCESS_TOKEN is unconfigured) -->
-      <div id="premium-dev-webhook-panel" class="card-subtle stack-sm" style="display:none;">
-        <strong class="text-sm">
-          {locale === 'es-AR'
-            ? '[SIMULADOR DE WEBHOOK MERCADO PAGO — SOLO DESARROLLO]'
-            : '[MERCADO PAGO WEBHOOK SIMULATOR — DEV ONLY]'}
-        </strong>
-        <p class="text-xs text-muted" style="margin:0;">
-          {locale === 'es-AR'
-            ? 'En producción el acceso solo se activa cuando el Worker verifica el webhook firmado de Mercado Pago. Hacé clic abajo para enviar un evento firmado idempotente a POST /api/webhooks/mercadopago.'
-            : 'In production, entitlement is only granted when the Worker verifies a signed Mercado Pago webhook. Click below to send an idempotent signed webhook to POST /api/webhooks/mercadopago.'}
+        <p class="mk-label" id="premium-signin-hint">
+          {L('Antes de pagar vas a necesitar la', 'Before paying you will need the')}{' '}
+          <a href={buildAccountUrl(locale)}>{L('cuenta de la familia', 'family account')}</a>.
         </p>
-        <button type="button" class="btn btn-emerald btn-sm" id="btn-simulate-mp-webhook">
-          {locale === 'es-AR'
-            ? 'Simular Webhook Verificado de Mercado Pago (Activar Premium)'
-            : 'Simulate Verified Mercado Pago Webhook (Activate Premium)'}
-        </button>
+      </div>
+
+      <button type="button" class="mk-btn" id="btn-cancel-subscription" hidden>
+        {L('Cancelar la suscripción', 'Cancel the subscription')}
+      </button>
+
+      <!-- Personal invitation codes (discounts). Collapsed: most parents never need it. -->
+      <details class="mk-details" id="promo-redeem" data-locale={locale}>
+        <summary>{L('¿Tenés un código de invitación?', 'Have an invitation code?')}</summary>
+        <div class="mk-stack mk-stack--tight">
+          <div class="mk-field">
+            <label for="promo-code">{promoText(locale, 'code')}</label>
+            <input id="promo-code" class="mk-input" type="text" maxlength="64" autocomplete="off" spellcheck="false" autocapitalize="characters" placeholder={L('Ej.: MUND-1234', 'e.g. MUND-1234')} />
+          </div>
+          <button type="button" class="mk-btn" id="promo-review">{promoText(locale, 'review')}</button>
+          <p id="promo-summary" class="mk-text" aria-live="polite"></p>
+          <label class="mk-check" for="promo-consent">
+            <input id="promo-consent" type="checkbox" />
+            <span>{promoText(locale, 'consent')}</span>
+          </label>
+          <button type="button" class="mk-btn mk-btn--premium" id="promo-accept" disabled>{promoText(locale, 'accept')}</button>
+          <p id="promo-status" class="mk-label" role="status" aria-live="polite"></p>
+        </div>
+      </details>
+
+      <!-- Local development only: stands in for Mercado Pago's signed confirmation -->
+      <div id="premium-dev-webhook-panel" class="mk-card mk-card--sunk mk-stack mk-stack--tight" hidden>
+        <p class="mk-label">{L('Modo desarrollo: simulá la confirmación de pago de Mercado Pago.', 'Development mode: simulate Mercado Pago’s payment confirmation.')}</p>
+        <button type="button" class="mk-btn mk-btn--go" id="btn-simulate-mp-webhook">{L('Simular pago confirmado', 'Simulate confirmed payment')}</button>
+      </div>
+    </section>
+
+    <!-- 6. Trust -->
+    <section class="mk-stack" aria-labelledby="premium-trust">
+      <h2 class="mk-title" id="premium-trust">{L('Pensado para familias', 'Made for families')}</h2>
+      <div class="mk-grid mk-premium__trust">
+        {trust.map((item) => (
+          <div class="mk-row mk-premium__trust-item">
+            <span class="mk-premium__icon mk-premium__icon--leaf"><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg></span>
+            <div class="mk-stack mk-stack--tight">
+              <h3 class="mk-heading">{item.title}</h3>
+              <p class="mk-text">{item.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p class="mk-label"><a href={buildPrivacyUrl(locale)}>{L('Cómo cuidamos los datos', 'How we look after data')}</a></p>
+    </section>
+
+    <!-- 7. Questions -->
+    <section class="mk-stack" aria-labelledby="premium-faq">
+      <h2 class="mk-title" id="premium-faq">{L('Preguntas frecuentes', 'Questions parents ask')}</h2>
+      <div class="mk-card mk-premium__faq">
+        {faq.map((item) => (
+          <details>
+            <summary>{item.q}</summary>
+            <p class="mk-text">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- 8. Last call -->
+    <section class="mk-card mk-card--sun mk-stack mk-premium__final" aria-labelledby="premium-final">
+      <h2 class="mk-title" id="premium-final">{L('Empiecen hoy', 'Start today')}</h2>
+      <p class="mk-text">{L('Unos minutos por día alcanzan para notar el cambio.', 'A few minutes a day is enough to see a difference.')}</p>
+      <div class="mk-row">
+        <a class="mk-btn mk-btn--premium" href="#plan">{L('Suscribirse', 'Subscribe')}</a>
+        <a class="mk-btn" href={buildHomeUrl(locale)}>{L('Probar gratis', 'Try it free')}</a>
       </div>
     </section>
   </div>
 
   <script>
     import { initPromoClient } from '../../scripts/promoClient';
-    initPromoClient();
     import { initPremiumPage } from '../../scripts/premiumClient';
+    initPromoClient();
     initPremiumPage();
   </script>
 </AppLayout>

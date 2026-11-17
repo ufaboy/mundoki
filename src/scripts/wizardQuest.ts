@@ -1,6 +1,6 @@
 // Grade 2 mission page (QuestLesson.astro): answer checking, hints, rewards,
 // and the story scene (knots untied, friend freed, wizard defeated).
-import { questSceneState } from '../content/grade2/wizardQuest';
+import { questSceneState } from '../content/grade2/questScene';
 
 document.querySelectorAll<HTMLElement>('[data-quest-lesson]').forEach(root => {
  const es = root.dataset.locale === 'es-AR';

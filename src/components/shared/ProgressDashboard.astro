@@ -1,74 +1,98 @@
 ---
-import { t } from '../../i18n/translations';
-import { Locale } from '../../math/core/types';
+// "Estrellas": the child's stars and how far they got in each grade's world,
+// with a short block of plain numbers for the family at the end.
+// Everything shown comes from this browser (stars, answered mission questions);
+// the page is static and progressClient.ts fills it in.
+import HeroCharacter from './HeroCharacter.astro';
+import { SCHOOL_COURSES } from '../../content/schoolCourses';
+import { buildAccountUrl, buildGradeUrl, buildHomeUrl } from '../../i18n/routes';
+import type { Locale } from '../../math/core/types';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
+const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
+const star = 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z';
+
+// One entry per primary grade: which mission questions belong to it.
+// A mission counts as done when all of its questions were answered right.
+const worlds = SCHOOL_COURSES.map((course) => {
+  const lessons = course.lessons as readonly { id: string; checks?: readonly unknown[] }[];
+  return {
+    gradeId: course.gradeId,
+    label: L(`${course.gradeNumber}.º grado`, `Grade ${course.gradeNumber}`),
+    title: course.title[locale],
+    href: buildGradeUrl(locale, course.gradeId),
+    missions: lessons.map((lesson) => ({ id: lesson.id, checks: lesson.checks?.length ?? 0 })),
+  };
+});
+const worldData = JSON.stringify(worlds.map(({ gradeId, missions }) => ({ gradeId, missions })));
 ---
 
-<div id="progress-dashboard-root" data-locale={locale} class="stack-lg">
-  <header class="card flex-between">
-    <div>
-      <div class="kicker">
-        {locale === 'es-AR' ? 'Panel de Dominio y Logros' : 'Mastery & Achievements Dashboard'}
-      </div>
-      <h1 class="section-title" style="margin:0;">{t(locale, 'progressTitle')}</h1>
-    </div>
-    <button type="button" class="btn btn-emerald btn-sm" id="btn-prog-sync">
-      ☁ {t(locale, 'playSyncNow')}
-    </button>
-  </header>
-
-  <div id="prog-sync-message" style="display:none;"></div>
-
-  <!-- Summary Metrics -->
-  <section class="grid-2">
-    <div class="card flex-between">
-      <div>
-        <div class="text-xs text-muted">{t(locale, 'progressSolved')}</div>
-        <div class="text-mono font-bold" style="font-size:1.85rem;" id="prog-stat-solved">0</div>
-      </div>
-      <div>
-        <div class="text-xs text-muted">{t(locale, 'progressAccuracy')}</div>
-        <div class="text-mono font-bold" style="font-size:1.85rem;color:var(--accent-emerald);" id="prog-stat-accuracy">
-          100%
-        </div>
-      </div>
-    </div>
-
-    <div class="card flex-between">
-      <div>
-        <div class="text-xs text-muted">{t(locale, 'progressEnergy')}</div>
-        <div class="text-mono font-bold" style="font-size:1.85rem;color:var(--accent-amber);" id="prog-stat-energy">
-          20⚡
-        </div>
-      </div>
-      <div>
-        <div class="text-xs text-muted">{t(locale, 'progressSyncPending')}</div>
-        <div class="text-mono font-bold" style="font-size:1.85rem;" id="prog-stat-pending">0</div>
-      </div>
+<div id="progress-dashboard-root" data-locale={locale} class="mk-stack mk-stack--loose mk-stars-page">
+  <section class="mk-card mk-card--sun mk-hello" aria-labelledby="prog-title">
+    <div class="mk-hello__art"><HeroCharacter /></div>
+    <div class="mk-hello__body">
+      <h1 class="mk-title" id="prog-title">{L('Tus estrellas', 'Your stars')}</h1>
+      <p class="mk-stars-page__total">
+        <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d={star} /></svg>
+        <span id="prog-stat-stars">0</span>
+      </p>
+      <p class="mk-text">{L('Cada respuesta correcta suma una estrella.', 'Every right answer adds one star.')}</p>
     </div>
   </section>
 
-  <!-- Topic Mastery List -->
-  <section class="card stack-md">
-    <h2 class="section-title" style="margin:0;">
-      {locale === 'es-AR' ? 'Progreso por Tema y Guardián' : 'Topic & Guardian Mastery'}
-    </h2>
-    <div id="prog-topics-list" class="grid-2"></div>
+  <section class="mk-stack" aria-labelledby="prog-worlds-title">
+    <h2 class="mk-title" id="prog-worlds-title">{L('Tus mundos', 'Your worlds')}</h2>
+
+    <p class="mk-card mk-text mk-stars-page__empty" id="prog-empty" hidden>
+      {L('Todavía no empezaste ninguna misión. ¡Elegí tu grado y a jugar!', 'You have not started a mission yet. Pick your grade and play!')}
+      {' '}<a class="mk-btn mk-btn--primary mk-stars-page__start" href={buildHomeUrl(locale)}>{L('Elegir grado', 'Pick a grade')}</a>
+    </p>
+
+    <div class="mk-grid" id="prog-worlds">
+      {worlds.map((world) => (
+        <article class="mk-card mk-stack mk-stack--tight mk-stars-page__world" data-world={world.gradeId} hidden>
+          <span class="mk-chip mk-chip--sky">{world.label}</span>
+          <h3 class="mk-heading">{world.title}</h3>
+          <div class="mk-progress" role="img" data-world-bar><span style="width:0%"></span></div>
+          <p class="mk-row mk-row--between mk-label">
+            <span data-world-missions></span>
+            <span class="mk-stars-page__mini">
+              <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d={star} /></svg>
+              <span data-world-stars></span>
+            </span>
+          </p>
+          <a class="mk-btn mk-btn--go" href={world.href} data-world-link>{L('Seguir', 'Continue')}</a>
+        </article>
+      ))}
+    </div>
   </section>
 
-  <!-- Unlocked Spacecraft & Cosmetics -->
-  <section class="card stack-md">
-    <h2 class="section-title" style="margin:0;">
-      {locale === 'es-AR' ? 'Nave Espacial y Recompensas Desbloqueadas' : 'Spacecraft & Unlocked Rewards'}
-    </h2>
-    <div id="prog-rewards-list" class="grid-3"></div>
+  <section class="mk-card mk-card--sunk mk-stack" aria-labelledby="prog-family-title">
+    <h2 class="mk-heading" id="prog-family-title">{L('Para la familia', 'For parents')}</h2>
+    <div class="mk-stars-page__stats">
+      <div class="mk-stat">
+        <span class="mk-stat__value" id="prog-stat-missions">0</span>
+        <span class="mk-label">{L('Misiones completas', 'Missions finished')}</span>
+      </div>
+      <div class="mk-stat">
+        <span class="mk-stat__value" id="prog-stat-solved">0</span>
+        <span class="mk-label">{L('Respuestas correctas', 'Right answers')}</span>
+      </div>
+      <div class="mk-stat">
+        <span class="mk-stat__value" id="prog-stat-accuracy">—</span>
+        <span class="mk-label">{L('Aciertos', 'Accuracy')}</span>
+      </div>
+    </div>
+    <p class="mk-text" id="prog-save-status"></p>
+    <a class="mk-btn" id="prog-account-link" href={buildAccountUrl(locale)} hidden>{L('Ir a la cuenta', 'Go to account')}</a>
   </section>
 </div>
+
+<script type="application/json" id="prog-worlds-data" set:html={worldData}></script>
 
 <script>
   import { initProgressDashboard } from '../../scripts/progressClient';

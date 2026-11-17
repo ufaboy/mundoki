@@ -56,5 +56,9 @@ const useSystemMain = system || !legacyContent;
       <slot />
     </main>
     <SiteFooter locale={locale} switchLocaleHref={switchLocaleHref} />
+    <script>
+      import { markLockedLessonLinks } from '../scripts/premiumBadges';
+      markLockedLessonLinks();
+    </script>
   </body>
 </html>

@@ -1,286 +1,233 @@
 ---
-import { t } from '../../i18n/translations';
-import { Locale } from '../../math/core/types';
+import { buildPremiumUrl } from '../../i18n/routes';
+import type { Locale } from '../../math/core/types';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
+const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
+const icons = {
+  mail: 'M3 6.5h18v11H3zM3 7l9 6.5L21 7',
+  lock: 'M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3',
+  exit: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10',
+};
 ---
 
-<div id="account-page-root" data-locale={locale} class="article-container stack-lg">
-  <header class="card stack-sm">
-    <div class="kicker">Better Auth · Cloudflare D1 · OAuth 2.0 · Magic Link · 2FA (TOTP)</div>
-    <h1 class="section-title" style="margin:0;">{t(locale, 'authTitle')}</h1>
-    <p class="text-sm text-muted" style="margin:0;">
-      {locale === 'es-AR'
-        ? 'Podés usar Mundoki sin registrarte. Creá o conectá tu cuenta para sincronizar el progreso en Cloudflare D1, usar Enlace Mágico sin contraseña o proteger tu cuenta con 2FA (TOTP).'
-        : 'You can use Mundoki without registering. Create or connect an account to synchronize progress in Cloudflare D1, use a passwordless Magic Link, or protect your account with 2FA (TOTP).'}
-    </p>
-  </header>
-
-  <div id="account-status-banner" style="display:none;" role="status" aria-live="polite"></div>
-
-  <!-- 1. Guest Authentication View -->
-  <div id="account-guest-view" class="stack-lg">
-    <!-- OAuth 2.0 Section (temporarily hidden until OAuth credentials are configured) -->
-    <section id="oauth-section" class="card stack-md" hidden style="display:none;">
-      <h2 style="font-size:1.15rem;margin:0;">{t(locale, 'authOAuthSectionTitle')}</h2>
-      <div class="grid-3">
-        <button type="button" class="btn btn-outline" data-oauth-provider="google">
-          🌐 {t(locale, 'authOAuthGoogle')}
-        </button>
-        <button type="button" class="btn btn-outline" data-oauth-provider="facebook">
-          📘 {t(locale, 'authOAuthFacebook')}
-        </button>
-        <button type="button" class="btn btn-outline" data-oauth-provider="apple">
-           {t(locale, 'authOAuthApple')}
-        </button>
-      </div>
-
-      <!-- Development OAuth Sandbox (Shown when provider credentials are unconfigured) -->
-      <div id="oauth-dev-sandbox" class="card-subtle stack-sm" style="display:none;">
-        <div class="flex-between">
-          <strong class="text-sm" id="oauth-sandbox-provider-label">Google OAuth 2.0</strong>
-          <span class="text-xs text-mono text-muted">[DEV SANDBOX]</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="input-dev-oauth-email">
-            {locale === 'es-AR' ? 'Correo de prueba OAuth:' : 'Test OAuth Email:'}
-          </label>
-          <input
-            id="input-dev-oauth-email"
-            type="email"
-            class="input-field"
-            value="explorador.oauth@mundoki.edu.ar"
-          />
-        </div>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-dev-oauth">
-          {locale === 'es-AR' ? 'Completar Acceso OAuth Simulado' : 'Complete Simulated OAuth Sign-In'}
-        </button>
-      </div>
-    </section>
-
-    <!-- Email / Password & Magic Link Tabs -->
-    <section class="card stack-md">
-      <div class="flex-row">
-        <button type="button" class="btn btn-primary btn-sm" data-auth-tab="signin">
-          {t(locale, 'authSignIn')}
-        </button>
-        <button type="button" class="btn btn-outline btn-sm" data-auth-tab="signup">
-          {t(locale, 'authSignUp')}
-        </button>
-        <button type="button" class="btn btn-outline btn-sm" data-auth-tab="magic">
-          ✉ {t(locale, 'authMagicLinkTab')}
-        </button>
-      </div>
-
-      <!-- Password Form -->
-      <div id="auth-password-section">
-        <form id="form-password-auth" class="stack-sm">
-          <div id="auth-name-group" class="form-group" style="display:none;">
-            <label class="form-label" for="input-auth-name">{t(locale, 'authDisplayName')}</label>
-            <input id="input-auth-name" type="text" class="input-field" placeholder="Cadete Solar" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="input-auth-email">{t(locale, 'authEmail')}</label>
-            <input
-              id="input-auth-email"
-              type="email"
-              required
-              class="input-field"
-              placeholder="estudiante@escuela.edu.ar"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="input-auth-password">{t(locale, 'authPassword')}</label>
-            <input
-              id="input-auth-password"
-              type="password"
-              required
-              minlength="6"
-              class="input-field"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button type="submit" class="btn btn-primary" id="btn-submit-password-auth">
-            {t(locale, 'authSignIn')}
-          </button>
-        </form>
-      </div>
-
-      <!-- Magic Link Form -->
-      <div id="auth-magic-section" style="display:none;" class="stack-md">
-        <p class="text-sm text-muted" style="margin:0;">{t(locale, 'authMagicLinkDesc')}</p>
-        <form id="form-magic-link" class="stack-sm">
-          <div class="form-group">
-            <label class="form-label" for="input-magic-email">{t(locale, 'authEmail')}</label>
-            <input
-              id="input-magic-email"
-              type="email"
-              required
-              class="input-field"
-              placeholder="tutor@familia.com.ar"
-            />
-          </div>
-          <button type="submit" class="btn btn-emerald">
-            ✉ {t(locale, 'authMagicLinkSendBtn')}
-          </button>
-        </form>
-        <div id="magic-dev-outbox" class="callout callout-emerald stack-sm" style="display:none;"></div>
-      </div>
-    </section>
+<div id="account-page-root" data-locale={locale} class="mk-account">
+  <!-- Messages for every step of the page (sign-in errors, sent link, 2FA changes) -->
+  <div id="account-status-banner" class="mk-feedback" role="status" aria-live="polite" hidden>
+    <span class="mk-feedback__text"></span>
   </div>
 
-  <!-- 2. Two-Factor Authentication (2FA) Login Challenge View -->
-  <section id="account-2fa-challenge-view" class="card stack-md" style="display:none;">
-    <div class="kicker" style="color:var(--accent-amber);">RFC 6238 TOTP · 2FA</div>
-    <h2 class="section-title" style="margin:0;">{t(locale, 'twoFactorChallengeTitle')}</h2>
-    <p class="text-sm text-muted" style="margin:0;">
-      {t(locale, 'twoFactorChallengeDesc')} (<strong id="challenge-2fa-email"></strong>)
-    </p>
+  <!-- 1. Signed out: sign in or create an account -->
+  <section id="account-guest-view" class="mk-card mk-stack mk-account__auth" aria-labelledby="account-auth-title">
+    <div class="mk-stack mk-stack--tight">
+      <h1 class="mk-title" id="account-auth-title">{L('Cuenta de la familia', 'Family account')}</h1>
+      <p class="mk-text">
+        {L(
+          'Entrá para guardar el avance de tus hijos y verlo en cualquier dispositivo. Para jugar no hace falta cuenta.',
+          'Sign in to save your children’s progress and see it on any device. Playing does not need an account.'
+        )}
+      </p>
+    </div>
 
-    <div
-      id="challenge-2fa-dev-totp"
-      class="callout callout-amber text-mono text-sm"
-      style="display:none;"
-    ></div>
+    <div class="mk-tabs mk-account__mode" role="group" aria-label={L('Qué querés hacer', 'What do you want to do')}>
+      <button type="button" data-auth-tab="signin" aria-pressed="true">{L('Entrar', 'Sign in')}</button>
+      <button type="button" data-auth-tab="signup" aria-pressed="false">{L('Crear cuenta', 'Create account')}</button>
+    </div>
 
-    <form id="form-2fa-challenge" class="stack-sm">
-      <div class="form-group">
-        <label class="form-label" for="input-2fa-challenge-code">
-          {locale === 'es-AR'
-            ? 'Código TOTP de 6 dígitos o código de recuperación (ej. XXXX-XXXX):'
-            : '6-digit TOTP code or recovery backup code (e.g. XXXX-XXXX):'}
-        </label>
+    <form id="form-password-auth" class="mk-stack" novalidate>
+      <div id="auth-name-group" class="mk-field" hidden>
+        <label for="input-auth-name">{L('Tu nombre', 'Your name')}</label>
+        <input id="input-auth-name" class="mk-input" type="text" autocomplete="name" maxlength="60" />
+      </div>
+
+      <div class="mk-field">
+        <label for="input-auth-email">{L('Correo electrónico', 'Email')}</label>
+        <input
+          id="input-auth-email"
+          class="mk-input"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="off"
+          spellcheck="false"
+          required
+          aria-describedby="auth-email-error"
+          placeholder={L('nombre@correo.com', 'name@email.com')}
+        />
+        <p class="mk-field__error" id="auth-email-error" hidden></p>
+      </div>
+
+      <div class="mk-field">
+        <label for="input-auth-password">{L('Contraseña', 'Password')}</label>
+        <div class="mk-account__secret">
+          <input
+            id="input-auth-password"
+            class="mk-input"
+            type="password"
+            autocomplete="current-password"
+            minlength="6"
+            required
+            aria-describedby="auth-password-hint auth-password-error"
+          />
+          <button type="button" class="mk-btn mk-btn--quiet" id="btn-toggle-password" aria-pressed="false">
+            {L('Mostrar', 'Show')}
+          </button>
+        </div>
+        <p class="mk-label" id="auth-password-hint" hidden>{L('6 letras o números como mínimo.', 'At least 6 letters or numbers.')}</p>
+        <p class="mk-field__error" id="auth-password-error" hidden></p>
+      </div>
+
+      <button type="submit" class="mk-btn mk-btn--primary mk-btn--wide" id="btn-submit-password-auth">
+        {L('Entrar', 'Sign in')}
+      </button>
+    </form>
+
+    <!-- Passwordless shortcut for existing accounts: uses the email typed above -->
+    <div id="auth-magic-block" class="mk-stack mk-stack--tight">
+      <p class="mk-account__or"><span>{L('o', 'or')}</span></p>
+      <button type="button" class="mk-btn mk-btn--wide" id="btn-send-magic-link">
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.mail} /></svg>
+        {L('Pedir un enlace', 'Email me a link')}
+      </button>
+      <p class="mk-label mk-account__center">{L('Sin contraseña: te mandamos un enlace para entrar.', 'No password needed: we send you a link to sign in.')}</p>
+    </div>
+
+    <!-- Local development only: the server returns the link because no email provider is set up -->
+    <div id="magic-dev-outbox" class="mk-card mk-card--sunk mk-stack mk-stack--tight" hidden>
+      <p class="mk-label">{L('Modo desarrollo: no hay servicio de correo. Abrí el enlace acá.', 'Development mode: no email service. Open the link here.')}</p>
+      <button type="button" class="mk-btn mk-btn--go" id="btn-verify-magic-now">{L('Abrir el enlace', 'Open the link')}</button>
+    </div>
+
+    <!-- OAuth providers stay hidden until their credentials are configured -->
+    <div id="oauth-section" class="mk-stack mk-stack--tight" hidden>
+      <button type="button" class="mk-btn mk-btn--wide" data-oauth-provider="google">Google</button>
+      <button type="button" class="mk-btn mk-btn--wide" data-oauth-provider="facebook">Facebook</button>
+      <button type="button" class="mk-btn mk-btn--wide" data-oauth-provider="apple">Apple</button>
+      <div id="oauth-dev-sandbox" class="mk-card mk-card--sunk mk-stack mk-stack--tight" hidden>
+        <p class="mk-label" id="oauth-sandbox-provider-label">Google</p>
+        <div class="mk-field">
+          <label for="input-dev-oauth-email">{L('Correo de prueba', 'Test email')}</label>
+          <input id="input-dev-oauth-email" class="mk-input" type="email" value="explorador.oauth@mundoki.edu.ar" />
+        </div>
+        <button type="button" class="mk-btn" id="btn-confirm-dev-oauth">{L('Simular acceso', 'Simulate sign-in')}</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Second step for accounts with two-step verification -->
+  <section id="account-2fa-challenge-view" class="mk-card mk-stack mk-account__auth" aria-labelledby="account-2fa-title" hidden>
+    <div class="mk-stack mk-stack--tight">
+      <h1 class="mk-title" id="account-2fa-title">{L('Un paso más', 'One more step')}</h1>
+      <p class="mk-text">
+        {L('Escribí el código de 6 números de tu app de verificación para', 'Enter the 6-digit code from your authenticator app for')}
+        {' '}<strong id="challenge-2fa-email"></strong>.
+      </p>
+    </div>
+    <p id="challenge-2fa-dev-totp" class="mk-label" hidden></p>
+    <form id="form-2fa-challenge" class="mk-stack">
+      <div class="mk-field">
+        <label for="input-2fa-challenge-code">{L('Código', 'Code')}</label>
         <input
           id="input-2fa-challenge-code"
+          class="mk-input mk-account__code"
           type="text"
+          inputmode="text"
+          autocomplete="one-time-code"
+          autocapitalize="characters"
+          spellcheck="false"
           required
-          class="input-field input-mono"
-          placeholder="123456"
         />
+        <p class="mk-label">{L('¿Perdiste el teléfono? Usá uno de tus códigos de respaldo.', 'Lost your phone? Use one of your backup codes.')}</p>
       </div>
-      <div class="flex-row">
-        <button type="submit" class="btn btn-primary">
-          {t(locale, 'twoFactorVerifyLoginBtn')}
-        </button>
-        <button type="button" class="btn btn-outline" id="btn-cancel-2fa-challenge">
-          {locale === 'es-AR' ? 'Cancelar' : 'Cancel'}
-        </button>
-      </div>
+      <button type="submit" class="mk-btn mk-btn--primary mk-btn--wide">{L('Entrar', 'Sign in')}</button>
+      <button type="button" class="mk-btn mk-btn--quiet" id="btn-cancel-2fa-challenge">{L('Volver', 'Back')}</button>
     </form>
   </section>
 
-  <!-- 3. Authenticated User Profile & 2FA Management View -->
-  <div id="account-loggedin-view" class="stack-lg" style="display:none;">
-    <a id="account-admin-promos" class="btn btn-outline" href={`/${locale.toLowerCase()}/admin/promos`} hidden>{locale === 'es-AR' ? 'Administrar invitaciones' : 'Manage invitations'}</a>
-    <a id="account-return-promo" class="btn btn-primary" href={`/${locale.toLowerCase()}/premium`} hidden>{locale === 'es-AR' ? 'Volver a mi invitación' : 'Return to my invitation'}</a>
-    <section class="card stack-md">
-      <div class="flex-between">
-        <div>
-          <div class="kicker">{locale === 'es-AR' ? 'Sesión Activa' : 'Active Session'}</div>
-          <h2 id="user-profile-name" style="margin:0;font-size:1.45rem;">Explorador</h2>
-          <div id="user-profile-email" class="text-sm text-muted text-mono"></div>
-        </div>
-        <button type="button" class="btn btn-outline btn-sm" id="btn-sign-out">
-          {t(locale, 'authSignOut')}
-        </button>
+  <!-- 3. Signed in -->
+  <div id="account-loggedin-view" class="mk-stack" hidden>
+    <section class="mk-row mk-row--between mk-account__hello" aria-labelledby="user-profile-name">
+      <div class="mk-stack mk-stack--tight">
+        <p class="mk-label">{L('Cuenta de la familia', 'Family account')}</p>
+        <h1 class="mk-title" id="user-profile-name"></h1>
+        <p class="mk-text mk-account__email" id="user-profile-email"></p>
       </div>
-
-      <div class="grid-2 text-sm">
-        <div class="card-subtle">
-          <div class="text-xs text-muted">
-            {locale === 'es-AR' ? 'Métodos de acceso vinculados' : 'Linked sign-in methods'}
-          </div>
-          <strong class="text-mono" id="user-profile-methods">password</strong>
-        </div>
-        <div class="card-subtle">
-          <div class="text-xs text-muted">
-            {locale === 'es-AR' ? 'Estado de Suscripción' : 'Subscription Tier'}
-          </div>
-          <strong id="user-profile-tier">Free Demo</strong>
-        </div>
-      </div>
+      <button type="button" class="mk-btn" id="btn-sign-out">
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.exit} /></svg>
+        {L('Salir', 'Sign out')}
+      </button>
     </section>
 
-    <!-- Two-Factor Authentication (2FA / TOTP + Backup Codes) Card -->
-    <section class="card stack-md">
-      <div class="flex-between">
-        <div>
-          <div class="kicker">RFC 6238 TOTP + Backup Recovery Codes</div>
-          <h3 style="margin:0;font-size:1.2rem;">{t(locale, 'twoFactorTitle')}</h3>
-          <div id="user-2fa-status-badge" class="text-sm text-muted">2FA Disabled</div>
-        </div>
+    <div class="mk-row" id="account-extra-links">
+      <a id="account-return-next" class="mk-btn mk-btn--go" href="#" hidden>{L('Volver a la misión', 'Back to the mission')}</a>
+      <a id="account-return-promo" class="mk-btn mk-btn--primary" href={buildPremiumUrl(locale)} hidden>{L('Volver a mi invitación', 'Return to my invitation')}</a>
+      <a id="account-admin-promos" class="mk-btn" href={`/${locale.toLowerCase()}/admin/promos`} hidden>{L('Administrar invitaciones', 'Manage invitations')}</a>
+    </div>
 
-        <div class="flex-row">
-          <button type="button" class="btn btn-primary btn-sm" id="btn-start-2fa-setup">
-            🔐 {t(locale, 'twoFactorSetupBtn')}
-          </button>
-          <button
-            type="button"
-            class="btn btn-outline btn-sm"
-            id="btn-disable-2fa"
-            style="display:none;"
-          >
-            {t(locale, 'twoFactorDisableBtn')}
-          </button>
-        </div>
-      </div>
+    <div class="mk-grid">
+      <section class="mk-card mk-stack" aria-labelledby="account-plan-title">
+        <h2 class="mk-heading" id="account-plan-title">{L('Suscripción', 'Subscription')}</h2>
+        <p><span class="mk-chip" id="user-profile-tier"></span></p>
+        <p class="mk-text" id="user-profile-tier-text"></p>
+        <a class="mk-btn mk-btn--premium" id="user-profile-tier-link" href={buildPremiumUrl(locale)}></a>
+      </section>
 
-      <!-- 2FA Setup Wizard -->
-      <div id="panel-2fa-setup" class="card-subtle stack-md" style="display:none;">
-        <div class="stack-sm">
-          <div class="text-xs text-muted">
-            {locale === 'es-AR'
-              ? '1. Clave Secreta Base32 para Google Authenticator / Authy / 1Password:'
-              : '1. Base32 Secret Key for Google Authenticator / Authy / 1Password:'}
+      <section class="mk-card mk-stack" aria-labelledby="account-security-title">
+        <h2 class="mk-heading" id="account-security-title">{L('Seguridad', 'Security')}</h2>
+        <p class="mk-text">
+          {L('Verificación en dos pasos:', 'Two-step verification:')}
+          {' '}<span class="mk-chip" id="user-2fa-status-badge"></span>
+        </p>
+        <p class="mk-label">
+          {L(
+            'Al entrar, además de la contraseña, se pide un código de una app del teléfono (Google Authenticator, Authy y otras).',
+            'When you sign in, besides the password you are asked for a code from a phone app (Google Authenticator, Authy and others).'
+          )}
+        </p>
+        <button type="button" class="mk-btn" id="btn-start-2fa-setup">
+          <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.lock} /></svg>
+          {L('Activar', 'Turn on')}
+        </button>
+
+        <!-- Turning it off needs a current code, so a stolen session cannot remove it -->
+        <form id="form-disable-2fa" class="mk-stack mk-stack--tight" hidden>
+          <div class="mk-field">
+            <label for="input-2fa-disable-code">{L('Código de la app para desactivar', 'App code to turn it off')}</label>
+            <input id="input-2fa-disable-code" class="mk-input mk-account__code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required />
           </div>
-          <code id="totp-setup-secret" class="card text-mono font-bold" style="display:block;padding:10px;"></code>
-          <div class="text-xs text-mono text-muted" id="totp-setup-uri" style="word-break:break-all;"></div>
-        </div>
-
-        <div class="callout callout-amber text-sm">
-          {locale === 'es-AR'
-            ? '[MODO DESARROLLO — Código TOTP actual de 6 dígitos]: '
-            : '[DEV TOTP HELPER — Current 6-digit code]: '}
-          <strong class="text-mono" id="totp-setup-dev-code"></strong>
-        </div>
-
-        <div class="stack-sm">
-          <div class="text-xs font-bold">
-            {locale === 'es-AR'
-              ? '2. Códigos de Recuperación de Respaldo (un solo uso):'
-              : '2. Single-Use Backup Recovery Codes:'}
-          </div>
-          <div id="totp-backup-codes-list" class="flex-row"></div>
-        </div>
-
-        <form id="form-enable-2fa" class="stack-sm">
-          <label class="form-label" for="input-totp-verify-code">
-            {locale === 'es-AR'
-              ? '3. Ingresá el código de 6 dígitos para confirmar y activar 2FA:'
-              : '3. Enter the 6-digit code to verify and enable 2FA:'}
-          </label>
-          <div class="flex-row">
-            <input
-              id="input-totp-verify-code"
-              type="text"
-              required
-              class="input-field input-mono"
-              style="max-width:200px;"
-              placeholder="123456"
-            />
-            <button type="submit" class="btn btn-emerald">
-              {t(locale, 'twoFactorVerifyEnableBtn')}
-            </button>
-          </div>
+          <button type="submit" class="mk-btn" id="btn-disable-2fa">{L('Desactivar', 'Turn off')}</button>
         </form>
-      </div>
+      </section>
+    </div>
+
+    <!-- Setup steps, shown after "Turn on" -->
+    <section id="panel-2fa-setup" class="mk-card mk-stack" aria-labelledby="account-2fa-setup-title" hidden>
+      <h2 class="mk-heading" id="account-2fa-setup-title">{L('Activar la verificación en dos pasos', 'Turn on two-step verification')}</h2>
+      <ol class="mk-account__steps">
+        <li class="mk-stack mk-stack--tight">
+          <p class="mk-text">{L('En la app del teléfono, agregá una cuenta nueva con esta clave:', 'In the phone app, add a new account with this key:')}</p>
+          <code id="totp-setup-secret" class="mk-account__key"></code>
+          <a id="totp-setup-uri" class="mk-btn mk-btn--quiet" href="#">{L('Abrir en la app de este teléfono', 'Open in the app on this phone')}</a>
+        </li>
+        <li class="mk-stack mk-stack--tight">
+          <p class="mk-text">{L('Guardá estos códigos de respaldo en un lugar seguro. Cada uno sirve una sola vez si perdés el teléfono.', 'Keep these backup codes somewhere safe. Each works once if you lose your phone.')}</p>
+          <ul id="totp-backup-codes-list" class="mk-account__codes"></ul>
+        </li>
+        <li>
+          <form id="form-enable-2fa" class="mk-stack mk-stack--tight">
+            <div class="mk-field">
+              <label for="input-totp-verify-code">{L('Escribí el código de 6 números que muestra la app', 'Enter the 6-digit code the app shows')}</label>
+              <input id="input-totp-verify-code" class="mk-input mk-account__code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required />
+            </div>
+            <p class="mk-label" id="totp-setup-dev-code" hidden></p>
+            <button type="submit" class="mk-btn mk-btn--go">{L('Confirmar y activar', 'Confirm and turn on')}</button>
+          </form>
+        </li>
+      </ol>
     </section>
   </div>
 </div>

@@ -14,24 +14,38 @@ import GradeSevenLab from '../../../../../components/learn/GradeSevenLab.astro';
 import GradeFiveLab from '../../../../../components/learn/GradeFiveLab.astro';
 import UpperPrimaryLab from '../../../../../components/learn/UpperPrimaryLab.astro';
 import GradeTwoLab from '../../../../../components/learn/GradeTwoLab.astro';
+import PremiumLock from '../../../../../components/learn/PremiumLock.astro';
+import { isFreeLesson } from '../../../../../content/premiumAccess';
 import { SCHOOL_COURSES, getCourseForPackage, getSchoolPackage } from '../../../../../content/schoolCourses';
-import { buildGradeUrl, buildSchoolLessonUrl, normalizeUrlLocale } from '../../../../../i18n/routes';
-export const prerender = true;
+import { buildGradeUrl, buildSchoolLessonUrl, getGradeSlug, getGradeVerbSlug, getSubjectSlug, normalizeUrlLocale } from '../../../../../i18n/routes';
+import { getPremiumEntitlement } from '../../../../../lib/server/premiumEntitlement';
+import { getRuntimeEnv } from '../../../../../lib/server/runtimeEnv';
 
-export async function getStaticPaths() {
-  const coursePaths = await Promise.all(SCHOOL_COURSES.map(async course => {
-    const lessons = await getCollection(course.collection);
-    return lessons.flatMap(entry => [
-      { params: { locale: 'es-ar', subject: 'matematicas', gradeVerb: 'grado', grade: `${course.gradeNumber}-grado`, lesson: entry.id.toLowerCase() }, props: { entry } },
-      { params: { locale: 'en-us', subject: 'mathematics', gradeVerb: 'grade', grade: course.gradeId, lesson: entry.id.toLowerCase() }, props: { entry } },
-    ]);
-  }));
-  return coursePaths.flat();
-}
-const { entry } = Astro.props;
-const lesson = entry.data;
+// Rendered on the server for every request, so a mission that needs Premium is
+// never sent to a visitor without it (not even inside the page source).
+export const prerender = false;
+
 const locale = normalizeUrlLocale(Astro.params.locale);
+const urlCourse = SCHOOL_COURSES.find((item) => getGradeSlug(item.gradeId, locale) === Astro.params.grade);
+const validPath =
+  Astro.params.locale === (locale === 'es-AR' ? 'es-ar' : 'en-us') &&
+  Astro.params.subject === getSubjectSlug(locale) &&
+  Astro.params.gradeVerb === getGradeVerbSlug(locale) &&
+  urlCourse !== undefined;
+const entry = validPath
+  ? (await getCollection(urlCourse!.collection)).find((item) => item.id.toLowerCase() === String(Astro.params.lesson || '').toLowerCase())
+  : undefined;
+if (!entry) {
+  return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+}
+
+const lesson = entry.data;
 const es = locale === 'es-AR';
+const locked = !isFreeLesson(entry.id);
+const access = locked ? await getPremiumEntitlement(Astro.request, await getRuntimeEnv()) : { signedIn: false, isPremium: true };
+const showLock = locked && !access.isPremium;
+// Locked missions depend on who asks: never cache them in shared caches.
+Astro.response.headers.set('Cache-Control', locked ? 'private, no-store' : 'public, max-age=300');
 const course = getCourseForPackage(lesson.packageId);
 const pack = getSchoolPackage(lesson.packageId);
 const all = (await getCollection(course.collection)).sort((a,b) => a.data.order - b.data.order);
@@ -44,8 +58,8 @@ const horizontalScene = lesson.scene.layout === 'row' || ['G01-03-L02', 'G01-03-
 const onDayPage = course.gradeNumber === 1;
 const alignedScene = lesson.scene.layout === 'aligned' || lesson.packageId === 'G01-11' || entry.id === 'G01-09-L02';
 ---
-<AppLayout legacyContent title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)} system={onDayPage}>
-  {onDayPage ? <DayLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 2 ? <QuestLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 3 ? <HouseLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 4 ? <IslandLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 5 ? <MoonLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 6 ? <RaceLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 7 ? <DetectiveLesson locale={locale} lessonId={entry.id} /> : <article class="stack-lg grade-one" data-grade-one-lesson>
+<AppLayout legacyContent title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)} system={onDayPage || showLock}>
+  {showLock ? <PremiumLock locale={locale} missionTitle={lesson.title[locale]} mapHref={buildGradeUrl(locale, course.gradeId)} signedIn={access.signedIn} returnPath={Astro.url.pathname} /> : onDayPage ? <DayLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 2 ? <QuestLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 3 ? <HouseLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 4 ? <IslandLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 5 ? <MoonLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 6 ? <RaceLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 7 ? <DetectiveLesson locale={locale} lessonId={entry.id} /> : <article class="stack-lg grade-one" data-grade-one-lesson>
     <nav class="flex-between" aria-label={es ? 'Navegación de la lección' : 'Lesson navigation'}>
       <a href={`${buildGradeUrl(locale, course.gradeId)}#${pack.id.toLowerCase()}`}>← {pack.title[locale]}</a>
       <span>{position + 1} / {all.length} · {course.gradeNumber >= 4 ? '12–18' : '8–12'} min</span>
