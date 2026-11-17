@@ -63,14 +63,6 @@ const icons = {
   data-topic-id={topicId}
   data-intro={intro[locale]}
 >
-  <nav class="mk-crumb" aria-label={L('La aventura', 'The adventure')}>
-    <a class="mk-back" href={mapHref}>
-      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icons.back} /></svg>
-      <HeroText text={L('El día de {name}', '{name}’s day')} />
-    </a>
-    <span class="mk-chip mk-chip--sky">{index + 1} / {GRADE_ONE_LESSONS.length}</span>
-  </nav>
-
   <header class="mk-stack mk-stack--tight">
     <p class="mk-label">{place.icon} {L('Lugar', 'Place')} {placeNumber} · {place.name[locale]}</p>
     <h1 class="mk-title">{adventure.title[locale]}</h1>

@@ -1382,28 +1382,6 @@ body:has(.mk-nav--dock) {
    ==========================================================================
    Each world sets its own colour in --world (see GradeHub.astro). */
 
-.mk-crumb {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--mk-s3);
-}
-
-.mk-back {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--mk-s2);
-  min-height: calc(2.75 * var(--mk-rem));
-  padding: 0 var(--mk-s3);
-  margin-left: calc(-1 * var(--mk-s3));
-  border-radius: var(--mk-radius-sm);
-  color: var(--mk-sky-deep);
-  font-size: var(--mk-text-label);
-  font-weight: var(--mk-weight-strong);
-  text-decoration: none;
-}
-
 /* World card: picture first on a phone, beside the words from tablet up */
 .mk-world {
   display: grid;
@@ -1637,7 +1615,7 @@ body:has(.mk-nav--dock) {
 }
 
 /* Legacy global.css underlines every hovered link; keep our controls clean. */
-.mk-ui a:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile, .mk-grade, .mk-mission, .mk-back):hover,
+.mk-ui a:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile, .mk-grade, .mk-mission):hover,
 a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
   text-decoration: none;
 }
@@ -1719,10 +1697,6 @@ a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
     border-color: var(--mk-sky);
     box-shadow: 0 5px 0 var(--mk-sky);
     transform: translateY(-2px);
-  }
-
-  :where(.mk-back):hover {
-    background: var(--mk-sky-tint);
   }
 
   .mk-chapter > summary:hover {

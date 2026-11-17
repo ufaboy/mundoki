@@ -3,6 +3,14 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.5] - 2026-11-17
+
+### Changed
+- Separated sign-in and registration (`/es-ar/login/`, `/en-us/login/`) from the family/admin account page (`/es-ar/cuenta/`, `/en-us/account/`), with server-side session checks redirecting unauthenticated visitors to login and authenticated visitors away from login.
+- Protected `/admin/promos/` with a server-side admin check so unauthenticated or non-admin visitors are redirected to the home page, added common discount percentage presets, and updated the account header label to show `Admin account` (`Cuenta de administrador`) for administrators.
+- Removed the redundant top breadcrumb/back-link bar (`nav.mk-crumb`) from grade hub and Grade 1 lesson pages.
+- Updated `package.json` script references from `npm` to `pnpm`.
+
 ## [2.2.3] - 2026-11-17
 
 ### Changed

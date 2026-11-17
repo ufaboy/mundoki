@@ -12,7 +12,6 @@
 //   families     notes for adults, inside a closed <details>
 import type { GradeId, Locale } from '../../math/core/types';
 import { t } from '../../i18n/translations';
-import { buildHomeUrl } from '../../i18n/routes';
 import { GRADE_STORAGE_KEY } from '../../content/savedGrade';
 
 interface Mission {
@@ -73,14 +72,6 @@ const boot = { key: GRADE_STORAGE_KEY, gradeId };
 ---
 
 <div class="mk-stack mk-stack--loose" style={`--world:${accent};`} {...rootAttrs}>
-  <nav class="mk-crumb" aria-label={t(locale, 'gradeAllGrades')}>
-    <a class="mk-back" href={`${buildHomeUrl(locale)}#home-grades`}>
-      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-      {t(locale, 'gradeAllGrades')}
-    </a>
-    {gradeLabel !== title && <span class="mk-chip mk-chip--sky">{gradeLabel}</span>}
-  </nav>
-
   <header class="mk-world">
     <div class="mk-world__body">
       <h1 class="mk-display">{title}</h1>
