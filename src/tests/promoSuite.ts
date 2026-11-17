@@ -10,7 +10,7 @@ import { getSubscriptionFromStore, saveSubscriptionInStore } from '../lib/db/d1S
 import type { RuntimeEnv } from '../lib/server/runtimeEnv';
 
 const sqlite = new DatabaseSync(':memory:');
-for (const file of ['0000_initial.sql', '0001_better_auth.sql', '0002_personal_promos.sql', '0003_promo_campaigns.sql']) sqlite.exec(readFileSync(`drizzle/${file}`, 'utf8'));
+sqlite.exec(readFileSync('drizzle/0000_initial.sql', 'utf8'));
 class Statement {
   constructor(private query: string, private params: any[] = []) {}
   bind(...params: any[]) { return new Statement(this.query, params); }

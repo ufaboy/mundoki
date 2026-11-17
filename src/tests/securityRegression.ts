@@ -190,8 +190,6 @@ console.log('PASS [Checkout regression] concurrent request rejected, failed requ
 // SQLite-backed D1 adapter exercises actual Drizzle statements, constraints and batch rollback.
 const sqlite = new DatabaseSync(':memory:');
 sqlite.exec(readFileSync(path.join(root, 'drizzle/0000_initial.sql'), 'utf8'));
-sqlite.exec(readFileSync(path.join(root, 'drizzle/0001_better_auth.sql'), 'utf8'));
-sqlite.exec(readFileSync(path.join(root, 'drizzle/0002_personal_promos.sql'), 'utf8'));
 sqlite.exec("INSERT INTO users(id,email,name,created_at,updated_at) VALUES('u1','sql@example.invalid','SQL','2026','2026')");
 class Statement {
   constructor(private query: string, private params: any[] = []) {}

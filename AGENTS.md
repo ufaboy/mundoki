@@ -31,7 +31,7 @@ This file defines mandatory rules for working on the **Mundoki** codebase (a bil
   - **Do not** rely on filesystem writes (`node:fs` / `.data/`) in the Worker runtime: production data must go through the `env.DB` binding (Cloudflare D1). Local `.data/mundoki-d1.json` in `src/lib/db/d1Store.ts` is only a fallback when `env.DB` is absent.
 - **DB Schema & Migrations (`drizzle/`):**
   - Table definitions: `src/lib/db/schema.ts`.
-  - SQL migrations: `drizzle/0000_initial.sql`, `drizzle/0001_better_auth.sql`.
+  - SQL migrations: `drizzle/0000_initial.sql`.
   - Whenever changing the schema, update `src/lib/db/schema.ts` and add a new migration `drizzle/000X_*.sql`, then apply it:
     - locally: `npx wrangler d1 migrations apply mundoki-d1 --local`
     - remotely: `npx wrangler d1 migrations apply mundoki-d1 --remote`
