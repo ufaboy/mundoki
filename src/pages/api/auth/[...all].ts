@@ -497,7 +497,7 @@ export const ALL: APIRoute = async ({ request, params }) => {
       return jsonResponse(neutral);
     }
 
-    const localePrefix = locale === 'en-US' ? '/en-us/account' : '/es-ar/cuenta';
+    const localePrefix = locale === 'en-US' ? '/en-us/login' : '/es-ar/login';
     try {
       await auth.api.signInMagicLink({
         body: { email, callbackURL: `${origin}${localePrefix}` },
@@ -524,9 +524,9 @@ export const ALL: APIRoute = async ({ request, params }) => {
   // Email links must enter the same UI challenge flow as manual token verification.
   // Never delegate GET verification: Better Auth's magic-link flow does not require TOTP.
   if (action === 'magic-link/verify' && method === 'GET') {
-    const accountPath = (url.searchParams.get('callbackURL') || '').includes('/en-us/')
-      ? '/en-us/account' : '/es-ar/cuenta';
-    const target = new URL(accountPath, origin);
+    const loginPath = (url.searchParams.get('callbackURL') || '').includes('/en-us/')
+      ? '/en-us/login' : '/es-ar/login';
+    const target = new URL(loginPath, origin);
     target.searchParams.set('magic_token', url.searchParams.get('token') || '');
     return new Response(null, { status: 303, headers: { Location: target.toString(), 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
   }

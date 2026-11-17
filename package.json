@@ -1,11 +1,11 @@
 {
   "name": "mundoki",
   "private": true,
-  "version": "2.2.3",
+  "version": "2.2.4",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
-    "start": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
+    "dev": "npm run build:worker && wrangler dev dist/server/entry.mjs --config wrangler.jsonc --env staging --port 3333 --ip 0.0.0.0",
+    "start": "npm run dev",
     "build": "node scripts/astro-cli.mjs build",
     "build:worker": "node scripts/cf-cli.mjs build",
     "preview": "node scripts/astro-cli.mjs preview --port 3000 --host 0.0.0.0",

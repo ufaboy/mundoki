@@ -2,22 +2,28 @@
 import AppLayout from '../../layouts/AppLayout.astro';
 import AccountPortal from '../../components/shared/AccountPortal.astro';
 import { buildAccountUrl, normalizeUrlLocale } from '../../i18n/routes';
+import { requireAuthenticatedAccount } from '../../lib/server/authGuard';
 
-export const prerender = true;
-
-export function getStaticPaths() {
-  return [{ params: { locale: 'es-ar' } }, { params: { locale: 'en-us' } }];
-}
+export const prerender = false;
 
 const locale = normalizeUrlLocale(Astro.params.locale);
 const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+
+const auth = await requireAuthenticatedAccount(Astro.request, Astro.url, locale);
+if ('redirect' in auth) {
+  return Astro.redirect(auth.redirect, 302);
+}
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
 ---
 
 <AppLayout
-  title={locale === 'es-AR' ? 'Cuenta de la familia' : 'Family account'}
+  title={auth.user.role === 'admin'
+    ? (locale === 'es-AR' ? 'Cuenta de administrador' : 'Admin account')
+    : (locale === 'es-AR' ? 'Cuenta de la familia' : 'Family account')}
   locale={locale}
   activeNav="account"
   switchLocaleHref={buildAccountUrl(otherLocale)}
 >
-  <AccountPortal locale={locale} />
+  <AccountPortal locale={locale} user={auth.user} isPremium={auth.isPremium} />
 </AppLayout>
