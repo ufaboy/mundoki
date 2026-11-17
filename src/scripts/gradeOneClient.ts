@@ -1,4 +1,4 @@
-import { hasGradeOneEvidence } from '../content/grade1/assessments';
+import { hasGradeOneEvidence } from '../content/grade1/evidence';
 
 document.querySelectorAll<HTMLFormElement>('[data-g1-checks]').forEach(form => {
   const es = form.dataset.locale === 'es-AR';

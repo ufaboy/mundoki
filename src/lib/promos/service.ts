@@ -3,6 +3,7 @@ import { initiateMercadoPagoSubscription } from '../payments/mercadoPago';
 import { getAppOrigin, isDevSandboxEnabled, type RuntimeEnv } from '../server/runtimeEnv';
 import { addCalendarMonths, maxPromoMonths, normalizePromoCode, promoPrice, PromoError, PROMO_TERMS_VERSION } from './policy';
 import { changeInvite, getInvite, type PromoInvite } from './store';
+import { DEFAULT_PREMIUM_MONTHLY_ARS } from '../payments/pricing';
 
 export async function quotePromo(env: RuntimeEnv, user: AuthenticatedSessionUser, code: unknown) {
   const invite = await getInvite(env, 'code', normalizePromoCode(code));
@@ -22,7 +23,7 @@ export async function quotePromo(env: RuntimeEnv, user: AuthenticatedSessionUser
 }
 
 export function publicQuote(invite: PromoInvite, env: RuntimeEnv) {
-  const full = invite.fullAmountArs ?? Number(env.PREMIUM_MONTHLY_ARS || 4500);
+  const full = invite.fullAmountArs ?? Number(env.PREMIUM_MONTHLY_ARS || DEFAULT_PREMIUM_MONTHLY_ARS);
   return { discountPercent: invite.discountPercent, durationMonths: invite.durationMonths,
     fullAmountArs: full, discountedAmountArs: promoPrice(full, invite.discountPercent), currency: 'ARS',
     acceptedAt: invite.acceptedAt, promoEndsAt: invite.promoEndsAt, activationDeadline: invite.expiresAt, termsVersion: PROMO_TERMS_VERSION,
@@ -42,7 +43,7 @@ async function redeemPromoWithLease(env: RuntimeEnv, user: AuthenticatedSessionU
   if (input.adultConfirmed !== true || input.termsVersion !== PROMO_TERMS_VERSION) throw new PromoError('consent_required');
   const { invite, resumed } = await quotePromo(env, user, input.code);
   if (resumed) return { mode: 'live_mercadopago', initPointUrl: invite.checkoutUrl, promo: publicQuote(invite, env) };
-  const fullAmount = Number(env.PREMIUM_MONTHLY_ARS || 4500);
+  const fullAmount = Number(env.PREMIUM_MONTHLY_ARS || DEFAULT_PREMIUM_MONTHLY_ARS);
   if (input.fullAmountArs !== fullAmount) throw new PromoError('price_changed', 409);
   const hasProvider = Boolean(env.MERCADOPAGO_ACCESS_TOKEN || env.MP_ACCESS_TOKEN);
   if (hasProvider && env.PROMO_LIVE_BILLING_ENABLED !== 'true') throw new PromoError('billing_not_enabled', 503);

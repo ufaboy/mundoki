@@ -194,23 +194,6 @@ export const QUEST_CHAPTERS: QuestChapter[] = [
   chapter('tower', '🏰', 'Liberamos a Chispa|We free Chispa', 'Torre Enredada|Tangled Tower', 'Chispa', '🐉', 'la dragoncita|the little dragon', 5),
 ];
 
-/** Knots on each friend's spell: 6 missions × 2 challenges. */
-export const KNOTS_PER_CHAPTER = 12;
-
-/** Story state for mission `missionIndex` after `solved` challenges. Local to the page, not saved progress. */
-export function questSceneState(missionIndex: number, solved: number) {
-  const m = Math.max(0, Math.min(QUEST_MISSIONS.length - 1, Math.floor(missionIndex)));
-  const steps = Math.max(0, Math.min(2, Math.floor(solved)));
-  const chapterIndex = Math.floor(m / 6);
-  const untied = (m % 6) * 2 + steps;
-  const friendFree = untied === KNOTS_PER_CHAPTER;
-  return {
-    chapterIndex,
-    steps,
-    untied,
-    friendFree,
-    /** Friends already free, in chapter order. */
-    freedFriends: chapterIndex + (friendFree ? 1 : 0),
-    wizardDefeated: m === QUEST_MISSIONS.length - 1 && friendFree,
-  };
-}
+// The story state lives in questScene.ts so the page script can use it without
+// shipping these mission texts to the browser (most missions need Premium).
+export { KNOTS_PER_CHAPTER, QUEST_MISSION_COUNT, questSceneState } from './questScene';

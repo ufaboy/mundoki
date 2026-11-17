@@ -13,8 +13,8 @@ const locale = normalizeUrlLocale(Astro.params.locale);
 const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
 ---
 
-<AppLayout legacyContent
-  title={locale === 'es-AR' ? 'Mi Progreso' : 'My Progress'}
+<AppLayout
+  title={locale === 'es-AR' ? 'Estrellas' : 'Stars'}
   locale={locale}
   activeNav="progress"
   switchLocaleHref={buildProgressUrl(otherLocale)}

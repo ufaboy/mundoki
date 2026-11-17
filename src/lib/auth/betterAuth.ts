@@ -166,6 +166,8 @@ function buildAuthInstance(params: {
       }),
       magicLink({
         expiresIn: 60 * 15,
+        // Magic link is a sign-in shortcut for existing accounts only; registration needs the form.
+        disableSignUp: true,
         sendMagicLink: async ({ email, url, token }) => {
           const resendApiKey = env.RESEND_API_KEY;
           const emailFrom = env.EMAIL_FROM || 'Mundoki <no-reply@mundoki.edu.ar>';

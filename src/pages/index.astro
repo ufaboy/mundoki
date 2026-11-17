@@ -1,7 +1,8 @@
 ---
+import { buildHomeUrl, getPreferredLocale } from '../i18n/routes';
+
 export const prerender = false;
 
-const acceptLang = (Astro.request.headers.get('accept-language') || '').toLowerCase();
-const target = acceptLang.startsWith('en') ? '/en-us/' : '/es-ar/';
-return Astro.redirect(target, 302);
+const locale = getPreferredLocale(Astro.request.headers.get('accept-language'));
+return Astro.redirect(buildHomeUrl(locale), 302);
 ---

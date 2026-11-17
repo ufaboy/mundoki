@@ -12,6 +12,7 @@ import {
 } from '../../../lib/db/d1Store';
 import { initiateMercadoPagoSubscription } from '../../../lib/payments/mercadoPago';
 import { getAppOrigin, getRuntimeEnv } from '../../../lib/server/runtimeEnv';
+import { DEFAULT_PREMIUM_MONTHLY_ARS } from '../../../lib/payments/pricing';
 
 export const prerender = false;
 
@@ -48,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
     const id = randomUUID();
     const reservation: StoredSubscription = resumable ? existing : {
       id, userId: user.id, provider: 'mercadopago', providerSubscriptionId: `checkout:${id}`,
-      planCode: 'monthly_ars', currency: 'ARS', amountArs: Number(env.PREMIUM_MONTHLY_ARS) || 4500,
+      planCode: 'monthly_ars', currency: 'ARS', amountArs: Number(env.PREMIUM_MONTHLY_ARS) || DEFAULT_PREMIUM_MONTHLY_ARS,
       status: 'pending', currentPeriodEnd: null, isDevMock: false, updatedAt: new Date().toISOString(),
     };
     if (!resumable) await saveSubscriptionInStore(reservation, env);

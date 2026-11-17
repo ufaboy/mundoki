@@ -8,6 +8,28 @@ export function normalizeUrlLocale(param?: string): Locale {
   return param.toLowerCase() === 'en-us' ? 'en-US' : 'es-AR';
 }
 
+/** Pick the best supported interface locale from an Accept-Language header. */
+export function getPreferredLocale(acceptLanguage?: string | null): Locale {
+  const preferences = (acceptLanguage || '')
+    .split(',')
+    .map((entry, index) => {
+      const [tag = '', ...parameters] = entry.trim().toLowerCase().split(';');
+      const qualityParameter = parameters.find((parameter) => parameter.trim().startsWith('q='));
+      const quality = qualityParameter ? Number(qualityParameter.trim().slice(2)) : 1;
+      return { tag: tag.trim(), quality, index };
+    })
+    .filter(({ tag, quality }) => tag && quality > 0 && quality <= 1)
+    .sort((a, b) => b.quality - a.quality || a.index - b.index);
+
+  for (const { tag } of preferences) {
+    const language = tag.split('-')[0];
+    if (language === 'en') return 'en-US';
+    if (language === 'es') return 'es-AR';
+  }
+
+  return 'es-AR';
+}
+
 export function localeToUrlPrefix(locale: Locale): 'es-ar' | 'en-us' {
   return locale === 'en-US' ? 'en-us' : 'es-ar';
 }
@@ -23,10 +45,6 @@ export function getGradeVerbSlug(locale: Locale): 'grado' | 'grade' {
 export function getGradeSlug(gradeId: GradeId, locale: Locale): string {
   const grade = getGradeById(gradeId);
   return locale === 'en-US' ? grade.slugEn : grade.slugEs;
-}
-
-export function getPlayVerbSlug(locale: Locale): 'jugar' | 'play' {
-  return locale === 'en-US' ? 'play' : 'jugar';
 }
 
 export function getTopicSlug(topicId: TopicId, locale: Locale): string {
@@ -68,12 +86,6 @@ export function buildGradeOneLessonUrl(locale: Locale, lessonId: string): string
 
 export function buildSchoolLessonUrl(locale: Locale, gradeId: GradeId, lessonId: string): string {
   return `${buildGradeUrl(locale, gradeId)}${lessonId.toLowerCase()}/`;
-}
-
-export function buildPlayUrl(locale: Locale, topicId?: TopicId): string {
-  const base = `/${localeToUrlPrefix(locale)}/${getPlayVerbSlug(locale)}/`;
-  if (!topicId) return base;
-  return `${base}${getTopicSlug(topicId, locale)}/`;
 }
 
 export function getTrainVerbSlug(locale: Locale): 'entrenar' | 'train' {
@@ -118,4 +130,4 @@ export function buildTermsUrl(locale: Locale): string {
 }
 
 /** Which destination the header marks as current. */
-export type SiteNavId = 'home' | 'learn' | 'play' | 'train' | 'progress' | 'premium' | 'account' | 'none';
+export type SiteNavId = 'home' | 'learn' | 'train' | 'progress' | 'premium' | 'account' | 'none';

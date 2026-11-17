@@ -1,7 +1,7 @@
 ---
 import AppLayout from '../../../layouts/AppLayout.astro';
 import TomiCharacter from '../../../components/learn/TomiCharacter.astro';
-import { buildCatalogUrl, buildGradeUrl, buildLearnTopicUrl, buildPlayUrl, normalizeUrlLocale } from '../../../i18n/routes';
+import { buildCatalogUrl, buildGradeUrl, buildLearnTopicUrl, buildTrainHubUrl, normalizeUrlLocale } from '../../../i18n/routes';
 import { GRADES_CATALOG } from '../../../math/curriculum';
 import { TOPICS_CATALOG } from '../../../math/topics/generators';
 export const prerender = true;
@@ -45,7 +45,7 @@ const symbols=['','','🏘','🏝','🚀','🤿','🎡'];
    <p class="math-welcome-note">{es?'Podés volver a un grado anterior para practicar. Aprendé a tu ritmo.':'You can revisit an earlier grade to practice. Learn at your own pace.'}</p>
   </section>
   <details class="math-more" id="secondary"><summary><span><strong>{es?'¿Ya estás en secundaria?':'Already in secondary school?'}</strong><span>{es?'Elegí tu año':'Choose your year'}</span></span><span aria-hidden="true">↓</span></summary><div class="math-secondary-links">{secondary.map(grade=><a href={buildGradeUrl(locale,grade.id)} data-math-grade={grade.id}><b>{grade.gradeNumber-7}</b><span>{es?`${grade.gradeNumber-7}.º año`:`Year ${grade.gradeNumber-7}`}</span><span aria-hidden="true">→</span></a>)}</div></details>
-  <details class="math-more" id="topics"><summary><span><strong>{es?'Quiero practicar un tema':'I want to practice a topic'}</strong><span>{es?'Sumas, fracciones y más':'Addition, fractions, and more'}</span></span><span aria-hidden="true">↓</span></summary><ul class="math-topic-links">{TOPICS_CATALOG.map(topic=><li><strong>{topic.title[locale]}</strong><div><a href={buildLearnTopicUrl(locale,topic.id)}>{es?'Ver ejemplo':'See an example'}</a><a href={buildPlayUrl(locale,topic.id)}>{es?'Practicar':'Practice'} →</a></div></li>)}</ul></details>
+  <details class="math-more" id="topics"><summary><span><strong>{es?'Quiero practicar un tema':'I want to practice a topic'}</strong><span>{es?'Sumas, fracciones y más':'Addition, fractions, and more'}</span></span><span aria-hidden="true">↓</span></summary><ul class="math-topic-links">{TOPICS_CATALOG.map(topic=><li><strong>{topic.title[locale]}</strong><div><a href={buildLearnTopicUrl(locale,topic.id)}>{es?'Ver ejemplo':'See an example'}</a><a href={buildTrainHubUrl(locale)}>{es?'Practicar':'Practice'} →</a></div></li>)}</ul></details>
   <details class="math-family" id="families"><summary>{es?'Para familias y docentes':'For families and teachers'}</summary><p>{es?'Elijan el grado escolar o repasen un grado anterior. Los siete grados de primaria tienen aventuras: desde un día con amigos hasta la construcción de un parque. Secundaria ofrece lecciones, modelos y práctica.':'Choose the school grade or review an earlier grade. All seven primary grades have adventures, from a day with friends to building a park. Secondary years offer lessons, models, and practice.'}</p><p>{es?'La organización usa la estructura de CABA: siete grados de primaria y cinco años de secundaria en el trayecto común. Las dos versiones de idioma muestran el mismo curso.':'The organization uses the CABA structure: seven primary grades and five secondary years in the standard track. Both language versions show the same course.'}</p></details>
  </div>
 </AppLayout>

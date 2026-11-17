@@ -145,6 +145,16 @@ const backupResponses = await Promise.all(challenges.map(pending2faToken => call
 assert.deepEqual(backupResponses.map(response => response.status).sort(), [200, 401]);
 console.log('PASS [2FA regression] native magic link gated, provisional session revoked, backup code single use');
 
+// A magic link is only issued for registered emails, and the answer never reveals which ones exist.
+const magicFor = async (email: string) => (await call(auth, request('/api/auth/magic-link/request', { email, locale: 'en-US' }, { authorization: '' }), 'magic-link/request')).json();
+const unknownMagic = await magicFor('nobody-here@example.invalid');
+const knownMagic = await magicFor(spoofed.user.email);
+assert.equal(unknownMagic.ok, true);
+assert.equal(unknownMagic.magicToken, undefined);
+assert.ok(knownMagic.magicToken);
+assert.equal(unknownMagic.message.replace('nobody-here@example.invalid', ''), knownMagic.message.replace(spoofed.user.email, ''));
+console.log('PASS [Magic link] sent only to registered emails; same answer for unknown emails');
+
 let providerCalls = 0;
 let checkoutKey = '';
 let providerEntered!: () => void;

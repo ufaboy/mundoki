@@ -4,7 +4,7 @@ import HeroCharacter from '../../components/shared/HeroCharacter.astro';
 import HeroText from '../../components/shared/HeroText.astro';
 import { DEFAULT_HERO, HEROES, HERO_SKINS, type HeroId } from '../../content/heroes';
 import { t } from '../../i18n/translations';
-import { buildAccountUrl, buildGradeUrl, buildPlayUrl, buildTrainHubUrl, buildTrainSkillUrl, normalizeUrlLocale } from '../../i18n/routes';
+import { buildAccountUrl, buildGradeUrl, buildTrainHubUrl, buildTrainSkillUrl, normalizeUrlLocale } from '../../i18n/routes';
 import { SKILL_GAMES_META } from '../../math/arcade/skillGames';
 import { GRADES_CATALOG } from '../../math/curriculum';
 
@@ -62,7 +62,7 @@ const resumeCss = [
         <h1 class="mk-display"><HeroText text={t(locale, 'homeHello')} /></h1>
         <p class="mk-text">{t(locale, 'homeInvite')}</p>
 
-        <a class="mk-btn mk-btn--primary home-first" href={buildPlayUrl(locale, 'addition-subtraction')}>
+        <a class="mk-btn mk-btn--primary home-first" href={buildTrainHubUrl(locale)}>
           <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
           {t(locale, 'homePlay')}
         </a>

@@ -36,6 +36,6 @@
 		"APP_URL": "https://mundoki.mercosur.workers.dev",
 		"BETTER_AUTH_URL": "https://mundoki.mercosur.workers.dev",
 		"DEFAULT_LOCALE": "es-AR",
-		"PREMIUM_MONTHLY_ARS": "4500"
+		"PREMIUM_MONTHLY_ARS": "9999"
 	}
 }

@@ -1,0 +1,46 @@
+---
+// Shown by the server instead of a mission that needs Premium. Contains no part
+// of the mission itself: only its title, the offer and the way back.
+import HeroCharacter from '../shared/HeroCharacter.astro';
+import { countMissions } from '../../content/premiumAccess';
+import { buildAccountUrl, buildPremiumUrl } from '../../i18n/routes';
+import type { Locale } from '../../math/core/types';
+
+interface Props {
+  locale: Locale;
+  missionTitle: string;
+  mapHref: string;
+  /** True when the visitor is signed in (but the family has no Premium). */
+  signedIn: boolean;
+  /** This page's path, so the account page can send the visitor back after signing in. */
+  returnPath: string;
+}
+
+const { locale, missionTitle, mapHref, signedIn, returnPath } = Astro.props;
+const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
+const { total } = countMissions();
+const accountHref = `${buildAccountUrl(locale)}?next=${encodeURIComponent(returnPath)}`;
+---
+
+<section class="mk-card mk-card--grape mk-hello mk-lock" aria-labelledby="lock-title">
+  <div class="mk-hello__art"><HeroCharacter /></div>
+  <div class="mk-hello__body">
+    <span class="mk-chip mk-chip--grape mk-lock__chip">
+      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3" /></svg>
+      Premium
+    </span>
+    <h1 class="mk-title" id="lock-title">{missionTitle}</h1>
+    <p class="mk-text">
+      {L(
+        `Esta misión es parte de Premium. La primera aventura de cada grado es gratis; con Premium se abren las ${total} misiones de 1.º a 7.º grado.`,
+        `This mission is part of Premium. The first adventure of every grade is free; Premium opens all ${total} missions from Grade 1 to Grade 7.`
+      )}
+    </p>
+    <p class="mk-label">{L('Pedile a una persona adulta de tu familia que lo active.', 'Ask a grown-up in your family to turn it on.')}</p>
+    <div class="mk-row mk-lock__actions">
+      <a class="mk-btn mk-btn--premium" href={buildPremiumUrl(locale)}>{L('Ver Premium', 'See Premium')}</a>
+      {!signedIn && <a class="mk-btn" href={accountHref}>{L('Ya tengo Premium: entrar', 'I have Premium: sign in')}</a>}
+    </div>
+    <a class="mk-btn mk-btn--quiet" href={mapHref}>{L('Volver al mapa', 'Back to the map')}</a>
+  </div>
+</section>

@@ -2185,3 +2185,563 @@ a.mk-ui:where(.mk-brand, .mk-btn:not(.mk-btn--quiet), .mk-tile):hover {
     transition: none !important;
   }
 }
+
+/* ==========================================================================
+   Family account page (sign in, sign up, subscription, security)
+   ========================================================================== */
+
+.mk-account {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-gap);
+}
+
+/* Sign-in card: one narrow column, centred on wide screens */
+.mk-account__auth,
+.mk-account > .mk-feedback {
+  width: 100%;
+  max-width: calc(30 * var(--mk-rem));
+  margin-inline: auto;
+}
+
+/* Signed in, the page is full width and so are its messages */
+.mk-account.is-signed-in > .mk-feedback {
+  max-width: none;
+}
+
+.mk-account__mode {
+  display: flex;
+}
+
+.mk-account__mode button {
+  flex: 1 1 0;
+  padding-inline: var(--mk-s2);
+  white-space: nowrap;
+}
+
+/* Password with a "Show" button sitting inside the box, so the box keeps its full width */
+.mk-account__secret {
+  position: relative;
+}
+
+.mk-account__secret .mk-input {
+  padding-right: calc(6.5 * var(--mk-rem));
+}
+
+.mk-account__secret .mk-btn {
+  position: absolute;
+  top: 50%;
+  right: var(--mk-s1);
+  transform: translateY(-50%);
+  min-height: calc(var(--mk-control) - 2 * var(--mk-s1));
+  padding-inline: var(--mk-s3);
+  font-size: var(--mk-text-label);
+}
+
+.mk-account__secret .mk-btn:active {
+  transform: translateY(-50%);
+}
+
+/* "or" between the password form and the email-link button */
+.mk-account__or {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-s3);
+  margin: 0;
+  color: var(--mk-ink-soft);
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-account__or::before,
+.mk-account__or::after {
+  content: '';
+  flex: 1;
+  border-top: var(--mk-border) solid var(--mk-line);
+}
+
+.mk-account__center {
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* No lonely last word on a line: centred hints are balanced, the rest avoids orphans */
+.mk-account :where(p, label, li) {
+  text-wrap: pretty;
+}
+
+.mk-account .mk-account__center,
+.mk-account .mk-btn {
+  text-wrap: balance;
+}
+
+/* Narrow phones: slimmer side padding keeps button labels on one line */
+.mk-account .mk-btn--wide {
+  padding-inline: var(--mk-s4);
+}
+
+.mk-account__hello .mk-title {
+  overflow-wrap: anywhere;
+}
+
+.mk-account__email {
+  color: var(--mk-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.mk-account .mk-card > p {
+  margin: 0;
+}
+
+.mk-account .mk-card > .mk-btn {
+  align-self: flex-start;
+}
+
+/* Codes are typed and read back, so keep digits even and spaced */
+.mk-account__code {
+  max-width: calc(14 * var(--mk-rem));
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.15em;
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-account__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s5);
+  margin: 0;
+  padding-left: var(--mk-s5);
+}
+
+.mk-account__steps > li::marker {
+  font-weight: var(--mk-weight-display);
+  color: var(--mk-sky-deep);
+}
+
+.mk-account__key {
+  display: block;
+  padding: var(--mk-s3) var(--mk-s4);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-sunk);
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-strong);
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.mk-account__codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(10 * var(--mk-rem))), 1fr));
+  gap: var(--mk-s2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mk-account__codes li {
+  padding: var(--mk-s2) var(--mk-s3);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-sunk);
+  font-weight: var(--mk-weight-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+  user-select: all;
+}
+
+/* ==========================================================================
+   Stars page: the child's star total, their worlds, numbers for the family
+   ========================================================================== */
+
+.mk-stars-page__total {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-s3);
+  margin: 0;
+  font-size: var(--mk-text-display);
+  font-weight: var(--mk-weight-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mk-stars-page__total .mk-icon,
+.mk-stars-page__mini .mk-icon {
+  fill: var(--mk-sun);
+  stroke: var(--mk-sun-deep);
+  stroke-width: 1.5;
+}
+
+.mk-stars-page__total .mk-icon {
+  width: 1em;
+  height: 1em;
+}
+
+.mk-stars-page__mini {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-s1);
+  color: var(--mk-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-stars-page__world > .mk-chip {
+  align-self: flex-start;
+}
+
+.mk-stars-page__world > .mk-btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.mk-stars-page__world .mk-label,
+.mk-stars-page p {
+  margin: 0;
+}
+
+.mk-stars-page :where(p, h2, h3) {
+  text-wrap: pretty;
+}
+
+.mk-stars-page__start {
+  margin-top: var(--mk-s4);
+}
+
+.mk-stars-page__empty:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mk-stars-page__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Each number on its own row: words on the left, number on the right */
+.mk-stars-page__stats .mk-stat {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--mk-s4);
+  padding: var(--mk-s3) 0;
+  border-bottom: var(--mk-border) solid var(--mk-line);
+}
+
+.mk-stars-page__stats .mk-stat:last-child {
+  border-bottom: 0;
+}
+
+.mk-stars-page__stats .mk-stat__value {
+  font-size: var(--mk-text-title);
+}
+
+.mk-stars-page .mk-btn {
+  padding-inline: var(--mk-s5);
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   Premium page (for parents): promise, benefits, free vs Premium, plan, FAQ
+   ========================================================================== */
+
+.mk-premium p {
+  margin: 0;
+}
+
+.mk-premium :where(p, h1, h2, h3, li, summary) {
+  text-wrap: pretty;
+}
+
+.mk-premium__badge {
+  align-self: center;
+  background: var(--mk-surface);
+}
+
+/* Round icon badge at the top of a benefit card */
+.mk-premium__icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: calc(3 * var(--mk-rem));
+  height: calc(3 * var(--mk-rem));
+  border-radius: var(--mk-radius-pill);
+  font-size: calc(1.5 * var(--mk-rem));
+}
+
+.mk-premium__icon .mk-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mk-premium__icon--sun { background: var(--mk-sun-tint); color: var(--mk-sun-ink); }
+.mk-premium__icon--sky { background: var(--mk-sky-tint); color: var(--mk-sky-deep); }
+.mk-premium__icon--leaf { background: var(--mk-leaf-tint); color: var(--mk-leaf-deep); }
+
+/* Free / Premium table: feature words on the left, two narrow tick columns */
+.mk-premium__table-card {
+  padding-inline: var(--mk-s4);
+}
+
+.mk-premium__table th[scope='row'] {
+  padding-left: 0;
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-body);
+  color: var(--mk-ink);
+}
+
+.mk-premium__table .is-mark {
+  width: 1%; /* shrink to the column heading, leave the rest to the words */
+  padding-inline: var(--mk-s2);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mk-premium__table thead .is-premium {
+  color: var(--mk-grape-deep);
+}
+
+.mk-premium__table td .mk-icon {
+  width: calc(1.75 * var(--mk-rem));
+  height: calc(1.75 * var(--mk-rem));
+  fill: none;
+  stroke: var(--mk-line-strong);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mk-premium__table td.is-on .mk-icon {
+  stroke: var(--mk-leaf);
+}
+
+.mk-premium__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Plan card */
+.mk-premium__plan {
+  width: 100%;
+  max-width: calc(36 * var(--mk-rem));
+  margin-inline: auto;
+  scroll-margin-top: var(--mk-s7);
+}
+
+.mk-premium__price {
+  font-size: var(--mk-text-body);
+  font-weight: var(--mk-weight-strong);
+  color: var(--mk-ink-soft);
+}
+
+.mk-premium__price span {
+  font-size: var(--mk-text-display);
+  font-weight: var(--mk-weight-display);
+  color: var(--mk-grape-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-premium__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-s3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: var(--mk-weight-strong);
+}
+
+.mk-premium__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mk-s3);
+}
+
+.mk-premium__list .mk-icon {
+  flex: 0 0 auto;
+  margin-top: 0.15em;
+  fill: none;
+  stroke: var(--mk-leaf);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mk-premium__plan > .mk-btn {
+  align-self: flex-start;
+}
+
+.mk-premium .mk-btn {
+  text-wrap: balance;
+}
+
+/* Benefit and trust items: icon next to its words, compact on phones */
+.mk-premium__point {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mk-s4);
+}
+
+.mk-premium__trust-item {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+
+/* Questions: one card, rows that open in place */
+.mk-premium__faq {
+  padding-block: var(--mk-s2);
+}
+
+.mk-premium__faq details {
+  border-bottom: var(--mk-border) solid var(--mk-line);
+}
+
+.mk-premium__faq details:last-child {
+  border-bottom: 0;
+}
+
+.mk-premium__faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-s4);
+  min-height: var(--mk-control);
+  padding: var(--mk-s3) 0;
+  font-weight: var(--mk-weight-strong);
+  cursor: pointer;
+  list-style: none;
+}
+
+.mk-premium__faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.mk-premium__faq summary::after {
+  content: '+';
+  flex: 0 0 auto;
+  font-size: var(--mk-text-title);
+  font-weight: var(--mk-weight-display);
+  line-height: 1;
+  color: var(--mk-sky-deep);
+}
+
+.mk-premium__faq details[open] summary::after {
+  content: '–';
+}
+
+.mk-premium__faq details > p {
+  padding-bottom: var(--mk-s4);
+}
+
+.mk-premium__final {
+  align-items: center;
+  text-align: center;
+}
+
+.mk-premium__final .mk-row {
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Premium locks: badge on links to locked missions, and the lock screen
+   ========================================================================== */
+
+.mk-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-s1);
+  flex: 0 0 auto;
+  margin-inline-start: var(--mk-s2);
+  padding: 0.1em var(--mk-s2);
+  border-radius: var(--mk-radius-pill);
+  background: var(--mk-grape-tint);
+  color: var(--mk-grape-deep);
+  font-family: var(--mk-font);
+  font-size: var(--mk-text-label);
+  font-weight: var(--mk-weight-strong);
+  line-height: 1.3;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.mk-lock-badge .mk-icon {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mk-lock__chip {
+  align-self: center;
+  background: var(--mk-surface);
+}
+
+.mk-lock__chip .mk-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+}
+
+.mk-lock p {
+  margin: 0;
+}
+
+.mk-lock__actions {
+  justify-content: center;
+}
+
+@media (min-width: 40rem) {
+  .mk-lock__chip {
+    align-self: flex-start;
+  }
+
+  .mk-lock__actions {
+    justify-content: flex-start;
+  }
+}
+
+/* Game level that needs Premium: visible, clearly not available, explains on tap */
+.mk-btn.is-locked {
+  --_bg: var(--mk-sunk);
+  --_fg: var(--mk-ink-soft);
+  --_edge: var(--mk-line);
+  --_line: var(--mk-line);
+  cursor: not-allowed;
+}
+
+/* In a mission row the lock replaces the arrow, so the title keeps its width */
+.mk-mission.is-premium-locked > .mk-icon {
+  display: none;
+}
+
+.mk-mission .mk-lock-badge {
+  justify-content: center;
+  width: calc(2.25 * var(--mk-rem));
+  height: calc(2.25 * var(--mk-rem));
+  margin-inline-start: auto;
+  padding: 0;
+}
+
+.mk-mission .mk-lock-badge .mk-icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.mk-mission .mk-lock-badge__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

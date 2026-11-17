@@ -13,8 +13,8 @@ const locale = normalizeUrlLocale(Astro.params.locale);
 const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
 ---
 
-<AppLayout legacyContent
-  title={locale === 'es-AR' ? 'Cuenta, OAuth, Magic Link y 2FA' : 'Account, OAuth, Magic Link & 2FA'}
+<AppLayout
+  title={locale === 'es-AR' ? 'Cuenta de la familia' : 'Family account'}
   locale={locale}
   activeNav="account"
   switchLocaleHref={buildAccountUrl(otherLocale)}

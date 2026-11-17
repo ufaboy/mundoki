@@ -103,6 +103,5 @@ export const GRADE_ONE_ASSESSMENTS: Record<string, GradeOneCheck[]> = {
   ],
 };
 
-export function hasGradeOneEvidence(correct: boolean[]): boolean {
-  return correct.length === 5 && correct.filter(Boolean).length >= 4 && correct[3] && correct[4];
-}
+// Kept apart so the page script does not ship every chapter's questions.
+export { hasGradeOneEvidence } from './evidence';

@@ -139,9 +139,41 @@ export function initSkillGame(): void {
 
   renderChallengeUI();
 
+  // Level 1 is free; levels 2 and 3 need Premium. The buttons stay visible but
+  // disabled, with a note saying why and how to open them.
+  const levelNote = document.getElementById('skill-level-note');
+  let hasPremium = document.documentElement.dataset.premium === 'true';
+  const applyLevelLocks = () => {
+    diffButtons.forEach((btn) => {
+      const locked = !hasPremium && btn.dataset.skillDiff !== '1';
+      btn.setAttribute('aria-disabled', String(locked));
+      btn.classList.toggle('is-locked', locked);
+      if (locked) btn.title = es ? 'Este nivel es parte de Premium.' : 'This level is part of Premium.';
+      else btn.removeAttribute('title');
+    });
+    if (!hasPremium && difficulty !== 1) diffButtons.find((b) => b.dataset.skillDiff === '1')?.click();
+    if (hasPremium && levelNote) levelNote.hidden = true;
+  };
+  applyLevelLocks();
+  // Confirm the plan with the server (session cookie or saved token).
+  {
+    const savedToken = window.localStorage.getItem('mundoki_token');
+    fetch('/api/auth/me', { credentials: 'same-origin', headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {} })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        hasPremium = Boolean(data?.authenticated && data.isPremiumEntitled);
+        applyLevelLocks();
+      })
+      .catch(() => {});
+  }
+
   diffButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (busy) return;
+      if (btn.getAttribute('aria-disabled') === 'true') {
+        if (levelNote) levelNote.hidden = false;
+        return;
+      }
       const nextDiff = Number(btn.dataset.skillDiff) as SkillDifficulty;
       if (nextDiff !== 1 && nextDiff !== 2 && nextDiff !== 3) return;
       difficulty = nextDiff;
