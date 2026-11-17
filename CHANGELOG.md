@@ -3,6 +3,15 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.0.0] - 2026-11-17
+
+### Changed
+- Rebuilt the Grade 3–7 lesson adventures around each learner’s mission, so solving a task visibly advances the story.
+- Reworked bilingual lesson prompts, examples, hints, explanations, and scenes to connect the mathematics to the story while preserving the course learning goals.
+
+### Added
+- Added generated Grade 6 practice with new numbers and server-verified answers during racing missions.
+
 ## [1.1.0] - 2026-11-16
 
 ### Changed
