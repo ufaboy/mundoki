@@ -1,13 +1,20 @@
 import type { Locale } from '../core/types';
 
-export type SkillGameId = 'addition' | 'subtraction' | 'multiplication' | 'division';
+export type SkillGameId =
+  | 'addition'
+  | 'subtraction'
+  | 'multiplication'
+  | 'division'
+  | 'sea-cannon'
+  | 'chain-ops';
 export type SkillDifficulty = 1 | 2 | 3;
 
 export interface SkillGameMeta {
   id: SkillGameId;
   slugEs: string;
   slugEn: string;
-  accent: 'sky' | 'coral' | 'sun' | 'leaf';
+  accent: 'sky' | 'coral' | 'sun' | 'leaf' | 'grape';
+  inputMode?: 'single' | 'xy';
   title: Record<Locale, string>;
   subtitle: Record<Locale, string>;
   actionLabel: Record<Locale, string>;
@@ -22,9 +29,24 @@ export interface SkillChallenge {
   a: number;
   b: number;
   answer: number;
-  operatorSymbol: '+' | '−' | '×' | '÷';
+  operatorSymbol: '+' | '−' | '×' | '÷' | '⚙';
   equationText: string;
   prompt: Record<Locale, string>;
+  // Optional 2-axis coordinate fields for sea-cannon
+  gridSize?: number;
+  targetX?: number;
+  targetY?: number;
+  xExpr?: string;
+  yExpr?: string;
+}
+
+export interface SkillXYEvaluation {
+  valid: boolean;
+  isCorrect: boolean;
+  xValue: number | null;
+  yValue: number | null;
+  xCorrect: boolean;
+  yCorrect: boolean;
 }
 
 export interface SkillEvaluation {
@@ -123,6 +145,52 @@ export const SKILL_GAMES_META: SkillGameMeta[] = [
       'en-US': 'Divide the total gems by the number of minecarts.',
     },
   },
+  {
+    id: 'sea-cannon',
+    slugEs: 'canon-marino',
+    slugEn: 'sea-cannon',
+    accent: 'sky',
+    inputMode: 'xy',
+    title: {
+      'es-AR': 'Batalla Naval Isométrica · Coordenadas (X, Y)',
+      'en-US': 'Isometric Sea Cannon · Coordinates (X, Y)',
+    },
+    subtitle: {
+      'es-AR': 'Calculá las 2 coordenadas con operaciones combinadas para acertar al barco.',
+      'en-US': 'Calculate both (X, Y) coordinates using combined operations to hit the ship.',
+    },
+    actionLabel: {
+      'es-AR': '¡Disparar al mar!',
+      'en-US': 'Fire at sea!',
+    },
+    howToPlay: {
+      'es-AR': 'Resolvé X e Y respetando el orden de las operaciones.',
+      'en-US': 'Solve both X and Y following the order of operations.',
+    },
+  },
+  {
+    id: 'chain-ops',
+    slugEs: 'operaciones-combinadas',
+    slugEn: 'chain-operations',
+    accent: 'grape',
+    inputMode: 'single',
+    title: {
+      'es-AR': 'Puente de Engranajes · Operaciones Combinadas',
+      'en-US': 'Gear Bridge · Combined Operations',
+    },
+    subtitle: {
+      'es-AR': 'Resolvé 2 o 3 operaciones en el orden correcto para activar el puente.',
+      'en-US': 'Solve 2 or 3 operations in the right order to power up the bridge.',
+    },
+    actionLabel: {
+      'es-AR': 'Activar puente',
+      'en-US': 'Power bridge',
+    },
+    howToPlay: {
+      'es-AR': 'Primero paréntesis, luego × y ÷, y al final + y −.',
+      'en-US': 'Parentheses first, then × and ÷, then + and −.',
+    },
+  },
 ];
 
 export function getSkillGameMeta(skill: SkillGameId): SkillGameMeta {
@@ -135,6 +203,54 @@ export function resolveSkillFromSlug(slug: string): SkillGameId | null {
     (item) => item.id === clean || item.slugEs === clean || item.slugEn === clean
   );
   return match ? match.id : null;
+}
+
+function buildAxisExpression(
+  rng: () => number,
+  target: number,
+  difficulty: SkillDifficulty
+): string {
+  if (difficulty === 1) {
+    // 2 operations: m × k ± offset
+    const m = randInt(rng, 2, 4);
+    const k = randInt(rng, 2, 4);
+    const prod = m * k;
+    if (prod > target) {
+      return `${m} × ${k} − ${prod - target}`;
+    }
+    return `${m} × ${k} + ${target - prod}`;
+  }
+
+  if (difficulty === 2) {
+    // 2–3 operations with division or multiplication
+    if (rng() < 0.5) {
+      const d = randInt(rng, 2, 5);
+      const q = randInt(rng, 2, 6);
+      const dividend = d * q;
+      if (q > target) {
+        return `${dividend} ÷ ${d} − ${q - target}`;
+      }
+      return `${dividend} ÷ ${d} + ${target - q}`;
+    }
+    const a = randInt(rng, 2, 5);
+    const b = randInt(rng, 2, 5);
+    const c = randInt(rng, 1, 4);
+    const val = a * b + c;
+    if (val >= target) {
+      return `${a} × ${b} + ${c} − ${val - target}`;
+    }
+    return `${a} × ${b} + ${c} + ${target - val}`;
+  }
+
+  // difficulty === 3: 3 operations with parentheses
+  const p1 = randInt(rng, 2, 5);
+  const p2 = randInt(rng, 1, 4);
+  const mul = randInt(rng, 2, 4);
+  const val = (p1 + p2) * mul;
+  if (val >= target) {
+    return `(${p1} + ${p2}) × ${mul} − ${val - target}`;
+  }
+  return `(${p1} + ${p2}) × ${mul} + ${target - val}`;
 }
 
 function mulberry32(seed: number): () => number {
@@ -251,6 +367,93 @@ export function generateSkillChallenge(
     };
   }
 
+  if (skill === 'sea-cannon') {
+    const gridSize = difficulty === 1 ? 8 : difficulty === 2 ? 10 : 12;
+    const targetX = randInt(rng, 2, gridSize - 1);
+    const targetY = randInt(rng, 2, gridSize - 1);
+    const xExpr = buildAxisExpression(rng, targetX, difficulty);
+    const yExpr = buildAxisExpression(rng, targetY, difficulty);
+    return {
+      id: `${skill}-${difficulty}-${seed}`,
+      skill,
+      difficulty,
+      seed,
+      a: targetX,
+      b: targetY,
+      answer: targetX,
+      operatorSymbol: '⚙',
+      equationText: `X = ${xExpr}  |  Y = ${yExpr}`,
+      gridSize,
+      targetX,
+      targetY,
+      xExpr,
+      yExpr,
+      prompt: {
+        'es-AR': `Calculá X e Y para apuntar al barco en la grilla ${gridSize}×${gridSize}.`,
+        'en-US': `Calculate X and Y to target the ship on the ${gridSize}×${gridSize} sea grid.`,
+      },
+    };
+  }
+
+  if (skill === 'chain-ops') {
+    let expr = '';
+    let answer = 0;
+    if (difficulty === 1) {
+      const a = randInt(rng, 2, 7);
+      const b = randInt(rng, 2, 7);
+      const c = randInt(rng, 2, 12);
+      if (rng() < 0.5) {
+        answer = a * b + c;
+        expr = `${a} × ${b} + ${c}`;
+      } else {
+        answer = a * b - Math.min(c, a * b - 1);
+        expr = `${a} × ${b} − ${Math.min(c, a * b - 1)}`;
+      }
+    } else if (difficulty === 2) {
+      const a = randInt(rng, 3, 15);
+      const b = randInt(rng, 2, 8);
+      const c = randInt(rng, 2, 7);
+      const d = randInt(rng, 1, 9);
+      answer = a + b * c - d;
+      expr = `${a} + ${b} × ${c} − ${d}`;
+    } else {
+      const variant = rng() < 0.5;
+      if (variant) {
+        const a = randInt(rng, 3, 9);
+        const b = randInt(rng, 2, 8);
+        const c = randInt(rng, 2, 6);
+        const d = randInt(rng, 2, 12);
+        answer = (a + b) * c - d;
+        expr = `(${a} + ${b}) × ${c} − ${d}`;
+      } else {
+        const div = randInt(rng, 2, 5);
+        const quot = randInt(rng, 3, 9);
+        const total = div * quot;
+        const p1 = randInt(rng, 1, div - 1);
+        const p2 = div - p1;
+        const extra = randInt(rng, 2, 12);
+        answer = quot + extra;
+        expr = `${total} ÷ (${p1} + ${p2}) + ${extra}`;
+      }
+    }
+
+    return {
+      id: `${skill}-${difficulty}-${seed}`,
+      skill,
+      difficulty,
+      seed,
+      a: 0,
+      b: 0,
+      answer,
+      operatorSymbol: '⚙',
+      equationText: `${expr} = ?`,
+      prompt: {
+        'es-AR': `Resolvé la cadena de operaciones respetando el orden correcto.`,
+        'en-US': `Solve the chain of operations in the right order.`,
+      },
+    };
+  }
+
   // division (always exact integer quotient)
   const b =
     difficulty === 1
@@ -310,5 +513,48 @@ export function evaluateSkillAnswer(
     isCorrect: delta === 0,
     numericValue,
     delta,
+  };
+}
+
+export function evaluateSkillXYAnswer(
+  challenge: Pick<SkillChallenge, 'targetX' | 'targetY'>,
+  rawX: string,
+  rawY: string
+): SkillXYEvaluation {
+  const tx = challenge.targetX ?? 0;
+  const ty = challenge.targetY ?? 0;
+  const xStr = (rawX || '').trim();
+  const yStr = (rawY || '').trim();
+  if (!/^-?\d+$/.test(xStr) || !/^-?\d+$/.test(yStr)) {
+    return {
+      valid: false,
+      isCorrect: false,
+      xValue: null,
+      yValue: null,
+      xCorrect: false,
+      yCorrect: false,
+    };
+  }
+  const xValue = Number.parseInt(xStr, 10);
+  const yValue = Number.parseInt(yStr, 10);
+  if (!Number.isSafeInteger(xValue) || !Number.isSafeInteger(yValue)) {
+    return {
+      valid: false,
+      isCorrect: false,
+      xValue: null,
+      yValue: null,
+      xCorrect: false,
+      yCorrect: false,
+    };
+  }
+  const xCorrect = xValue === tx;
+  const yCorrect = yValue === ty;
+  return {
+    valid: true,
+    isCorrect: xCorrect && yCorrect,
+    xValue,
+    yValue,
+    xCorrect,
+    yCorrect,
   };
 }

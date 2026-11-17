@@ -12,7 +12,8 @@ export interface SkillScene {
   playAttempt(
     submitted: number,
     challenge: SkillChallenge,
-    onComplete: (won: boolean) => void
+    onComplete: (won: boolean) => void,
+    submittedY?: number
   ): void;
   update(dt: number, reducedMotion: boolean): void;
   render(ctx: CanvasRenderingContext2D, width: number, height: number): void;

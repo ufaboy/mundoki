@@ -1,5 +1,6 @@
 import {
   evaluateSkillAnswer,
+  evaluateSkillXYAnswer,
   generateSkillChallenge,
   type SkillChallenge,
   type SkillDifficulty,
@@ -9,8 +10,10 @@ import type { Locale } from '../../math/core/types';
 import { readStoredHero, resizeCanvasToDisplaySize } from './canvasUtils';
 import type { SkillScene } from './sceneTypes';
 import { AdditionCylindersScene } from './scenes/additionCylinders';
+import { ChainGearBridgeScene } from './scenes/chainGearBridge';
 import { DivisionGondolaScene } from './scenes/divisionGondola';
 import { MultiplicationCannonScene } from './scenes/multiplicationCannon';
+import { SeaCannonIsoScene } from './scenes/seaCannonIso';
 import { SubtractionBalloonScene } from './scenes/subtractionBalloon';
 
 const LOGICAL_W = 840;
@@ -28,6 +31,10 @@ function createScene(skill: SkillGameId, locale: Locale): SkillScene {
       return new MultiplicationCannonScene(ctxInfo);
     case 'division':
       return new DivisionGondolaScene(ctxInfo);
+    case 'sea-cannon':
+      return new SeaCannonIsoScene(ctxInfo);
+    case 'chain-ops':
+      return new ChainGearBridgeScene(ctxInfo);
   }
 }
 
@@ -37,6 +44,7 @@ export function initSkillGame(): void {
 
   const skill = (root.dataset.skill || 'addition') as SkillGameId;
   const locale = (root.dataset.locale || 'es-AR') as Locale;
+  const isXY = root.dataset.inputMode === 'xy';
   const es = locale === 'es-AR';
 
   const canvas = document.getElementById('skill-game-canvas') as HTMLCanvasElement | null;
@@ -44,6 +52,8 @@ export function initSkillGame(): void {
   const eqEl = document.getElementById('skill-equation');
   const form = document.getElementById('skill-answer-form') as HTMLFormElement | null;
   const input = document.getElementById('skill-answer-input') as HTMLInputElement | null;
+  const inputX = document.getElementById('skill-answer-x') as HTMLInputElement | null;
+  const inputY = document.getElementById('skill-answer-y') as HTMLInputElement | null;
   const submitBtn = document.getElementById('skill-submit-btn') as HTMLButtonElement | null;
   const nextBtn = document.getElementById('skill-next-btn') as HTMLButtonElement | null;
   const feedbackEl = document.getElementById('skill-feedback');
@@ -57,7 +67,26 @@ export function initSkillGame(): void {
     root.querySelectorAll<HTMLButtonElement>('[data-keypad]')
   );
 
-  if (!canvas || !form || !input || !submitBtn || !nextBtn) return;
+  if (!canvas || !form || !submitBtn || !nextBtn) return;
+  if (!isXY && !input) return;
+  if (isXY && (!inputX || !inputY)) return;
+
+  let activeInput: HTMLInputElement = (isXY ? inputX : input)!;
+  inputX?.addEventListener('focus', () => {
+    activeInput = inputX;
+  });
+  inputY?.addEventListener('focus', () => {
+    activeInput = inputY;
+  });
+  input?.addEventListener('focus', () => {
+    activeInput = input;
+  });
+
+  const setInputsDisabled = (disabled: boolean) => {
+    if (input) input.disabled = disabled;
+    if (inputX) inputX.disabled = disabled;
+    if (inputY) inputY.disabled = disabled;
+  };
 
   let difficulty: SkillDifficulty = 1;
   let seed = Math.floor(Date.now() % 100000) + 17;
@@ -94,14 +123,17 @@ export function initSkillGame(): void {
   const renderChallengeUI = () => {
     if (promptEl) promptEl.textContent = challenge.prompt[locale];
     if (eqEl) eqEl.textContent = challenge.equationText;
-    input.value = '';
-    input.disabled = false;
+    if (input) input.value = '';
+    if (inputX) inputX.value = '';
+    if (inputY) inputY.value = '';
+    setInputsDisabled(false);
     submitBtn.disabled = false;
     nextBtn.hidden = true;
     roundWon = false;
     busy = false;
     setFeedback('', 'neutral');
-    input.focus();
+    activeInput = (isXY ? inputX : input)!;
+    activeInput.focus();
   };
 
   const startNewRound = () => {
@@ -139,15 +171,15 @@ export function initSkillGame(): void {
       if (busy || roundWon) return;
       const key = btn.dataset.keypad || '';
       if (key === 'clear') {
-        input.value = '';
+        activeInput.value = '';
       } else if (key === 'back') {
-        input.value = input.value.slice(0, -1);
+        activeInput.value = activeInput.value.slice(0, -1);
       } else {
-        if (input.value.length < 5) {
-          input.value += key;
+        if (activeInput.value.length < 5) {
+          activeInput.value += key;
         }
       }
-      input.focus();
+      activeInput.focus();
     });
   });
 
@@ -163,22 +195,40 @@ export function initSkillGame(): void {
       return;
     }
 
-    const evalRes = evaluateSkillAnswer(challenge, input.value);
-    if (!evalRes.valid || evalRes.numericValue === null) {
-      setFeedback(
-        es ? 'Escribí un número entero para probar.' : 'Enter a whole number to try.',
-        'retry'
-      );
-      input.focus();
-      return;
+    let valA = 0;
+    let valB: number | undefined = undefined;
+
+    if (isXY) {
+      const xyRes = evaluateSkillXYAnswer(challenge, inputX?.value || '', inputY?.value || '');
+      if (!xyRes.valid || xyRes.xValue === null || xyRes.yValue === null) {
+        setFeedback(
+          es ? 'Escribí valores enteros para X e Y.' : 'Enter whole numbers for X and Y.',
+          'retry'
+        );
+        (inputX?.value ? inputY : inputX)?.focus();
+        return;
+      }
+      valA = xyRes.xValue;
+      valB = xyRes.yValue;
+    } else {
+      const evalRes = evaluateSkillAnswer(challenge, input?.value || '');
+      if (!evalRes.valid || evalRes.numericValue === null) {
+        setFeedback(
+          es ? 'Escribí un número entero para probar.' : 'Enter a whole number to try.',
+          'retry'
+        );
+        input?.focus();
+        return;
+      }
+      valA = evalRes.numericValue;
     }
 
     busy = true;
-    input.disabled = true;
+    setInputsDisabled(true);
     submitBtn.disabled = true;
     setFeedback(es ? '¡En marcha!' : 'Here we go!', 'neutral');
 
-    scene.playAttempt(evalRes.numericValue, challenge, (won) => {
+    scene.playAttempt(valA, challenge, (won) => {
       busy = false;
       if (won) {
         roundWon = true;
@@ -186,7 +236,7 @@ export function initSkillGame(): void {
         streak += 1;
         if (scoreEl) scoreEl.textContent = String(score);
         if (streakEl) streakEl.textContent = String(streak);
-        if (eqEl) {
+        if (eqEl && !isXY) {
           eqEl.textContent = challenge.equationText.replace('?', String(challenge.answer));
         }
         setFeedback(
@@ -200,16 +250,16 @@ export function initSkillGame(): void {
       } else {
         streak = 0;
         if (streakEl) streakEl.textContent = '0';
-        input.disabled = false;
+        setInputsDisabled(false);
         submitBtn.disabled = false;
         setFeedback(
           es ? 'Casi — revisá el cálculo y probá de nuevo.' : 'Almost — check the math and try again.',
           'retry'
         );
-        input.select();
-        input.focus();
+        activeInput.select();
+        activeInput.focus();
       }
-    });
+    }, valB);
   });
 
   // 60fps Canvas Loop

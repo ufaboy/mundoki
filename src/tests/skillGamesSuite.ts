@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   evaluateSkillAnswer,
+  evaluateSkillXYAnswer,
   generateSkillChallenge,
   resolveSkillFromSlug,
   SKILL_GAMES_META,
@@ -9,7 +10,14 @@ import {
 } from '../math/arcade/skillGames';
 import { buildTrainHubUrl, buildTrainSkillUrl } from '../i18n/routes';
 
-const skills: SkillGameId[] = ['addition', 'subtraction', 'multiplication', 'division'];
+const skills: SkillGameId[] = [
+  'addition',
+  'subtraction',
+  'multiplication',
+  'division',
+  'sea-cannon',
+  'chain-ops',
+];
 const difficulties: SkillDifficulty[] = [1, 2, 3];
 
 for (const skill of skills) {
@@ -30,6 +38,16 @@ for (const skill of skills) {
       } else if (skill === 'division') {
         assert.ok(c.b >= 2, `Division divisor must be >= 2 (${c.id})`);
         assert.equal(c.a, c.b * c.answer);
+      } else if (skill === 'sea-cannon') {
+        assert.ok((c.gridSize ?? 0) >= 8);
+        assert.ok((c.targetX ?? -1) >= 2 && (c.targetX ?? 99) < (c.gridSize ?? 0));
+        assert.ok((c.targetY ?? -1) >= 2 && (c.targetY ?? 99) < (c.gridSize ?? 0));
+        const xyOk = evaluateSkillXYAnswer(c, String(c.targetX), String(c.targetY));
+        assert.equal(xyOk.isCorrect, true);
+        const xyPartial = evaluateSkillXYAnswer(c, String(c.targetX), String((c.targetY ?? 0) + 1));
+        assert.equal(xyPartial.isCorrect, false);
+        assert.equal(xyPartial.xCorrect, true);
+        assert.equal(xyPartial.yCorrect, false);
       }
 
       const right = evaluateSkillAnswer(c, String(c.answer));
