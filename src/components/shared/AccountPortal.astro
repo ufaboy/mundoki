@@ -41,13 +41,14 @@ const icons = {
     <form id="form-password-auth" class="mk-stack" novalidate>
       <div id="auth-name-group" class="mk-field" hidden>
         <label for="input-auth-name">{L('Tu nombre', 'Your name')}</label>
-        <input id="input-auth-name" class="mk-input" type="text" autocomplete="name" maxlength="60" />
+        <input id="input-auth-name" name="name" class="mk-input" type="text" autocomplete="name" maxlength="60" />
       </div>
 
       <div class="mk-field">
         <label for="input-auth-email">{L('Correo electrónico', 'Email')}</label>
         <input
           id="input-auth-email"
+          name="email"
           class="mk-input"
           type="email"
           inputmode="email"
@@ -62,15 +63,28 @@ const icons = {
       </div>
 
       <div class="mk-field">
-        <label for="input-auth-password">{L('Contraseña', 'Password')}</label>
+        <label id="label-auth-password" for="input-auth-password">{L('Contraseña', 'Password')}</label>
         <div class="mk-account__secret">
           <input
             id="input-auth-password"
+            name="password"
             class="mk-input"
             type="password"
             autocomplete="current-password"
             minlength="6"
             required
+            aria-describedby="auth-password-hint auth-password-error"
+          />
+          <input
+            id="input-auth-signup-password"
+            name="password"
+            class="mk-input"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+            hidden
+            disabled
             aria-describedby="auth-password-hint auth-password-error"
           />
           <button type="button" class="mk-btn mk-btn--quiet" id="btn-toggle-password" aria-pressed="false">

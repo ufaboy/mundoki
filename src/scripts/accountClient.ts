@@ -26,6 +26,8 @@ export function initAccountPage(): void {
   const banner = byId('account-status-banner');
   const emailInput = byId<HTMLInputElement>('input-auth-email');
   const passwordInput = byId<HTMLInputElement>('input-auth-password');
+  const signupPasswordInput = byId<HTMLInputElement>('input-auth-signup-password');
+  const passwordLabel = byId<HTMLLabelElement>('label-auth-password');
   const nameInput = byId<HTMLInputElement>('input-auth-name');
   const emailError = byId('auth-email-error');
   const passwordError = byId('auth-password-error');
@@ -65,9 +67,12 @@ export function initAccountPage(): void {
     }
   }
 
+  const activePasswordInput = () => (authMode === 'signup' ? signupPasswordInput : passwordInput);
+
   function clearFieldErrors() {
     setFieldError(emailInput, emailError, '');
     setFieldError(passwordInput, passwordError, '');
+    setFieldError(signupPasswordInput, passwordError, '');
   }
 
   function validEmail(): string | null {
@@ -128,7 +133,15 @@ export function initAccountPage(): void {
     show(byId('auth-magic-block'), !signup);
     if (!signup) show(magicDevBox, Boolean(devMagicToken));
     else show(magicDevBox, false);
-    passwordInput?.setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+    if (passwordInput) {
+      passwordInput.hidden = signup;
+      passwordInput.disabled = signup;
+    }
+    if (signupPasswordInput) {
+      signupPasswordInput.hidden = !signup;
+      signupPasswordInput.disabled = !signup;
+    }
+    passwordLabel?.setAttribute('for', signup ? 'input-auth-signup-password' : 'input-auth-password');
     if (submitBtn) submitBtn.textContent = signup ? L('Crear cuenta', 'Create account') : L('Entrar', 'Sign in');
     clearFieldErrors();
     hideBanner();
@@ -206,6 +219,7 @@ export function initAccountPage(): void {
       if (data.gameState) saveLocalGameState(data.gameState);
       updateHeaderName(String(data.user.name || ''));
       if (passwordInput) passwordInput.value = '';
+      if (signupPasswordInput) signupPasswordInput.value = '';
       devMagicToken = '';
       show(magicDevBox, false);
       renderLoggedInState(data.user, Boolean(data.isPremiumEntitled));
@@ -257,9 +271,11 @@ export function initAccountPage(): void {
 
   byId('btn-toggle-password')?.addEventListener('click', (event) => {
     const btn = event.currentTarget as HTMLButtonElement;
-    if (!passwordInput) return;
-    const reveal = passwordInput.type === 'password';
-    passwordInput.type = reveal ? 'text' : 'password';
+    const current = activePasswordInput();
+    if (!current) return;
+    const reveal = current.type === 'password';
+    if (passwordInput) passwordInput.type = reveal ? 'text' : 'password';
+    if (signupPasswordInput) signupPasswordInput.type = reveal ? 'text' : 'password';
     btn.setAttribute('aria-pressed', String(reveal));
     btn.textContent = reveal ? L('Ocultar', 'Hide') : L('Mostrar', 'Show');
   });
@@ -267,8 +283,10 @@ export function initAccountPage(): void {
   emailInput?.addEventListener('input', () => {
     if (emailInput.getAttribute('aria-invalid') === 'true') setFieldError(emailInput, emailError, '');
   });
-  passwordInput?.addEventListener('input', () => {
-    if (passwordInput.getAttribute('aria-invalid') === 'true') setFieldError(passwordInput, passwordError, '');
+  [passwordInput, signupPasswordInput].forEach((input) => {
+    input?.addEventListener('input', () => {
+      if (input.getAttribute('aria-invalid') === 'true') setFieldError(input, passwordError, '');
+    });
   });
 
   byId<HTMLFormElement>('form-password-auth')?.addEventListener('submit', (event) => {
@@ -276,14 +294,15 @@ export function initAccountPage(): void {
     hideBanner();
     const email = validEmail();
     if (!email) return;
-    const password = passwordInput?.value || '';
+    const currentPasswordInput = activePasswordInput();
+    const password = currentPasswordInput?.value || '';
     if (password.length < MIN_PASSWORD) {
       setFieldError(
-        passwordInput,
+        currentPasswordInput,
         passwordError,
         password ? L('La contraseña tiene que tener 6 letras o números como mínimo.', 'The password needs at least 6 letters or numbers.') : L('Escribí tu contraseña.', 'Enter your password.')
       );
-      passwordInput?.focus();
+      currentPasswordInput?.focus();
       return;
     }
 
@@ -332,7 +351,7 @@ export function initAccountPage(): void {
 
   magicBtn?.addEventListener('click', () => {
     hideBanner();
-    setFieldError(passwordInput, passwordError, '');
+    setFieldError(activePasswordInput(), passwordError, '');
     const email = validEmail();
     if (!email) return;
 
