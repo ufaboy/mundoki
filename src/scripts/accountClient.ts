@@ -88,7 +88,7 @@ export function initAccountPage(): void {
   async function postJson(url: string, body: unknown, token?: string): Promise<{ ok: boolean; status: number; data: Json }> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers.Authorization = `Bearer ${token}`;
-    const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body ?? {}) });
+    const res = await fetch(url, { method: 'POST', credentials: 'same-origin', headers, body: JSON.stringify(body ?? {}) });
     const data = (await res.json().catch(() => ({}))) as Json;
     return { ok: res.ok, status: res.status, data };
   }
@@ -215,18 +215,19 @@ export function initAccountPage(): void {
 
   // ---------- Restore an existing session ----------
 
-  if (sessionToken()) {
-    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${sessionToken()}` } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data && data.authenticated && data.user) {
-          window.localStorage.setItem('mundoki_user', JSON.stringify(data.user));
-          window.localStorage.setItem('mundoki_premium', data.isPremiumEntitled ? 'true' : 'false');
-          renderLoggedInState(data.user, Boolean(data.isPremiumEntitled));
-        }
-      })
-      .catch(() => {});
-  }
+  fetch('/api/auth/me', {
+    credentials: 'same-origin',
+    headers: sessionToken() ? { Authorization: `Bearer ${sessionToken()}` } : {},
+  })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (data && data.authenticated && data.user) {
+        window.localStorage.setItem('mundoki_user', JSON.stringify(data.user));
+        window.localStorage.setItem('mundoki_premium', data.isPremiumEntitled ? 'true' : 'false');
+        renderLoggedInState(data.user, Boolean(data.isPremiumEntitled));
+      }
+    })
+    .catch(() => {});
 
   // ---------- Magic link: opened from the email (?magic_token=) ----------
 
@@ -508,7 +509,11 @@ export function initAccountPage(): void {
 
   byId<HTMLButtonElement>('btn-sign-out')?.addEventListener('click', (event) => {
     withBusy(event.currentTarget as HTMLButtonElement, async () => {
-      await fetch('/api/auth/signout', { method: 'POST', headers: { Authorization: `Bearer ${sessionToken()}` } }).catch(() => {});
+      await fetch('/api/auth/signout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: sessionToken() ? { Authorization: `Bearer ${sessionToken()}` } : {},
+      }).catch(() => {});
       window.localStorage.removeItem('mundoki_token');
       window.localStorage.removeItem('mundoki_user');
       window.localStorage.removeItem('mundoki_premium');

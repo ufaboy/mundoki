@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import { DEFAULT_PREMIUM_MONTHLY_ARS } from '../payments/pricing';
 import {
   integer,
   check,
@@ -231,7 +232,7 @@ export const subscriptions = sqliteTable('subscriptions', {
   providerSubscriptionId: text('provider_subscription_id'),
   planCode: text('plan_code').notNull().default('monthly_ars'),
   currency: text('currency').notNull().default('ARS'),
-  amountArs: integer('amount_ars').notNull().default(4500),
+  amountArs: integer('amount_ars').notNull().default(DEFAULT_PREMIUM_MONTHLY_ARS),
   status: text('status', {
     enum: ['inactive', 'pending', 'active', 'cancelled', 'expired'],
   }).notNull(),

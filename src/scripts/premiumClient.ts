@@ -20,6 +20,9 @@ export function initPremiumPage(): void {
   const webhookPanel = byId('premium-dev-webhook-panel');
   const adultCheck = byId<HTMLInputElement>('checkbox-adult-confirm');
   const token = () => window.localStorage.getItem('mundoki_token') || '';
+  const authHeaders = (): Record<string, string> => (token() ? { Authorization: `Bearer ${token()}` } : {});
+  let isAuthenticated = Boolean(token());
+  let authenticatedUserId = '';
 
   function showMessage(message: string, kind: Kind = 'info') {
     if (!statusBox) return;
@@ -44,18 +47,20 @@ export function initPremiumPage(): void {
     root!.classList.toggle('is-premium', isEntitled);
   }
 
-  const signedIn = Boolean(token());
   const signInHint = byId('premium-signin-hint');
-  if (signInHint) signInHint.hidden = signedIn;
+  if (signInHint) signInHint.hidden = isAuthenticated;
 
-  if (signedIn) {
-    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token()}` } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data && data.authenticated) updateEntitlementUi(Boolean(data.isPremiumEntitled), data.subscription?.status);
-      })
-      .catch(() => {});
-  }
+  fetch('/api/auth/me', { credentials: 'same-origin', headers: authHeaders() })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (data && data.authenticated) {
+        isAuthenticated = true;
+        authenticatedUserId = String(data.user?.id || '');
+        if (signInHint) signInHint.hidden = true;
+        updateEntitlementUi(Boolean(data.isPremiumEntitled), data.subscription?.status);
+      }
+    })
+    .catch(() => {});
 
   async function withBusy(btn: HTMLButtonElement | null, work: () => Promise<void>) {
     if (btn?.disabled) return;
@@ -70,7 +75,7 @@ export function initPremiumPage(): void {
   }
 
   btnCheckout?.addEventListener('click', () => {
-    if (!token()) {
+    if (!isAuthenticated) {
       showMessage(
         L('Primero entrá o creá la cuenta de la familia; después volvé acá para suscribirte.', 'First sign in or create the family account, then come back here to subscribe.'),
         'info'
@@ -87,7 +92,8 @@ export function initPremiumPage(): void {
     withBusy(btnCheckout, async () => {
       const res = await fetch('/api/subscriptions/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ adultConfirmed: true }),
       });
       const data = await res.json().catch(() => ({}));
@@ -108,16 +114,24 @@ export function initPremiumPage(): void {
 
   // Local development only: send the signed confirmation Mercado Pago would send.
   byId<HTMLButtonElement>('btn-simulate-mp-webhook')?.addEventListener('click', (event) => {
-    const rawUser = window.localStorage.getItem('mundoki_user');
-    if (!rawUser) return;
-    const user = JSON.parse(rawUser);
+    let userId = authenticatedUserId;
+    if (!userId) {
+      try {
+        const rawUser = window.localStorage.getItem('mundoki_user');
+        if (rawUser) userId = String(JSON.parse(rawUser)?.id || '');
+      } catch {
+        // Ignore malformed local user cache.
+      }
+    }
+    if (!userId) return;
     withBusy(event.currentTarget as HTMLButtonElement, async () => {
       const res = await fetch('/api/webhooks/mercadopago', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({
           eventId: `mp_evt_${Date.now()}`,
-          userId: user.id,
+          userId,
           action: 'subscription_authorized',
           signature: 'dev_verified_webhook_sig',
         }),
@@ -137,7 +151,11 @@ export function initPremiumPage(): void {
     );
     if (!sure) return;
     withBusy(btnCancel, async () => {
-      const res = await fetch('/api/subscriptions/cancel', { method: 'POST', headers: { Authorization: `Bearer ${token()}` } });
+      const res = await fetch('/api/subscriptions/cancel', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: authHeaders(),
+      });
       if (res.ok) {
         updateEntitlementUi(false, 'cancelled');
         showMessage(L('La suscripción está cancelada. No se harán más cobros.', 'The subscription is cancelled. No more charges will be made.'), 'info');
