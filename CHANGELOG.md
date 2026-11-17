@@ -3,6 +3,11 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.1] - 2026-11-17
+
+### Changed
+- Removed the redundant three-step instructions from the Grade 2 adventure map so the mission list appears sooner.
+
 ## [2.2.0] - 2026-11-17
 
 ### Added
