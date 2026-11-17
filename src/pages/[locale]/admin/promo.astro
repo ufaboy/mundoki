@@ -1,0 +1,92 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import { normalizeUrlLocale } from '../../../i18n/routes';
+import { promoText } from '../../../i18n/promos';
+import { requireAdminAccount } from '../../../lib/server/authGuard';
+
+export const prerender = false;
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const auth = await requireAdminAccount(Astro.request, locale);
+if ('redirect' in auth) {
+  return Astro.redirect(auth.redirect, 302);
+}
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const tr = (key: string) => promoText(locale, key);
+const otherPrefix = locale === 'es-AR' ? 'en-us' : 'es-ar';
+---
+
+<AppLayout
+  title={tr('promoTitle')}
+  locale={locale}
+  switchLocaleHref={`/${otherPrefix}/admin/promo`}
+  legacyContent
+>
+  <div id="promo-campaign-admin" data-locale={locale} class="article-container stack-lg">
+    <header class="card stack-sm">
+      <div class="kicker">Mundoki · Admin</div>
+      <h1>{tr('promoTitle')}</h1>
+      <p>{tr('promoIntro')}</p>
+    </header>
+
+    <p id="promo-campaign-message" role="status" aria-live="polite"></p>
+
+    <datalist id="promo-discount-presets">
+      <option value="10" />
+      <option value="15" />
+      <option value="20" />
+      <option value="25" />
+      <option value="30" />
+      <option value="50" />
+      <option value="75" />
+      <option value="100" />
+    </datalist>
+
+    <form id="promo-campaign-create" class="card stack-md">
+      <h2>{tr('promoCampaignHeading')}</h2>
+      <div class="promo-form-grid">
+        <label>{tr('promoCode')}<input class="input-field" name="code" type="text" maxlength="32" placeholder="PROMO2026" autocomplete="off" /></label>
+        <label>{tr('label')}<input class="input-field" name="label" maxlength="120" /></label>
+      </div>
+      <div class="promo-form-grid">
+        <label>{tr('discount')}<input class="input-field" name="discountPercent" type="number" min="10" max="100" step="1" value="50" list="promo-discount-presets" required /></label>
+        <label>{tr('months')}<input class="input-field" name="durationMonths" type="number" min="1" max="6" step="1" value="1" required /></label>
+        <label>{tr('maxActivations')}<input class="input-field" name="maxActivations" type="number" min="1" max="10000" step="1" value="10" required /></label>
+        <label>{tr('expires')}<input class="input-field" name="expiresAt" type="datetime-local" required /></label>
+      </div>
+      <label class="flex-row"><input name="newCustomersOnly" type="checkbox" checked />{tr('newOnly')}</label>
+      <button class="btn btn-primary" type="submit">{tr('createPromo')}</button>
+    </form>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="promo-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>{tr('offer')}</th>
+            <th>{tr('activations')}</th>
+            <th>{tr('expires')}</th>
+            <th>{tr('status')}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="promo-campaign-list"></tbody>
+      </table>
+    </div>
+
+    <form id="promo-direct-create" class="card stack-md">
+      <h2>{tr('promoDirectHeading')}</h2>
+      <label>{tr('existingUserEmail')}<input class="input-field" name="recipientEmail" type="email" required maxlength="254" autocomplete="off" /></label>
+      <label>{tr('label')}<input class="input-field" name="label" maxlength="120" /></label>
+      <div class="promo-form-grid">
+        <label>{tr('discount')}<input class="input-field" name="discountPercent" type="number" min="10" max="100" step="1" value="50" list="promo-discount-presets" required /></label>
+        <label>{tr('months')}<input class="input-field" name="durationMonths" type="number" min="1" max="6" step="1" value="1" required /></label>
+        <label>{tr('expires')}<input class="input-field" name="expiresAt" type="datetime-local" required /></label>
+      </div>
+      <label class="flex-row"><input name="newCustomersOnly" type="checkbox" checked />{tr('newOnly')}</label>
+      <button class="btn btn-primary" type="submit">{tr('addDirectPromo')}</button>
+    </form>
+  </div>
+  <script>import { initPromoCampaignAdmin } from '../../../scripts/promoCampaignAdmin'; initPromoCampaignAdmin();</script>
+</AppLayout>

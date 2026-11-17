@@ -1,7 +1,7 @@
 {
   "name": "mundoki",
   "private": true,
-  "version": "2.2.5",
+  "version": "2.2.6",
   "type": "module",
   "scripts": {
     "dev": "pnpm run build:worker && wrangler dev dist/server/entry.mjs --config wrangler.jsonc --env staging --port 3333 --ip 0.0.0.0",

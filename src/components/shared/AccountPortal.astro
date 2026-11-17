@@ -58,7 +58,8 @@ const tfEnabled = Boolean(user.twoFactorEnabled);
     <div class="mk-row" id="account-extra-links" hidden={!isAdmin}>
       <a id="account-return-next" class="mk-btn mk-btn--go" href="#" hidden>{L('Volver a la misión', 'Back to the mission')}</a>
       <a id="account-return-promo" class="mk-btn mk-btn--primary" href={buildPremiumUrl(locale)} hidden>{L('Volver a mi invitación', 'Return to my invitation')}</a>
-      <a id="account-admin-promos" class="mk-btn" href={`/${locale.toLowerCase()}/admin/promos`} hidden={!isAdmin}>{L('Administrar invitaciones', 'Manage invitations')}</a>
+      <a id="account-admin-promos" class="mk-btn" href={`/${locale.toLowerCase()}/admin/promos`} hidden={!isAdmin}>{L('Invitaciones', 'Invitations')}</a>
+      <a id="account-admin-promo" class="mk-btn" href={`/${locale.toLowerCase()}/admin/promo`} hidden={!isAdmin}>Promo</a>
     </div>
 
     <div class="mk-grid">

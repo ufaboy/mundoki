@@ -11,8 +11,8 @@ export const POST: APIRoute = async ({ request }) => {
   if (!user) return jsonResponse({ error: 'sign_in' }, 401);
   try {
     const body = await request.json();
-    const { invite } = await quotePromo(env, user, body?.code);
-    return jsonResponse({ promo: publicQuote(invite, env) });
+    const quoted = await quotePromo(env, user, body?.code);
+    return jsonResponse({ promo: publicQuote((quoted.invite ?? quoted.campaign)!, env) });
   } catch (error) {
     return jsonResponse({ error: error instanceof PromoError ? error.code : 'request_failed' }, error instanceof PromoError ? error.status : 400);
   }

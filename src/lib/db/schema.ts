@@ -277,9 +277,42 @@ export const promoEvents = sqliteTable('promo_events', {
   detail: text('detail').notNull().default(''), createdAt: text('created_at').notNull(),
 });
 
+export const promoCampaigns = sqliteTable('promo_campaigns', {
+  id: text('id').primaryKey().notNull(),
+  code: text('code').notNull().unique(),
+  label: text('label').notNull().default(''),
+  discountPercent: integer('discount_percent').notNull(),
+  durationMonths: integer('duration_months').notNull(),
+  maxActivations: integer('max_activations').notNull().default(10),
+  activationsCount: integer('activations_count').notNull().default(0),
+  newCustomersOnly: integer('new_customers_only', { mode: 'boolean' }).notNull().default(true),
+  expiresAt: text('expires_at').notNull(),
+  active: integer('active', { mode: 'boolean' }).notNull().default(true),
+  createdBy: text('created_by').notNull().references(() => users.id),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, table => [
+  check('promo_campaign_discount_range', sql`${table.discountPercent} BETWEEN 10 AND 100`),
+  check('promo_campaign_duration_range', sql`${table.durationMonths} BETWEEN 1 AND 6`),
+  check('promo_campaign_max_activations', sql`${table.maxActivations} >= 1`),
+  check('promo_campaign_activations_range', sql`${table.activationsCount} >= 0 AND ${table.activationsCount} <= ${table.maxActivations}`),
+]);
+
+export const promoCampaignRedemptions = sqliteTable('promo_campaign_redemptions', {
+  id: text('id').primaryKey().notNull(),
+  campaignId: text('campaign_id').notNull().references(() => promoCampaigns.id),
+  userId: text('user_id').notNull().references(() => users.id),
+  inviteId: text('invite_id').notNull().references(() => promoInvites.id),
+  createdAt: text('created_at').notNull(),
+}, table => [
+  uniqueIndex('promo_campaign_redemptions_user_idx').on(table.campaignId, table.userId),
+]);
+
 export const schema = {
   promoInvites,
   promoEvents,
+  promoCampaigns,
+  promoCampaignRedemptions,
   users,
   sessions,
   accounts,
