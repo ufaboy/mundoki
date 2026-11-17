@@ -3,6 +3,15 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.7] - 2026-11-17
+
+### Added
+- Added a dedicated **Promo** admin console (`/es-ar/admin/promo`, `/en-us/admin/promo`) alongside **Invitations** (`/admin/promos`), with both links surfaced on the administrator account page.
+- Added unassigned temporary promo campaigns with configurable activation limits (defaulting to 10 activations, 1 per user) and on/off controls, plus direct promo assignment for existing registered users.
+
+### Changed
+- Consolidated all D1 database schema migrations into `drizzle/0000_initial.sql`.
+
 ## [2.2.5] - 2026-11-17
 
 ### Changed
