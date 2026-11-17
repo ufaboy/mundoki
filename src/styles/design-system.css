@@ -171,6 +171,7 @@
 
 .mk-root {
   font-size: 100%;
+  scrollbar-gutter: stable;
 }
 
 /* Legacy pages (global.css) run on an 18px root: undo it for this system. */
