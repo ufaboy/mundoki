@@ -3,6 +3,12 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.3] - 2026-11-17
+
+### Changed
+- Added an isolated staging environment with its own test database and Worker, giving the team a separate place to validate changes before production releases.
+- Improved signup password autofill behavior so browsers can distinguish signup credentials from sign-in credentials.
+
 ## [2.2.1] - 2026-11-17
 
 ### Changed
