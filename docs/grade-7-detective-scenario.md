@@ -1,6 +1,6 @@
-# Grade 7 – scenario plan for “Agencia Lupa and the Riddles of the Sphinx”
+# Grade 7 – story reference: “Agencia Lupa and the Riddles of the Sphinx”
 
-Draft game layer to replace the current Grade 7 story (`src/content/grade7/parkAdventure.ts`, a park-design project). The educational content and the order of the lessons do not change: 11 packages G07-01 … G07-11, **33 lessons, 2 tasks per lesson = 66 tasks** (`docs/lesson-creation-plan.md`, section Grade 7; `src/content/grade7/README.md`). What changes: the scenes, who needs each answer and why, and what the detectives learn after a correct answer.
+This document preserves the planning brief for the implemented Grade 7 detective story. The current learner-facing content lives in `src/content/grade7/detectiveStory.ts`, the Grade 7 lesson files, and `src/content/grade7/README.md`; those files are authoritative wherever this older plan differs. The course has 11 packages G07-01 … G07-11, 33 lessons, and 66 challenge steps.
 
 Decisions made (November 2026):
 
@@ -280,15 +280,8 @@ Story continuity checks:
 - The number cipher needs all 8 map pieces, which come from main chapters only, so side cases are never required.
 - Side-case clues appear in the finale only with “if found”.
 
-## 8. Implementation notes (for later)
+## 8. Implementation record
 
-- Game layer: replace `src/content/grade7/parkAdventure.ts` (`ParkScene`, 11 scenes, generic rewards) with a detective story file; keep one chapter per package. Each mission gets its own introduction and one reward per task (66 rewards), as in Grade 2 `wizardQuest.ts`. Rename scenes to the chapter places above.
-- Lessons: rewrite `story`, `steps`, `items`, `checks`, and `exit` (as *Desafío de la Esfinge*) in `numbers.ts`, `relations.ts`, `space.ts`, `data.ts`. Changed numbers: G07-01-L02 task 1 (35 + 45 books), G07-03-L01 (cuadras and minutes instead of labels and price), G07-03-L03 task 1 (scale 1:20.000, 5 cm → 1 km instead of 1:200 → 10 m), G07-09-L01 (same counts 8, 6, 6; activities renamed reading/drawing/sport), G07-09-L03 (letter heights 4, 4, 4, 4 and 2, 3, 5, 6 mm instead of 4, 4, 4, 4 and 1, 1, 7, 7 minutes; both keep equal means and different ranges). All other answers and distractors stay as in the current checks.
-- Interactive models in `parkModels.ts` (shared-stick pattern, formula/table/graph, angles, scaling, cube layers, coin sequence) keep their maths; only labels change (bars of a gate, frame strip, street angles, photo, puzzle box, fair coin).
-- Update `hints.ts` (one hint per check, about the case objects); hints must differ from explanations.
-- Scene: corkboard with 66 evidence cards (+ up to 11 gold cards from logic riddles), the city map with 11 pins, the torn map (8 pieces with cipher numbers on the back), and the candidate board.
-- New story steps outside the lesson checks: 11 logic riddles (section 6), the number-cipher lock, and the final deduction. They need their own simple answer data (choice options + explanation) in the story file; they do not count toward lesson mastery or package checks.
-- Currency: show amounts in *lupas* with a small icon; es-AR and en-US keep the same word.
-- Final project (fair-design project in `index.ts`) can be reframed as “plan the egresados party and the capsule opening”.
-- Create a `grade-7-lesson-authoring` skill with this story map once the scenario is approved, as was done for Grade 2.
-- Package checks in `assessments.ts` stay outside the story.
+- Implemented story and episode rewards: `src/content/grade7/detectiveStory.ts`; lesson text and hints: `src/content/grade7/`; pages and interactions: `DetectiveLesson.astro`, `DetectiveScene.astro`, `DetectivePuzzle.astro`, and `src/scripts/detectiveAdventure.ts`.
+- Reused worked diagrams remain in `ParkWorkedDiagram.astro` and `parkModels.ts`; their legacy names are technical debt, not pending story work.
+- The 33 lesson missions and optional story puzzles are checked by `src/tests/detectiveAdventureSuite.ts`. Package assessments and the final project remain separate.

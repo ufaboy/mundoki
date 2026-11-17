@@ -12,7 +12,7 @@ document.querySelectorAll<HTMLElement>('[data-race-root]').forEach(root=>{
  const renderPreferences=()=>{
   root.style.setProperty('--race-paint',RACE_COLORS[preferences.color]);
   root.querySelectorAll('[data-race-emblem-display]').forEach(el=>{el.textContent=RACE_EMBLEMS[preferences.emblem];});
-  root.querySelectorAll('[data-race-name-display]').forEach(el=>{el.textContent=preferences.name||'Escudería Pampa';});
+  root.querySelectorAll('[data-race-name-display]').forEach(el=>{el.textContent=preferences.name||(es?'Escudería Pampa':'Pampa Racing Team');});
   root.querySelectorAll<HTMLElement>('[data-race-color]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.raceColor===preferences.color)));
   root.querySelectorAll<HTMLElement>('[data-race-emblem]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.raceEmblem===preferences.emblem)));
  };

@@ -7,7 +7,7 @@ export const numberLessons = [
   l(1, 1, 'Miles y valores de posición|Thousands and place values',
     'Explicar el valor de unidades, decenas, centenas y miles.|Explain the value of ones, tens, hundreds, and thousands.',
     'Explicá por qué diez decenas forman una centena.|Explain why ten tens make a hundred.',
-    'En el corralón, los ladrillos vienen en palés de 1.000, pilas de 100, paquetes de 10 y ladrillos sueltos. Un cartel dice: 2 palés, 3 pilas, 4 paquetes y 6 sueltos.|At the supply yard, bricks come in pallets of 1,000, stacks of 100, packs of 10, and loose bricks. A sign says: 2 pallets, 3 stacks, 4 packs, and 6 loose.',
+    'En el corralón, un palé tiene 1.000 ladrillos. Una pila tiene 100. Un paquete tiene 10. El cartel muestra: 2 palés, 3 pilas, 4 paquetes y 6 ladrillos sueltos.|At the supply yard, a pallet holds 1,000 bricks. A stack has 100. A pack has 10. The sign shows 2 pallets, 3 stacks, 4 packs, and 6 loose bricks.',
     ['2 palés son 2.000 ladrillos. 3 pilas son 300.|2 pallets are 2,000 bricks. 3 stacks are 300.', '4 paquetes son 40 ladrillos y quedan 6 sueltos.|4 packs are 40 bricks and 6 are loose.', 'En total: 2.000 + 300 + 40 + 6 = 2.346 ladrillos.|In all: 2,000 + 300 + 40 + 6 = 2,346 bricks.'],
     ['2 × 1000 = 2000','3 × 100 = 300','4 × 10 = 40','6 × 1 = 6','2346 = 2000 + 300 + 40 + 6'], 'Palé = 1.000, pila = 100, paquete = 10, suelto = 1.|Pallet = 1,000, stack = 100, pack = 10, loose = 1.',
     'El 2 de 2.346 son 2 palés: dos mil ladrillos, no doscientos.|The 2 in 2,346 is 2 pallets: two thousand bricks, not two hundred.',

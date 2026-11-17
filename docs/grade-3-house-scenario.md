@@ -1,6 +1,6 @@
-# Grade 3 – scenario plan for “A House for Our Family”
+# Grade 3 – story reference: “A House for Our Family”
 
-Draft game layer to replace the current Grade 3 story (building a city, `src/content/grade3/cityAdventure.ts`). The educational content and the order of the lessons do not change: 14 packages G03-01 … G03-14, **41 lessons, 2 tasks per lesson = 82 tasks** (`docs/lesson-creation-plan.md`, section Grade 3). What changes: the scenes, who needs each answer and why, and what visibly changes after a correct answer.
+This document preserves the original planning brief for the implemented Grade 3 story. The current learner-facing content lives in `src/content/grade3/houseStory.ts`, the Grade 3 lesson files, and `.agents/skills/grade-3-lesson-authoring/SKILL.md`; those files are authoritative wherever this older plan differs. The course has 14 packages G03-01 … G03-14, 41 lessons, and 82 challenge steps.
 
 Decisions made (November 2026):
 
@@ -207,10 +207,9 @@ Notation: **✔** correct answer, **✘** wrong option (the typical error in bra
 | 8 | The housewarming party | G03-13, G03-14 | 5 | 10 |
 | | **Total** | 14 | **41** | **82** |
 
-## 6. Implementation notes (for later)
+## 6. Implementation record
 
-- Game layer: replace `src/content/grade3/cityAdventure.ts` (`CITY_CHAPTERS`) with a house story file; chapters become the 8 stages above instead of 14 package chapters. Mission order must stay aligned with the 41 lessons.
-- Lessons: rewrite `story`, `steps`, `scene`, and `checks` in `numbers.ts`, `products.ts`, `strategies.ts`, `space.ts`, `measurement.ts` to the building-site context; keep numbers and distractors listed above. Update `hints.ts` (one hint per check, about the site objects).
-- Scene: a house picture with 82 pieces that appear one by one; the site notebook (*libreta de obra*) as the progress list.
-- Create a `grade-3-lesson-authoring` skill with this story map once the scenario is approved, as was done for Grade 2.
-- Package checks in `assessments.ts` stay outside the story.
+- Implemented in `src/content/grade3/houseStory.ts`, the Grade 3 lesson files, `src/components/learn/HouseLesson.astro`, and `src/components/learn/HouseScene.astro`.
+- Mission order and the 82 challenge steps are checked by `src/tests/houseAdventureSuite.ts`.
+- The current authoring map and age-language guidance live in `.agents/skills/grade-3-lesson-authoring/SKILL.md`.
+- Package checks in `assessments.ts` remain separate from the story.

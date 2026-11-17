@@ -25,7 +25,7 @@ Each lesson is split across two layers that are rendered on the same page:
 |---|---|---|
 | Curriculum lesson: `story` (worked example context), `steps`, `scene`, `misconception`, `checks[i].prompt/options/explanation` | `src/content/grade2/numbers.ts`, `operations.ts`, `groups.ts`, `world.ts` | `src/content/gradeN/*.ts` built with `createLessonFactory` (`src/content/lessonModel.ts`) or `author.ts` |
 | Hints per challenge | `src/content/grade2/hints.ts` (`hints[lessonId][i]`) | `src/content/gradeN/hints.ts` |
-| Game layer: mission `title`, `introduction`, `rewards[i]`, chapters, scene state | `src/content/grade2/wizardQuest.ts` | grade1 `adventures.ts`, grade3 `houseStory.ts`, grade4 `planeAdventure.ts`, grade5 `moonAdventure.ts`, grade6 `racingAdventure.ts`, grade7 `parkAdventure.ts` |
+| Game layer: mission `title`, `introduction`, `rewards[i]`, chapters, scene state | `src/content/grade2/wizardQuest.ts` | grade1 `adventures.ts`, grade3 `houseStory.ts`, grade4 `planeAdventure.ts`, grade5 `moonAdventure.ts`, grade6 `racingAdventure.ts`, grade7 `detectiveStory.ts` |
 | Package checks (separate practice) | `src/content/gradeN/assessments.ts` | same |
 
 `rewards[i]` (or adventure `steps[i]`) is shown right after `checks[i]` is solved; `hints[i]` belongs to `checks[i]`. Treat **mission intro + check i + hint i + explanation i + reward i** as one unit and rewrite them together.

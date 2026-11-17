@@ -1,6 +1,6 @@
-# Grade 5 – scenario plan for “The Cóndor: to the Moon, Mars, and Phobos”
+# Grade 5 – story reference: “The Cóndor: to the Moon, Mars, and Phobos”
 
-Draft game layer to replace the current Grade 5 story (`src/content/grade5/moonAdventure.ts`, where each package is a chapter with one generic reward per lesson). The educational content and the order of the lessons do not change: 13 packages G05-01 … G05-13, **38 lessons, 2 tasks per lesson = 76 tasks** (`docs/lesson-creation-plan.md`, section Grade 5; `src/content/grade5/README.md`). What changes: the scenes, who needs each answer and why, and what visibly changes after a correct answer.
+This document preserves the planning brief for the implemented Grade 5 space story. The current learner-facing content lives in `src/content/grade5/moonAdventure.ts`, the Grade 5 lesson files, and `src/content/grade5/README.md`; those files are authoritative wherever this older plan differs. The course has 13 packages G05-01 … G05-13, 38 lessons, and 76 challenge steps.
 
 Decisions made (November 2026):
 
@@ -9,7 +9,7 @@ Decisions made (November 2026):
 - **Crew:** an engineer in the hangar, a pilot on board, Átomo (hints), and a small helper robot for comic moments.
 - **Light realism:** real facts (no air on the Moon, Mars is red and cold, the trip to Mars takes months, Phobos is tiny), simplified numbers that fit Grade 5.
 - **38 lessons × 2 tasks**, grouped into **9 chapters** of different length (2–6 lessons), because the package order is fixed.
-- Status: **scenario for discussion.** Not yet in code. Learner-facing texts will be written in es-AR and en-US with the same numbers and meaning.
+- Status: **implemented.** The space story, lesson contexts, hints, and rewards are in the Grade 5 content files in both es-AR and en-US. The text below records design intent and is not a verbatim copy of the current lessons.
 
 The task texts below are planning wording, not final copy. They keep the mathematics, the number range, and the typical-error distractor of the current Grade 5 checks; only the context changes. Where a number had to change to fit the story, the new number keeps the same operation and difficulty.
 
@@ -220,12 +220,8 @@ Notation: **✔** correct answer, **✘** wrong option (the typical error in bra
 | 9 | Coming home | G05-13 | 2 | 4 |
 | | **Total** | 13 | **38** | **76** |
 
-## 6. Implementation notes (for later)
+## 6. Implementation record
 
-- Game layer: replace `src/content/grade5/moonAdventure.ts` (`MOON_CHAPTERS`, one chapter per package, two generic rewards per scene) with a space-journey story file; chapters become the 9 stages above. Mission order must stay aligned with the 38 lessons. Each mission gets its own introduction and one reward per task (76 rewards), as in Grade 2 `wizardQuest.ts`.
-- Lessons: rewrite `story`, `steps`, `scene`, and `checks` in `calculation.ts`, `fractions.ts`, `decimals.ts`, `world.ts` to the mission context; keep numbers and distractors listed above. Changed numbers: none of the check answers change; only units and objects change (e.g. G05-10-L02/L03 use dm instead of cm for real-size panels; G05-12-L02 bars count squares instead of people).
-- Update `hints.ts` (one hint per check, about the mission objects) — the current hints name buttons, ribbons, and books and will no longer match.
-- Scene: the Cóndor in the hangar with 30 parts that appear one by one (Ch. 1–3), then a route map with 46 lit steps (Ch. 4–9); the mission log (*bitácora de misión*) as the progress list.
-- Final project (`GRADE_FIVE_PROJECT` in `index.ts`, recipe and budget) can stay as is, reframed as “plan the welcome for the next crew”.
-- Create a `grade-5-lesson-authoring` skill with this story map once the scenario is approved, as was done for Grade 2.
-- Package checks in `assessments.ts` stay outside the story.
+- Implemented story and rewards: `src/content/grade5/moonAdventure.ts`; lesson text and hints: `src/content/grade5/`; learner experience: `src/components/learn/MoonLesson.astro`, `MoonScene.astro`, and the Grade 5 map.
+- This document is the original planning brief, not a verbatim source for the current prompts. Use the content files as authoritative when details differ.
+- Package assessments and the final project remain separate from the story missions.

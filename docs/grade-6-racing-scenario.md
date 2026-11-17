@@ -1,6 +1,6 @@
-# Grade 6 – scenario plan for “Math Racing: the Copa Mundoki”
+# Grade 6 – story reference: “Math Racing: the Copa Mundoki”
 
-Draft game layer to replace the current Grade 6 story (`src/content/grade6/oceanAdventure.ts`, an ocean expedition with one generic reward per lesson). The educational content and the order of the lessons do not change: 13 packages G06-01 … G06-13, **39 lessons, 2 tasks per lesson = 78 tasks** (`docs/lesson-creation-plan.md`, section 7; `src/content/grade6/README.md`). What changes: the scenes, who needs each answer and why, and what each correct answer does in the race.
+This document preserves the planning brief for the implemented Grade 6 racing story. The current learner-facing content lives in `src/content/grade6/racingAdventure.ts`, the Grade 6 lesson files, and `src/content/grade6/README.md`; those files are authoritative wherever this older plan differs. The course has 13 packages G06-01 … G06-13, 39 lessons, and 78 challenge steps.
 
 Decisions made (November 2026):
 
@@ -8,7 +8,7 @@ Decisions made (November 2026):
 - Format: a **season of races** across Argentina. Each chapter = garage/preparation + one Grand Prix. Between races the team upgrades the car.
 - **Friendly rival**, no villain. Tension comes from the track, the weather, the energy budget, wear, and a strong, fair rival team.
 - **39 lessons × 2 tasks**, grouped into **8 chapters** (preseason, 6 Grands Prix, the Grand Final). Chapter length follows the fixed package order.
-- Status: **implemented** (November 2026) in `src/content/grade6/racingAdventure.ts` and the lesson files, es-AR and en-US. Differences from this plan: the preseason ends with qualifying as a 🏆 result; G06-02-L02 task 2 happens in a 50-lap free practice (an 18-lap race has no lap 45); G06-03-L01 task 1 asks about “a rookie car” in general. Built later the same week: **Chispa’s garage** (13 car parts, each installed by one upgrade answer; shown on every mission page and as the season’s upgrade tree on the map) and the **duel with Nico** at the end of each chapter (replays the stage’s advantages; results: qualifying lap solo, then behind, ahead ×4, photo-finish tie, ahead in the final). Also built: the “New numbers” button with stars on the first challenge of 36 missions. Not built yet: the weather card and cosmetic liveries for stars; the family project is still the schoolyard plan.
+- Status: **implemented.** The story, missions, garage, chapter duels, and generated “New numbers” practice are present in code and localized in es-AR and en-US. The text below is the original planning brief, not a verbatim copy of current learner-facing content. The schoolyard family project remains separate; weather cards and cosmetic liveries are optional ideas outside this implementation.
 
 The task texts below are planning wording, not final copy. They keep the mathematics, the number range, and the typical-error distractor of the current Grade 6 checks; only the context changes. Where a number had to change to fit the story, it is marked **(changed)** and keeps the same operation and difficulty.
 
@@ -208,10 +208,8 @@ Notation: **✔** correct answer, **✘** wrong option (the typical error in bra
 
 ---
 
-## 6. Notes for implementation (later, not part of this draft)
+## 6. Implementation record and ideas outside the current scope
 
-- `oceanAdventure.ts` → a new `racingAdventure.ts`: 8 chapters instead of the current scene list; scene states: `garage`, `river`, `andes`, `sierras`, `jungle`, `wind`, `night`, `final`.
-- Each challenge carries an effect type (`boost`, `turbo`, `route`, `upgrade`, `pit`, `slipstream`, `telemetry`, `position`) so the UI can animate the right one; the reward text still names the specific object from the challenge.
-- Rewrite `checks[i]` prompts in `numbers.ts`, `rational.ts`, `proportions.ts`, `space.ts`, `data.ts` together with `hints.ts`, explanations, and worked examples (lesson-authoring skill: one unit = intro + check + hint + explanation + reward).
-- Changed items to re-test: G06-06-L02 task 2 distractor; G06-10-L02 scale 1:200 → 1:10.000 (example and both tasks).
-- Re-theme `GRADE_SIX_PROJECT` (schoolyard → pit area of the Grand Final) only if the user approves; the mathematics of the rubric stays the same.
+- Implemented story and rewards: `src/content/grade6/racingAdventure.ts`; lesson text and hints: `src/content/grade6/`; game page, scene, and state: `RaceLesson.astro`, `RaceScene.astro`, `src/scripts/racingAdventure.ts`, and `raceState.ts`.
+- The 39 missions, reward-to-check counts, chapter progression, bilingual fields, and practice generators are covered by the Grade 6 adventure and practice suites.
+- The schoolyard family project is intentionally still a separate curriculum project. Weather-card and star-livery ideas in this brief are optional ideas, not unfinished requirements.

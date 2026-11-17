@@ -1,6 +1,6 @@
-# Grade 4 – scenario plan for “La Golondrina: a Plane Around Argentina”
+# Grade 4 – story reference: “La Golondrina: a Plane Around Argentina”
 
-Draft game layer to replace the current Grade 4 story (an island expedition, `src/content/grade4/islandAdventure.ts`). The educational content and the order of the lessons do not change: 14 packages G04-01 … G04-14, **41 lessons, 2 tasks per lesson = 82 tasks** (`docs/lesson-creation-plan.md`, section Grade 4; `src/content/grade4/`). What changes: the scenes, who needs each answer and why, and what visibly changes after a correct answer.
+This document preserves the original planning brief for the implemented Grade 4 story. The current learner-facing content lives in `src/content/grade4/planeAdventure.ts`, the Grade 4 lesson files, and `src/content/grade4/README.md`; those files are authoritative wherever this older plan differs. The course has 14 packages G04-01 … G04-14, 41 lessons, and 82 challenge steps.
 
 Decisions made (November 2026):
 
@@ -10,7 +10,7 @@ Decisions made (November 2026):
 - **No villain.** Tension comes from weather, wind, fuel, weight, mountain height, and the festival date. Comic relief: Rulo, a hornero bird who keeps building mud nests on the plane.
 - **Route (a loop):** Aeroclub → CABA (Obelisco) → Cataratas del Iguazú → Quebrada de Humahuaca / Purmamarca → Mendoza and Aconcagua → Perito Moreno glacier → Ushuaia → Península Valdés → back to the aeroclub.
 - **41 lessons × 2 tasks**, grouped into **12 chapters** of different length (2–6 lessons), because the package order is fixed.
-- Status: **in code.** All 12 chapters and 41 missions are implemented in `src/content/grade4/planeAdventure.ts` with rewritten checks, hints, and scene parts. Not yet tested with children. Learner-facing texts will be written in es-AR and en-US with the same numbers and meaning.
+- Status: **implemented.** All 12 chapters and 41 missions are in `src/content/grade4/planeAdventure.ts`; learner-facing lesson text and hints are authored in es-AR and en-US. The content has not been validated through classroom usability testing.
 
 The task texts below are planning wording, not final copy. They keep the mathematics, number range, and typical-error distractor of the current Grade 4 checks; only the context changes. Where a task’s numbers were changed or the two tasks of a lesson were swapped, this is marked.
 
@@ -243,13 +243,9 @@ Notation: **✔** correct answer, **✘** wrong option (the typical error in bra
 | 12 | The aeroclub festival | G04-14 | 2 | 4 steps |
 | | **Total** | 14 | **41** | **82** |
 
-## 6. Implementation notes (for later)
+## 6. Implementation record
 
-- Game layer: replace `src/content/grade4/islandAdventure.ts` (`ISLAND_MISSIONS`, `ISLAND_CHAPTERS`, 14 package chapters) with a plane story file; chapters become the 12 stages above. Mission order must stay aligned with the 41 lessons. Each mission needs its own `rewards[i]` (today rewards repeat one line per chapter).
-- Lessons: rewrite `story`, `steps`, `scene`, and `checks` in `numbers.ts`, `fractions.ts`, `geometry.ts`, `data.ts` to the hangar and flight contexts; keep the numbers and distractors listed above. Update `hints.ts` (one hint per check, about the plane and route objects). `check()` places the correct option by prompt length, so do not rely on answer positions.
-- Worked examples changed in code so they no longer reveal a task answer: G04-03-L01 (tail panel 32 × 15), G04-03-L02 (rudder panel 26 × 13), G04-03-L03 (flap 36 × 24), G04-04-L02 (zero example 618 ÷ 3), G04-06-L01 (water bottle 2/3), G04-07-L01 (1/2 vs 1/4), G04-07-L02 (1/4 = 2/8), G04-07-L03 (1/8, 1/2, 6/8), G04-08-L03 (3/10 = 0,3), G04-09-L02 (parcel of 2 layers of 4), G04-10-L01 (half turn no longer stated), G04-11-L02 (no “2 + 3 = 5” card), G04-12-L02 (tent: triangular prism), G04-12-L03 (pyramid net), G04-13-L01 and G04-13-L03 (no longer say “not more than half”), G04-14-L01 (6 packs of 30 postcards), G04-02-L01 (12 boxes of 250 screws), G04-01-L02 (other engines).
-- Changes to check content beyond context: G04-02-L03 task 2 (screws instead of “7800 boxes”), G04-06-L03 (tasks swapped), G04-04-L03 task 2 (cars for 22 helpers instead of an unnamed vehicle count). Update `upperPrimarySuite.ts` invariants if they reference these prompts.
-- Scenes: a hangar with 30 plane parts that appear one by one (Ch. 1–4); a map of Argentina where the route grows stamp by stamp (Ch. 5–10); the aeroclub festival (Ch. 11–12). The logbook (*bitácora de vuelo*) is the progress list.
-- `IslandWorkedDiagram.astro` and the Grade 4 labs (fraction strips, hundred grid, angle model) can be reused; the hundred grid becomes Doña Elva’s tapestry, the fraction strip becomes the fuel gauge and the route line.
-- Create a `grade-4-lesson-authoring` skill with this story map once the scenario is approved, as was done for Grade 2.
-- Package checks in `assessments.ts` and the final project (`GRADE_FOUR_PROJECT`) stay outside the story; the project may later be renamed to fit the festival.
+- Implemented game content: `src/content/grade4/planeAdventure.ts`; lesson content and hints: `src/content/grade4/`; learner page and scene: `src/components/learn/IslandLesson.astro` and `src/components/learn/PlaneScene.astro`.
+- The route, lesson order, bilingual question data, and plane scene progression are covered by `src/tests/planeAdventureSuite.ts` and `src/tests/upperPrimarySuite.ts`.
+- `IslandLesson` and `IslandWorkedDiagram` are legacy component names; they currently render Grade 4 plane content. Renaming them is separate cleanup, not pending story work.
+- Package assessments and the final project remain outside the story missions.
