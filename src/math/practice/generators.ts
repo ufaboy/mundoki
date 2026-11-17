@@ -6,6 +6,7 @@
 // before it counts towards results (POST /api/progress/sync).
 
 import { createSeededRng, type LocalizedText, type TopicId } from '../core/types';
+import { G6_MAKERS, G6_MISSION_PRACTICE, type GradeSixSkillId } from './gradeSix';
 
 export type PracticeSkillId =
   | 'place-value-digit'
@@ -50,7 +51,9 @@ export type PracticeSkillId =
   | 'g1-next-day'
   | 'g1-more-votes'
   | 'g1-choose-operation'
-  | 'g1-check-sum';
+  | 'g1-check-sum'
+  // Grade 6 Math Racing: see gradeSix.ts.
+  | GradeSixSkillId;
 
 /** A row of the picture shown with a generated question (Grade 1 counts pictures, not symbols). */
 export interface PracticeSceneRow {
@@ -130,6 +133,8 @@ export const PRACTICE_TOPIC: Record<PracticeSkillId, TopicId> = {
   'g1-more-votes': 'addition-subtraction',
   'g1-choose-operation': 'addition-subtraction',
   'g1-check-sum': 'addition-subtraction',
+  // Grade 6: the grade's results bucket (GRADES_CATALOG grade-6 primaryTopicId).
+  ...(Object.fromEntries(Object.keys(G6_MAKERS).map((skill) => [skill, 'percentages-proportions'])) as Record<GradeSixSkillId, TopicId>),
 };
 
 /** Which mission question each skill re-creates. Missions not listed have no new-numbers button yet. */
@@ -175,6 +180,7 @@ export const MISSION_PRACTICE: Record<string, PracticeSkillId> = {
   'G01-13-L02': 'g1-more-votes',
   'G01-14-L01': 'g1-choose-operation',
   'G01-14-L02': 'g1-check-sum',
+  ...G6_MISSION_PRACTICE,
 };
 
 type Rng = ReturnType<typeof createSeededRng>;
@@ -1016,6 +1022,7 @@ function distinctDigits(rng: Rng, count: number): number[] {
 
 const MAKERS: Record<PracticeSkillId, (rng: Rng) => Draft> = {
   ...G1_MAKERS,
+  ...G6_MAKERS,
   // "What is the value of 5 in 3528?"
   'place-value-digit': (rng) => {
     const digits = distinctDigits(rng, 4);

@@ -1,0 +1,100 @@
+---
+// Grade 3 world: "Build a house for your family". Uses the shared grade frame
+// (GradeHub); the house script (houseAdventure) drives the name and colour.
+// Eight chapters = eight building stages (src/content/grade3/houseStory.ts).
+import type { Locale } from '../../math/core/types';
+import { HOUSE_CHAPTERS, HOUSE_MISSIONS, HOUSE_PIECES } from '../../content/grade3/houseStory';
+import { GRADE_THREE_PROJECT } from '../../content/grade3';
+import { buildSchoolLessonUrl } from '../../i18n/routes';
+import { t } from '../../i18n/translations';
+import GradeHub from './GradeHub.astro';
+import HouseScene from './HouseScene.astro';
+
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+
+const chapters = HOUSE_CHAPTERS.map((chapter) => ({
+  id: chapter.id,
+  icon: chapter.icon,
+  title: chapter.title[locale],
+  missions: chapter.missions.map((mission) => ({
+    id: mission.id,
+    title: mission.title[locale],
+    href: buildSchoolLessonUrl(locale, 'grade-3', mission.id),
+  })),
+}));
+
+const colours = [
+  { id: 'terracotta', label: es ? 'Terracota' : 'Terracotta', paint: '#ce9879' },
+  { id: 'sage', label: es ? 'Verde' : 'Green', paint: '#a4b58a' },
+  { id: 'blue', label: es ? 'Azul' : 'Blue', paint: '#8eb1bb' },
+];
+---
+
+<GradeHub
+  locale={locale}
+  gradeId="grade-3"
+  gradeLabel={es ? '3.º grado' : 'Grade 3'}
+  accent="#6F8F5A"
+  title={es ? '¡Construí la casa de tu familia!' : 'Build your family’s house!'}
+  intro={es ? 'Cada respuesta pone una pieza.' : 'Every answer adds a piece.'}
+  startHref={buildSchoolLessonUrl(locale, 'grade-3', HOUSE_MISSIONS[0].id)}
+  startLabel={es ? 'Construir' : 'Build'}
+  artFill
+  chapters={chapters}
+  missionAttr="data-city-mission-link"
+  rootAttrs={{ 'data-city-root': '', 'data-city-map': '', 'data-locale': locale }}
+  finale={{
+    icon: '🎉',
+    title: es ? '¡La fiesta de la casa nueva!' : 'The housewarming party!',
+    text: es ? 'La última misión termina con una fiesta.' : 'The last mission ends with a party.',
+  }}
+>
+  <HouseScene slot="art" progress={HOUSE_PIECES} />
+
+  <details class="mk-details" slot="style">
+    <summary>{es ? 'Dale tu estilo a la casa' : 'Make the house yours'}</summary>
+    <div class="mk-card mk-stack">
+      <div class="mk-field">
+        <label for="house-name">{es ? 'Nombre de la casa' : 'House name'}</label>
+        <input class="mk-input" id="house-name" type="text" maxlength="24" data-city-name placeholder={es ? 'Nuestra casa' : 'Our house'} autocomplete="off" />
+      </div>
+      <div class="mk-tabs" role="group" aria-label={es ? 'Color de las paredes' : 'Wall colour'}>
+        {colours.map((colour) => (
+          <button type="button" data-city-color={colour.id} aria-pressed={colour.id === 'terracotta' ? 'true' : 'false'}>
+            <span class="mk-dot" style={`background:${colour.paint};`} aria-hidden="true"></span>
+            {colour.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </details>
+
+  <span slot="list-title" data-city-name-display>{es ? 'Nuestra casa' : 'Our house'}</span>
+
+  <details class="mk-details" id="city-families" slot="families">
+    <summary>{t(locale, 'homeFamilyTitle')}</summary>
+    <div class="mk-card mk-stack">
+      <p class="mk-text">{es ? '41 misiones con dos desafíos cada una. El chico o la chica ayuda a construir la casa de su familia: cada respuesta correcta pone una pieza, 82 en total. Practicamos números hasta diez mil, las cuatro operaciones, planos, figuras, medidas, tiempo y datos.' : '41 missions with two challenges each. Your child helps build the family’s house: each correct answer adds a piece, 82 in all. Practice numbers up to ten thousand, the four operations, plans, shapes, measurement, time, and data.'}</p>
+      <p class="mk-text">{es ? 'Podés abrir cualquier misión. Solo el nombre de la casa y el color se recuerdan en este navegador. Al final de cada unidad hay cinco preguntas adicionales.' : 'Open any mission. Only the house name and colour are remembered in this browser. Each unit ends with five additional questions.'}</p>
+      <ul class="mk-list">
+        {HOUSE_CHAPTERS.map((chapter) => (
+          <li><a href={buildSchoolLessonUrl(locale, 'grade-3', chapter.missions[0].id)}>{chapter.number}. {chapter.title[locale]}</a>: {chapter.stage[locale]}</li>
+        ))}
+      </ul>
+      <section class="mk-stack" id="project">
+        <h2 class="mk-heading">{GRADE_THREE_PROJECT.title[locale]}</h2>
+        <p class="mk-text">{GRADE_THREE_PROJECT.introduction[locale]}</p>
+        <ol class="mk-list">{GRADE_THREE_PROJECT.tasks.map((task) => <li>{task[locale]}</li>)}</ol>
+        <details class="mk-details">
+          <summary>{es ? 'Cómo acompañar' : 'How to help'}</summary>
+          <ul class="mk-list">{GRADE_THREE_PROJECT.rubric.map((item) => <li>{item[locale]}</li>)}</ul>
+        </details>
+      </section>
+    </div>
+  </details>
+</GradeHub>
+
+<script>
+  import '../../scripts/houseAdventure';
+</script>

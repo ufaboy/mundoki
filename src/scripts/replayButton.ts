@@ -1,9 +1,9 @@
-// "Play again" in the mission worlds (city, island, moon, ocean, park, road).
+// "Play again" in the mission worlds (city, island, moon, race, park, road).
 // Each world's own script does the actual reset. This module makes the button
 // honest: it is hidden while there is nothing to replay, and pressing it always
 // shows a visible reaction (a short message, the first challenge back in view).
 
-const WORLDS = ['city', 'island', 'moon', 'ocean', 'park', 'road'] as const;
+const WORLDS = ['city', 'island', 'moon', 'race', 'park', 'road'] as const;
 
 function setup(world: (typeof WORLDS)[number], button: HTMLElement): void {
   const root = button.closest<HTMLElement>(`[data-${world}-root]`) ?? button.closest<HTMLElement>('[data-locale]');

@@ -20,8 +20,8 @@ const kind=['G05-02','G05-03','G05-04','G05-05'].includes(packageId)?'fractions'
   <label>{es?'Operación':'Operation'} <select data-operation><option value="compare">{es?'Comparar':'Compare'}</option><option value="add">{es?'Sumar':'Add'}</option><option value="subtract">{es?'Restar A − B':'Subtract A − B'}</option></select></label>
  </>}
  {kind==='mode' && <>
-  <p>{es?'Investigamos cuántos libros leyó cada persona. Ajustá cuántas personas dieron cada respuesta. El valor y su frecuencia no son lo mismo.':'We investigate how many books each person read. Adjust how many people gave each answer. The value and its frequency are different.'}</p>
-  {[0,1,2,3,4].map((n)=><label>{es?`${n} ${n === 1 ? 'libro' : 'libros'}: personas`:`${n} ${n === 1 ? 'book' : 'books'}: people`} <input type="range" min="0" max="10" step="1" value={[1,2,3,3,1][n]} data-frequency={n}/></label>)}
+  <p>{es?'Contamos cuántos cráteres tiene cada cuadrado de Fobos. Ajustá cuántos cuadrados tienen cada cantidad. El valor y su frecuencia no son lo mismo.':'We count how many craters each square on Phobos has. Adjust how many squares have each number. The value and its frequency are different.'}</p>
+  {[0,1,2,3,4].map((n)=><label>{es?`${n} ${n === 1 ? 'cráter' : 'cráteres'}: cuadrados`:`${n} ${n === 1 ? 'crater' : 'craters'}: squares`} <input type="range" min="0" max="10" step="1" value={[1,2,3,3,1][n]} data-frequency={n}/></label>)}
  </>}
  <p data-g5-summary role="status" aria-live="polite"></p>
  <div data-g5-model></div>

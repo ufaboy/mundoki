@@ -26,11 +26,11 @@ const angles = [
  </svg><figcaption>{es?'A y B son los extremos de la base. C es un punto donde se cruzan los arcos. Usá una regla para las medidas en papel; el tamaño en pantalla puede cambiar.':'A and B are the endpoints of the base. C is a point where the arcs cross. Use a ruler for measurements on paper; the size on screen can change.'}</figcaption>
  </figure>}
 {lessonId==='G04-13-L03' && <figure class="island-worked-diagram" data-island-worked-chart>
- <figcaption>{es?'Actividad elegida por doce estudiantes':'Activity chosen by twelve students'}</figcaption>
- <svg viewBox="0 0 440 300" role="img" aria-label={es?'Votos: dibujo 6, música 4, lectura 2. El eje vertical empieza en cero y avanza de dos en dos.':'Votes: drawing 6, music 4, reading 2. The vertical axis starts at zero and increases by twos.'}>
+ <figcaption>{es?'Lugar elegido por doce chicos del aeroclub':'Place chosen by twelve aeroclub kids'}</figcaption>
+ <svg viewBox="0 0 440 300" role="img" aria-label={es?'Votos: Iguazú 6, glaciar 4, ballenas 2. El eje vertical empieza en cero y avanza de dos en dos.':'Votes: Iguazú 6, glacier 4, whales 2. The vertical axis starts at zero and increases by twos.'}>
  <text x="15" y="25" font-size="18" fill="currentColor">{es?'Votos':'Votes'}</text>
  {[0,2,4,6].map(value=><g><path d={`M60 ${240-value*30}H410`} stroke="#b6c8c2"/><text x="48" y={246-value*30} text-anchor="end" font-size="18" fill="currentColor">{value}</text></g>)}
- {[6,4,2].map((value,i)=><g><rect x={90+i*110} y={240-value*30} width="55" height={value*30} fill="#378d8b"/><text x={117.5+i*110} y={230-value*30} text-anchor="middle" font-size="18" fill="currentColor">{value}</text><text x={117.5+i*110} y="265" text-anchor="middle" font-size="17" fill="currentColor">{(es?['Dibujo','Música','Lectura']:['Drawing','Music','Reading'])[i]}</text></g>)}
- <path d="M60 40V240H410" fill="none" stroke="currentColor" stroke-width="2"/><text x="240" y="293" text-anchor="middle" font-size="18" fill="currentColor">{es?'Actividades':'Activities'}</text>
+ {[6,4,2].map((value,i)=><g><rect x={90+i*110} y={240-value*30} width="55" height={value*30} fill="#378d8b"/><text x={117.5+i*110} y={230-value*30} text-anchor="middle" font-size="18" fill="currentColor">{value}</text><text x={117.5+i*110} y="265" text-anchor="middle" font-size="17" fill="currentColor">{(es?['Iguazú','Glaciar','Ballenas']:['Iguazú','Glacier','Whales'])[i]}</text></g>)}
+ <path d="M60 40V240H410" fill="none" stroke="currentColor" stroke-width="2"/><text x="240" y="293" text-anchor="middle" font-size="18" fill="currentColor">{es?'Lugares':'Places'}</text>
  </svg>
  </figure>}

@@ -1,180 +1,176 @@
-import {GRADE_FIVE_LESSONS,GRADE_FIVE_PACKAGES} from './index';
-import {text} from '../lessonModel';
-export type MoonScene='hangar'|'hull'|'tank'|'cargo'|'console'|'launch'|'flight'|'landing'|'rover'|'research'|'home';
-const definitions: [MoonScene,string,string,string,string,string,string[]][] = [
- [
-  "hangar",
-  "🧰",
-  "Abrimos el hangar|Opening the hangar",
-  "Revisá los cálculos para poner en marcha la grúa.|Check the calculations to start the crane.",
-  "La grúa trae la base.|The crane delivers the base.",
-  "La base está instalada.|The base is installed.",
-  [
-   "Abrimos el hangar|Opening the hangar",
-   "El inventario del equipo|Team inventory",
-   "La primera pieza|The first part"
-  ]
- ],
- [
-  "hull",
-  "🚀",
-  "Construimos el cohete|Building the rocket",
-  "Explorá fracciones para preparar las secciones del cohete.|Explore fractions to prepare the rocket sections.",
-  "La sección está alineada.|The section is aligned.",
-  "La sección encaja en el cohete.|The section fits the rocket.",
-  [
-   "Secciones del cohete|Rocket sections",
-   "Unidades para construir|Building units",
-   "Más de una sección|More than one section"
-  ]
- ],
- [
-  "tank",
-  "🔧",
-  "Conectamos los sistemas|Connecting systems",
-  "Comprobá equivalencias para conectar los depósitos.|Check equivalences to connect the tanks.",
-  "El depósito está conectado.|The tank is connected.",
-  "El indicador del sistema se enciende.|The system indicator lights up.",
-  [
-   "Piezas equivalentes|Equivalent parts",
-   "Conectores a medida|Matching connectors",
-   "Simplificá el plano|Simplify the plan"
-  ]
- ],
- [
-  "tank",
-  "⚖",
-  "Comprobamos los depósitos|Checking the tanks",
-  "Compará las cantidades antes de aprobar los sistemas.|Compare quantities before approving the systems.",
-  "El depósito está conectado.|The tank is connected.",
-  "El indicador del sistema se enciende.|The system indicator lights up.",
-  [
-   "Compará las reservas|Compare reserves",
-   "Una referencia común|A common reference",
-   "Orden en el tablero|Control panel order"
-  ]
- ],
- [
-  "cargo",
-  "📦",
-  "Cargamos las provisiones|Loading supplies",
-  "Calculá cantidades y restos para preparar la carga.|Calculate quantities and remainders to prepare the cargo.",
-  "Las provisiones llegan a la compuerta.|Supplies reach the hatch.",
-  "La carga entra y la compuerta se cierra.|Cargo goes inside and the hatch closes.",
-  [
-   "Sumá las provisiones|Add the supplies",
-   "Combiná las medidas|Combine measurements",
-   "Revisá lo que queda|Check what remains"
-  ]
- ],
- [
-  "console",
-  "🎛",
-  "Calibramos los instrumentos|Calibrating instruments",
-  "Leé los decimales para activar el tablero de vuelo.|Read decimals to activate the flight console.",
-  "El monitor se enciende.|The monitor switches on.",
-  "La antena transmite la señal.|The antenna transmits the signal.",
-  [
-   "El tablero decimal|The decimal console",
-   "Ceros importantes|Important zeros",
-   "Compará las lecturas|Compare readings"
-  ]
- ],
- [
-  "console",
-  "📡",
-  "Últimos controles|Final checks",
-  "Relacioná fracciones y decimales antes del despegue.|Connect fractions and decimals before liftoff.",
-  "El monitor se enciende.|The monitor switches on.",
-  "La antena transmite la señal.|The antenna transmits the signal.",
-  [
-   "Dos formas de medir|Two ways to measure",
-   "Lecturas equivalentes|Equivalent readings",
-   "Elegí la representación|Choose the representation"
-  ]
- ],
- [
-  "launch",
-  "🔥",
-  "¡Despegamos!|Liftoff!",
-  "Completá los cálculos del simulador para avanzar en el lanzamiento.|Complete the simulator calculations to advance the launch.",
-  "Los motores están encendidos.|The engines are on.",
-  "¡El cohete despega!|The rocket lifts off!",
-  [
-   "Encendé los motores|Start the engines",
-   "Dejamos la plataforma|Leaving the pad",
-   "Rumbo al espacio|Heading into space"
-  ]
- ],
- [
-  "flight",
-  "🌎",
-  "Camino a la Luna|On the way to the Moon",
-  "Elegí estrategias para completar los controles de vuelo.|Choose strategies to complete the flight checks.",
-  "La nave orienta sus paneles.|The spacecraft aligns its panels.",
-  "La nave se acerca a la Luna.|The spacecraft approaches the Moon.",
-  [
-   "El plan de vuelo|The flight plan",
-   "Revisá la trayectoria|Check the trajectory",
-   "La Luna a la vista|Moon in sight"
-  ]
- ],
- [
-  "landing",
-  "🌕",
-  "Aterrizamos|Landing",
-  "Investigá figuras y redes para preparar el módulo lunar.|Investigate shapes and nets to prepare the lunar module.",
-  "Las patas de aterrizaje se despliegan.|The landing legs unfold.",
-  "¡El módulo aterriza en la Luna!|The module lands on the Moon!",
-  [
-   "El módulo lunar|The lunar module",
-   "Piezas que cierran|Parts that close",
-   "Contacto con la Luna|Lunar touchdown"
-  ]
- ],
- [
-  "rover",
-  "🔬",
-  "Laboratorio lunar|Lunar laboratory",
-  "Comprobá medidas para transportar las muestras.|Check measurements to transport the samples.",
-  "La muestra está en el explorador.|The sample is in the rover.",
-  "El explorador lleva la muestra al laboratorio.|The rover carries the sample to the lab.",
-  [
-   "Preparamos los instrumentos|Preparing instruments",
-   "Medidas de las muestras|Sample measurements",
-   "Medir con cuidado|Measure carefully"
-  ]
- ],
- [
-  "research",
-  "📊",
-  "Compartimos descubrimientos|Sharing discoveries",
-  "Organizá datos y conclusiones para transmitir el informe.|Organize data and conclusions to transmit the report.",
-  "El informe aparece en la pantalla.|The report appears on screen.",
-  "La antena envía el informe a la Tierra.|The antenna sends the report to Earth.",
-  [
-   "El registro de la misión|The mission record",
-   "Organizá los resultados|Organize the results",
-   "Un informe para la Tierra|A report for Earth"
-  ]
- ],
- [
-  "home",
-  "🎉",
-  "Volvemos a casa|Coming home",
-  "Planificá la bienvenida del equipo con recetas y un presupuesto.|Plan the team welcome with recipes and a budget.",
-  "La cápsula regresa bajo su paracaídas.|The capsule returns under its parachute.",
-  "¡El equipo está en casa y la bienvenida está lista!|The team is home and the welcome is ready!",
-  [
-   "La bienvenida del equipo|Welcoming the team",
-   "¡Misión cumplida!|Mission accomplished!"
-  ]
- ]
+// Grade 5 story: "The Cóndor" — build a spaceship at Base Patagonia, fly to the
+// Moon, Mars, and Phobos, and come home. Scenario: docs/grade-5-space-scenario.md.
+// Each mission is one lesson; rewards[i] is shown after checks[i] and names what
+// that answer made possible. Introductions and rewards may use {name} (the chosen
+// hero); MoonLesson.astro renders them through HeroText. Lesson checks never do.
+import {GRADE_FIVE_LESSONS} from './index';
+import type {LocalizedText} from '../../math/core/types';
+export type MoonScene='hangar'|'hull'|'tank'|'cargo'|'console'|'launch'|'flight'|'landing'|'rover'|'research'|'cruise'|'mars'|'phobos'|'home';
+const t=(es:string,en:string):LocalizedText=>({'es-AR':es,'en-US':en});
+type Mission=[id:string,scene:MoonScene,title:LocalizedText,introduction:LocalizedText,rewards:[LocalizedText,LocalizedText]];
+type Chapter={id:string;icon:string;title:LocalizedText;opening:LocalizedText;missions:Mission[]};
+const chapters:Chapter[]=[
+ {id:'hangar',icon:'🧰',title:t('El hangar de Base Patagonia','The hangar at Base Patagonia'),
+  opening:t('La ingeniera Vera despliega el plano del Cóndor. Miles de piezas, y cada número tiene que estar bien.','Engineer Vera unrolls the plan of the Cóndor. Thousands of parts, and every number must be right.'),
+  missions:[
+  ['G05-01-L01','hangar',t('Remaches y baldosas','Rivets and tiles'),
+   t('{name} entra al hangar gigante. La ingeniera Vera necesita pedir remaches para las aletas y baldosas para el escudo térmico. Busquemos cuentas rápidas que no cambien el resultado.','{name} walks into the huge hangar. Engineer Vera must order rivets for the fins and tiles for the heat shield. Let’s find quick calculations that keep the result the same.'),
+   [t('Vera pide 288 remaches: alcanzan justo para las seis aletas.','Vera orders 288 rivets: exactly enough for the six fins.'),t('Las 700 baldosas quedan apiladas junto a la punta del cohete.','The 700 tiles are stacked next to the rocket nose.')]],
+  ['G05-01-L02','hangar',t('¿Puede la grúa?','Can the crane do it?'),
+   t('La grúa del hangar levanta hasta 5.000 kg. {name} y Vera tienen que subir los tubos de combustible. Primero una estimación; después, el número exacto para la bitácora.','The hangar crane lifts up to 5,000 kg. {name} and Vera must lift the fuel-line segments. First an estimate; then the exact number for the mission log.'),
+   [t('La carga está muy por debajo de 5.000 kg: la grúa empieza a subir los tubos.','The load is far below 5,000 kg: the crane starts lifting the segments.'),t('Vera anota la masa exacta en la bitácora de misión.','Vera writes the exact mass in the mission log.')]],
+  ['G05-01-L03','hangar',t('La calculadora de Tuerca','Tuerca’s calculator'),
+   t('Tuerca, el robot ayudante, llega rodando con una calculadora más grande que él. Hay que repartir los cables de los motores… y revisar lo que muestra la pantalla.','Tuerca, the little helper robot, rolls in with a calculator bigger than itself. The engine cables must be shared out… and the screen must be checked.'),
+   [t('Cada módulo de motor recibe sus 40 cables.','Each engine module gets its 40 cables.'),t('El error de Tuerca queda al descubierto. ¡La base del cohete está montada sobre la plataforma!','Tuerca’s mistake is caught. The rocket base stands on the launch frame!')]],
+ ]},
+ {id:'hull',icon:'🚀',title:t('Construimos el casco','Building the hull'),
+  opening:t('Ahora el cuerpo del Cóndor. Los planos están llenos de fracciones.','Now the body of the Cóndor. The plans are full of fractions.'),
+  missions:[
+  ['G05-02-L01','hull',t('Los tornillos de la escotilla','The hatch bolts'),
+   t('{name} ayuda a cerrar las escotillas del casco. Algunos tornillos tienen que ser de titanio. ¿Cuántos? Depende de qué conjunto de tornillos estemos mirando.','{name} helps close the hull hatches. Some bolts must be titanium. How many? It depends on which set of bolts we look at.'),
+   [t('Los 3 tornillos de titanio van en las esquinas de la escotilla.','The 3 titanium bolts go into the corners of the hatch.'),t('Las dos escotillas quedan atornilladas.','Both hatches are bolted.')]],
+  ['G05-02-L02','hull',t('La escalera de la cabina','The cockpit ladder'),
+   t('Para subir a la cabina hace falta una escalera. Vera mide con pasos de una fracción de metro. ¿Qué largo tiene que tener?','A ladder is needed to climb into the cockpit. Vera measures in steps of a fraction of a metre. How long must it be?'),
+   [t('La escalera se corta y queda fija al casco.','The ladder is cut and fixed to the hull.'),t('Las medidas se revisan con la nueva barra: la escalera sigue encajando.','The measurements are checked with the new bar: the ladder still fits.')]],
+  ['G05-02-L03','hull',t('El caño de combustible','The fuel pipe'),
+   t('Un caño de combustible recorre el casco de punta a punta. Mide más de un metro, y la hoja de pedido pide números mixtos.','A fuel pipe runs along the hull. It is longer than one metre, and the order sheet asks for mixed numbers.'),
+   [t('El caño se corta a la medida justa.','The pipe is cut to the exact length.'),t('El soporte de la antena queda marcado en el casco.','The antenna mount is marked on the hull.')]],
+  ['G05-03-L01','hull',t('Paneles solares','Solar panels'),
+   t('Las alas del Cóndor llevan paneles solares. Cada panel se divide en celdas más chicas, pero la parte que mira al Sol no puede cambiar.','The Cóndor’s wings carry solar panels. Each panel is split into smaller cells, but the part facing the Sun must not change.'),
+   [t('El panel queda cableado: 12 celdas iguales.','The panel is wired: 12 equal cells.'),t('El panel se instala con 8 celdas hacia el Sol.','The panel is installed with 8 cells facing the Sun.')]],
+  ['G05-03-L02','hull',t('Aislación para los tanques','Insulation for the tanks'),
+   t('La fábrica arma las paredes del tanque con placas, pero el plano usa otra fracción. Hay que escribir la misma parte con otras placas.','The factory builds the tank walls from plates, but the plan uses a different fraction. We must write the same part with other plates.'),
+   [t('Las 12 placas de aislación quedan pedidas.','The 12 insulation plates are ordered.'),t('La nota de Tuerca queda tachada: el plano sigue correcto.','Tuerca’s note is crossed out: the plan stays correct.')]],
+  ['G05-03-L03','hull',t('Pintamos la punta','Painting the nose'),
+   t('La punta del Cóndor ya está casi pintada. La etiqueta del control tiene poco espacio: necesita la fracción más simple.','The nose of the Cóndor is almost painted. The inspection label has little space: it needs the simplest fraction.'),
+   [t('La etiqueta se imprime con 2/3.','The label is printed with 2/3.'),t('¡El casco del Cóndor está cerrado!','The hull of the Cóndor is closed!')]],
+ ]},
+ {id:'tanks',icon:'⛽',title:t('Combustible, agua y oxígeno','Fuel, water, and oxygen'),
+  opening:t('En la Luna no hay aire. El oxígeno, el agua y el combustible salen desde acá.','The Moon has no air. Oxygen, water, and fuel all leave from here.'),
+  missions:[
+  ['G05-04-L01','tank',t('Los indicadores','The gauges'),
+   t('Cada tanque tiene un indicador con fracciones. Los tanques de cada tipo son del mismo tamaño. {name} decide cuál conectar primero.','Every tank has a gauge marked in fractions. Tanks of one kind are the same size. {name} decides which one to connect first.'),
+   [t('El tanque más lleno se conecta al motor principal.','The fuller tank is connected to the main engine.'),t('La manguera va primero al tanque con menos agua.','The hose goes first to the tank with less water.')]],
+  ['G05-04-L02','tank',t('Botellas de oxígeno','Oxygen bottles'),
+   t('Las botellas de oxígeno marcan sextos, cuartos y tercios. Para compararlas, hace falta una parte común.','The oxygen bottles show sixths, quarters, and thirds. To compare them, we need a common part.'),
+   [t('La botella con más oxígeno sube primero a la nave.','The bottle with more oxygen goes on board first.'),t('Los indicadores reciben una escala en doceavos.','The gauges get a twelfths scale.')]],
+  ['G05-04-L03','cargo',t('Camiones y cajones','Trucks and crates'),
+   t('Llegan camiones de combustible y cajones de provisiones. La grúa trabaja en orden: primero lo más liviano.','Fuel trucks and supply crates arrive. The crane works in order: lightest first.'),
+   [t('El primer camión descarga en un tanque vacío; el otro llena un tanque y un bidón extra.','The first truck unloads into an empty tank; the other fills a tank and a spare drum.'),t('Los cajones suben a la nave en el orden correcto.','The crates go up into the ship in the right order.')]],
+  ['G05-05-L01','tank',t('Refrigerante y agua','Coolant and water'),
+   t('El motor necesita refrigerante y la tripulación necesita agua. Los tanques se llenan por partes iguales.','The engine needs coolant and the crew needs water. The tanks are filled in equal parts.'),
+   [t('El refrigerante del motor está listo.','The engine coolant is ready.'),t('La prueba de la cañería queda anotada en la bitácora.','The pipe test is written in the mission log.')]],
+  ['G05-05-L02','tank',t('Dos bombas a la vez','Two pumps at once'),
+   t('Dos bombas llenan el mismo tanque, cada una con una fracción distinta. Y una botella de oxígeno perdió parte en la prueba de fugas.','Two pumps fill the same tank, each with a different fraction. And an oxygen bottle lost some in the leak test.'),
+   [t('Las bombas siguen funcionando: el tanque se llena.','The pumps keep running: the tank fills up.'),t('Vera pide recargar la botella de oxígeno.','Vera orders the oxygen bottle to be topped up.')]],
+  ['G05-05-L03','tank',t('Últimas pruebas','Final tests'),
+   t('Antes del lanzamiento, la tripulación prueba todo con el agua de una botella. ¿Cuánto queda para el viaje?','Before launch, the crew tests everything with the water from one bottle. How much is left for the trip?'),
+   [t('Lo que queda se guarda para el día del despegue.','What is left is stored for launch day.'),t('¡Todos los tanques están llenos! El Cóndor espera en la plataforma.','All tanks are full! The Cóndor waits on the launch pad.')]],
+ ]},
+ {id:'launch',icon:'🔥',title:t('Cuenta regresiva y vuelo a la Luna','Countdown and the flight to the Moon'),
+  opening:t('La tripulación se pone los trajes. En el tablero hay números decimales por todas partes.','The crew puts on spacesuits. The console shows decimal numbers everywhere.'),
+  missions:[
+  ['G05-06-L01','console',t('El tablero de presión','The pressure display'),
+   t('El capitán Leo, el piloto, revisa el tablero con {name}: «Leelos con cuidado. Una posición equivocada y volamos a otra parte».','Captain Leo, the pilot, checks the console with {name}: “Read them carefully. One wrong place, and we fly somewhere else.”'),
+   [t('Vera ajusta la válvula en el valor correcto.','Vera sets the valve to the right value.'),t('Empieza la cuenta regresiva: 10… 9… 8…','The countdown starts: 10… 9… 8…')]],
+  ['G05-06-L02','launch',t('¡Despegue!','Liftoff!'),
+   t('La lista de control indica cuánta potencia dar a los motores. La pantalla puede escribir el mismo número de varias formas.','The checklist says how much power to give the engines. The screen can write the same number in several ways.'),
+   [t('Los motores se encienden.','The engines ignite.'),t('¡Despegue! El Cóndor deja la plataforma.','Liftoff! The Cóndor leaves the launch pad.')]],
+  ['G05-06-L03','flight',t('Rumbo a la Luna','Heading to the Moon'),
+   t('El Cóndor vuela hacia la Luna. Leo tiene que elegir el encendido de motor correcto y la velocidad segura para bajar.','The Cóndor flies towards the Moon. Leo must choose the right engine burn and a safe speed to land.'),
+   [t('La nave gira hacia la Luna.','The ship turns towards the Moon.'),t('¡El Cóndor aterriza en la Luna!','The Cóndor lands on the Moon!')]],
+ ]},
+ {id:'moon-base',icon:'🌕',title:t('La base lunar','The lunar base'),
+  opening:t('Polvo gris, cielo negro y la Tierra en la ventana. Acá todo pesa cerca de 1/6 de lo que pesa en la Tierra.','Grey dust, a black sky, and the Earth in the window. Here everything weighs about 1/6 of its weight on Earth.'),
+  missions:[
+  ['G05-07-L01','landing',t('El campo solar','The solar field'),
+   t('Tuerca salta y flota. En la pequeña base Luna Sur, {name} tiene que recargar las baterías. El campo solar es una cuadrícula de 10 × 10 celdas, y el polvo lunar las tapa.','Tuerca jumps and floats. At the small base Luna Sur, {name} must recharge the batteries. The solar field is a 10 × 10 grid of cells, and moon dust covers them.'),
+   [t('La pantalla de la base confirma la carga de la batería.','The base display confirms the battery charge.'),t('Brillan 40 celdas limpias: la base tiene energía.','40 clean cells shine: the base has power.')]],
+  ['G05-07-L02','research',t('La bomba de combustible','The fuel pump'),
+   t('Las máquinas de la base solo aceptan decimales, pero los planes de la tripulación usan fracciones. En la pared hay una tabla de equivalencias.','The base machines only accept decimals, but the crew’s plans use fractions. A conversion table hangs on the wall.'),
+   [t('La bomba entrega la cantidad justa de combustible.','The pump delivers the exact amount of fuel.'),t('Leo agrega una pequeña reserva de seguridad de oxígeno.','Leo adds a small safety reserve of oxygen.')]],
+  ['G05-07-L03','rover',t('Reparamos el rover','Repairing the rover'),
+   t('El rover lunar tiene un cable cortado y la tripulación necesita sellar sus botas contra el polvo. ¿Fracción o decimal? Elegimos la escritura que sirve.','The lunar rover has a cut cable, and the crew must seal their boots against the dust. Fraction or decimal? We choose the form that helps.'),
+   [t('El cable queda unido: 0,75 m.','The cable is joined: 0.75 m.'),t('Las botas de todos quedan selladas contra el polvo.','Everyone’s boots are sealed against the dust.')]],
+  ['G05-08-L01','rover',t('El brazo del rover','The rover arm'),
+   t('El brazo del rover tiene dos tramos. Para alcanzar la roca, hay que saber cuánto mide en total.','The rover arm has two segments. To reach the rock, we need its total length.'),
+   [t('El brazo alcanza la roca.','The arm reaches the rock.'),t('¡El rover levanta su primera roca lunar!','The rover picks up its first moon rock!')]],
+  ['G05-08-L02','research',t('Combustible para Marte','Fuel for Mars'),
+   t('Para ir a Marte, el Cóndor carga combustible del tanque de reserva de la base. Hay que saber cuánto queda para la próxima nave.','To go to Mars, the Cóndor takes fuel from the base’s spare tank. We need to know how much is left for the next ship.'),
+   [t('La base guarda una reserva para la próxima nave.','The base keeps a reserve for the next ship.'),t('La bitácora de combustible es correcta.','The fuel log is correct.')]],
+  ['G05-08-L03','research',t('Agua y antena','Water and antenna'),
+   t('Últimos preparativos en la Luna: el agua para beber y la antena nueva. Unas medidas están en litros y metros; otras, en mililitros y centímetros.','Last preparations on the Moon: drinking water and the new antenna. Some measurements are in litres and metres; others in millilitres and centimetres.'),
+   [t('La botella de agua se guarda para el viaje.','The water bottle is packed for the trip.'),t('La antena encaja. ¡El Cóndor despega de la Luna rumbo a Marte!','The antenna fits. The Cóndor lifts off from the Moon towards Mars!')]],
+ ]},
+ {id:'cruise',icon:'🌌',title:t('El largo camino a Marte','The long road to Mars'),
+  opening:t('Siete meses hasta Marte. Nadie nos trae un envío hasta acá.','Seven months to Mars. Nobody brings us a delivery out here.'),
+  missions:[
+  ['G05-09-L01','cruise',t('El invernadero','The greenhouse'),
+   t('{name} cuida el pequeño invernadero de la nave. Las semillas y la comida tienen que alcanzar todo el viaje.','{name} looks after the ship’s small greenhouse. Seeds and food must last the whole trip.'),
+   [t('Brota la primera lechuga.','The first lettuce sprouts.'),t('El plan de comida queda aprobado.','The food plan is approved.')]],
+  ['G05-09-L02','cruise',t('Regamos las plantas','Watering the plants'),
+   t('Las plantas reciben agua en porciones: algunas escritas como fracción, otras como decimal.','The plants get water in portions: some written as fractions, others as decimals.'),
+   [t('Las plantas quedan regadas.','The plants are watered.'),t('El agua guardada queda bien contada.','The stored water is counted correctly.')]],
+  ['G05-09-L03','cruise',t('Un tajo en la vela solar','A tear in the solar sail'),
+   t('Un pequeño meteorito hizo un tajo en la vela solar. Leo y Vera miden la cinta para repararla, pero cada uno usa una unidad distinta.','A tiny meteorite tore the solar sail. Leo and Vera measure tape for the repair, but each uses a different unit.'),
+   [t('El tajo queda sellado.','The tear is sealed.'),t('Marte aparece en la ventana, rojo y enorme.','Mars appears in the window, red and huge.')]],
+ ]},
+ {id:'mars',icon:'🔴',title:t('Marte y la tormenta de polvo','Mars and the dust storm'),
+  opening:t('El módulo toca el suelo rojo. Vera, por radio: «Llega una tormenta de polvo. ¡Armen el refugio!».','The module touches the red ground. Vera on the radio: “A dust storm is coming. Build the shelter!”'),
+  missions:[
+  ['G05-10-L01','mars',t('Paneles del refugio','Shelter panels'),
+   t('{name} ordena los paneles del refugio en cajones por familia: paralelogramos, rectángulos, rombos y cuadrados. Cuentan las propiedades, no cómo se ven.','{name} sorts the shelter panels into bins by family: parallelograms, rectangles, rhombuses, and squares. Properties count, not looks.'),
+   [t('El cajón queda completo y el piso del refugio se arma.','The bin is complete and the shelter floor is laid.'),t('Los paneles largos de las paredes quedan aprobados.','The long wall panels are accepted.')]],
+  ['G05-10-L02','mars',t('La puerta del refugio','The shelter door'),
+   t('La puerta tiene que cerrar bien contra el polvo. El panel debe ser un rectángulo de verdad, no solo parecerlo.','The door must close tightly against the dust. The panel must truly be a rectangle, not just look like one.'),
+   [t('La puerta cierra sin rendijas.','The door closes without gaps.'),t('La pared lateral queda en pie.','The side wall stands.')]],
+  ['G05-10-L03','mars',t('Cajas plegables','Folding boxes'),
+   t('Las provisiones se guardan en cajas que se arman doblando una red de cartón. Cada borde tiene que coincidir con otro de la misma medida.','Supplies are kept in boxes folded from a cardboard net. Every edge must meet another edge of the same length.'),
+   [t('Se cortan la tapa y el fondo de la caja.','The top and bottom of the box are cut.'),t('Se corrige la red y la caja cierra.','The net is fixed and the box closes.')]],
+  ['G05-11-L01','mars',t('Agua del hielo','Water from ice'),
+   t('En Marte hay hielo. La tripulación lo derrite para tener agua y prepara tubos para guardar muestras. Cada cosa se mide con su instrumento.','There is ice on Mars. The crew melts it for water and prepares tubes for samples. Each thing is measured with its own tool.'),
+   [t('El agua queda medida.','The water is measured.'),t('Se desempacan los tubos correctos.','The right tubes are unpacked.')]],
+  ['G05-11-L02','mars',t('Rocas y huellas','Rocks and tracks'),
+   t('Las balanzas, los filtros y el odómetro del rover usan unidades distintas. Convertir cambia el número, no la cantidad.','The scales, filters, and rover odometer use different units. Converting changes the number, not the amount.'),
+   [t('El agua pasa por el filtro.','The water goes through the filter.'),t('El rover queda guardado dentro del refugio.','The rover is parked inside the shelter.')]],
+  ['G05-11-L03','mars',t('Antes de la tormenta','Before the storm'),
+   t('El polvo ya se ve en el horizonte. {name} mide las últimas cosas con cuidado y anota solo lo que la regla permite leer.','Dust is already on the horizon. {name} measures the last things carefully and records only what the ruler can show.'),
+   [t('La roca queda etiquetada con una medida honesta.','The rock is labelled with an honest measurement.'),t('La rendija se sella. La tormenta pasa sobre un refugio cerrado.','The gap is sealed. The storm passes over a closed shelter.')]],
+ ]},
+ {id:'phobos',icon:'🪨',title:t('Fobos','Phobos'),
+  opening:t('Fobos es una luna pequeña de Marte, de unos 22 km, llena de cráteres. La gravedad es tan débil que Tuerca usa pies magnéticos.','Phobos is a small moon of Mars, about 22 km across, full of craters. Gravity is so weak that Tuerca wears magnetic feet.'),
+  missions:[
+  ['G05-12-L01','phobos',t('La hoja de datos','The data sheet'),
+   t('Solo se pueden llevar pocas muestras. Vera: «Primero datos, después decidimos dónde excavar». {name} divide la zona en cuadrados y anota cada uno.','Only a few samples can be taken. Vera: “Data first, then we decide where to dig.” {name} divides the area into squares and records each one.'),
+   [t('La columna de cráteres queda completa.','The crater column is filled in.'),t('Los códigos de color se usan bien.','The colour codes are used correctly.')]],
+  ['G05-12-L02','phobos',t('Tabla y gráfico','Table and chart'),
+   t('La tripulación contó los cráteres de 8 cuadrados: 0, 1, 1, 2, 2, 2, 3, 3. Ahora arma una tabla y un gráfico para enviarle a Vera.','The crew counted craters in 8 squares: 0, 1, 1, 2, 2, 2, 3, 3. Now it builds a table and a chart to send to Vera.'),
+   [t('La tabla de frecuencias está completa.','The frequency table is complete.'),t('El gráfico llega a Vera por radio.','The chart reaches Vera by radio.')]],
+  ['G05-12-L03','phobos',t('¿Dónde excavamos?','Where do we dig?'),
+   t('La tripulación quiere muestras de los cuadrados más típicos de Fobos, no de uno raro. La moda ayuda a decidir.','The crew wants samples from the most typical squares of Phobos, not a rare one. The mode helps decide.'),
+   [t('La tripulación excava en un cuadrado típico.','The crew digs in a typical square.'),t('Las cajas de muestras quedan selladas. ¡El Cóndor gira hacia la Tierra!','The sample boxes are sealed. The Cóndor turns towards Earth!')]],
+ ]},
+ {id:'home',icon:'🎉',title:t('De vuelta a casa','Coming home'),
+  opening:t('La Tierra crece en la ventana. Falta preparar la bienvenida y el informe.','The Earth grows in the window. The welcome and the report still need preparing.'),
+  missions:[
+  ['G05-13-L01','home',t('Panqueques espaciales','Space pancakes'),
+   t('Antes de aterrizar, {name} prepara panqueques para recibir al equipo de la base. Hay que controlar la harina y el presupuesto en créditos de misión.','Before landing, {name} makes pancakes to welcome the base team. Flour and the budget in mission credits must be checked.'),
+   [t('¡Los panqueques están listos!','The pancakes are ready!'),t('Con el vuelto compran una torta para el «cumpleaños» de Tuerca.','The change buys a cake for Tuerca’s “birthday”.')]],
+  ['G05-13-L02','home',t('El informe final','The final report'),
+   t('La cápsula baja con paracaídas cerca de Base Patagonia. En la escuela, {name} presenta el informe de la misión. Cada número tiene que poder comprobarse.','The capsule comes down under parachutes near Base Patagonia. At school, {name} presents the mission report. Every number must be checkable.'),
+   [t('El nuevo cráter de Fobos recibe su nombre.','The new crater on Phobos gets its name.'),t('El informe queda completo: la bitácora tiene las 76 marcas. ¡Misión cumplida!','The report is complete: the mission log has all 76 ticks. Mission accomplished!')]],
+ ]},
 ];
-export const MOON_CHAPTERS=GRADE_FIVE_PACKAGES.map((p,i)=>{
- const [scene,icon,title,introduction,firstReward,lastReward,titles]=definitions[i];
- const lessons=GRADE_FIVE_LESSONS.filter(l=>l.packageId===p.id);
- if(lessons.length!==titles.length)throw new Error(`Incomplete Moon chapter ${p.id}`);
- return {id:p.id,icon,title:text(title),missions:lessons.map((lesson,j)=>({id:lesson.id,packageId:p.id,scene,title:text(titles[j]),introduction:text(introduction),objective:lesson.objective,checks:lesson.checks,rewards:lesson.checks.map((_,k)=>text(k===lesson.checks.length-1?lastReward:firstReward))}))};
-});
+const lessons=new Map(GRADE_FIVE_LESSONS.map(l=>[l.id,l]));
+export const MOON_CHAPTERS=chapters.map(chapter=>({
+ id:chapter.id,icon:chapter.icon,title:chapter.title,opening:chapter.opening,
+ missions:chapter.missions.map(([id,scene,title,introduction,rewards])=>{
+  const lesson=lessons.get(id);
+  if(!lesson)throw new Error(`Unknown Grade 5 lesson in the space story: ${id}`);
+  return {id,packageId:lesson.packageId,scene,title,introduction,objective:lesson.objective,checks:lesson.checks,rewards};
+ }),
+}));
 export const MOON_MISSIONS=MOON_CHAPTERS.flatMap(chapter=>chapter.missions);
+export const MOON_EPILOGUE=t(
+ 'La cápsula aterriza cerca de Base Patagonia. Vera, la familia de {name} y todo el equipo esperan en el campo. Tuerca sale primero y se cae: otra vez la gravedad de la Tierra. En la escuela, {name} muestra la Luna, el refugio en Marte y el gráfico de cráteres de Fobos. Cada paso del viaje se encendió con una respuesta.',
+ 'The capsule lands near Base Patagonia. Vera, {name}’s family, and the whole base team wait on the field. Tuerca rolls out first and falls over: Earth gravity again. At school {name} shows the Moon, the Mars shelter, and the crater chart from Phobos. Every step of the trip was lit by an answer.');

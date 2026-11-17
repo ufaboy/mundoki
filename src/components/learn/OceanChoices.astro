@@ -1,5 +1,0 @@
----
-import type {Locale} from '../../math/core/types';
-const {locale}=Astro.props as {locale:Locale};const es=locale==='es-AR';
----
-<details class="city-notebook ocean-choices"><summary>{es?'Personalizá tu expedición':'Make the expedition yours'}</summary><div><label>{es?'Nombre de la expedición':'Expedition name'} <input data-ocean-name maxlength="24" autocomplete="off" placeholder={es?'Mi expedición':'My expedition'}/></label><div class="ocean-colors" role="group" aria-label={es?'Color del submarino':'Submarine color'}>{(['teal','coral','gold'] as const).map((color,i)=><button type="button" data-ocean-color={color} aria-pressed="false">{(es?['Turquesa','Coral','Dorado']:['Teal','Coral','Gold'])[i]}</button>)}</div><div class="ocean-colors" role="group" aria-label={es?'Emblema del equipo':'Team emblem'}>{(['star','wave','anchor'] as const).map((emblem,i)=><button type="button" data-ocean-emblem={emblem} aria-pressed="false">{['★','≈','⚓'][i]} {(es?['Estrella','Ola','Ancla']:['Star','Wave','Anchor'])[i]}</button>)}</div></div></details>

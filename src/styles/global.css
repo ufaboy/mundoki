@@ -969,6 +969,11 @@ input, select, textarea { font-size:var(--font-body); }
 @media(max-width:750px) { .city-map-hero { grid-template-columns:1fr; }.city-map-hero>div:first-child { padding:26px 26px 0; }.city-map-preview { padding-top:22px; }.city-map-preview .city-world { height:180px; }.city-mission-list { gap:12px; padding:14px; }.city-mission-list a { padding:14px; }.city-answer-options { flex-direction:column; }.city-map-finale { gap:14px; }.city-map-finale>span { font-size:1.5rem; } }
 @media(max-width:500px) { .city-map-hero h1 { font-size:2rem; }.city-map-hero .city-primary { width:100%; font-size:1rem; }.city-mission-list { grid-template-columns:1fr; }.city-mission-list a { display:grid; grid-template-columns:38px 1fr; gap:12px; align-items:center; }.city-mission-play { grid-column:2; padding:8px; }.city-district summary { padding:14px 12px; gap:10px; }.city-district-icon { width:44px; height:48px; font-size:1.5rem; }.city-district summary strong { font-size:1.111rem; }.city-map-finale { flex-direction:column; align-items:flex-start; }.city-challenge { padding:20px 16px; }.city-answer-options button { font-size:1rem; padding:14px; }.city-controls .city-primary { width:100%; margin-left:0; }.city-scene-top { padding:12px 14px 0; }.city-world { min-height:200px; }.city-reward { font-size:1rem; padding:14px; }.city-notebook>div { padding:0 16px 18px; }.city-example { padding:12px; }.city-example button[data-scene-item] { font-size:1rem; }.city-celebration { padding:20px 14px; }.city-place-model { padding:12px 8px; }.city-place-model>div { gap:5px; }.city-place-model button span { font-size:var(--font-caption); } }
 @media(prefers-reduced-motion:reduce) { .city-effect-one,.city-effect-two,.city-neighborhood,.city-crane-hook,.city-moving-truck,.city-moving-bus,.city-waiting-people,.city-repair-barrier,.city-mission-list a { transition:none; } }
+/* Grade 3 house: one piece per correct answer (HouseScene.astro). */
+.house-piece { transition:opacity .6s,transform .6s; transform-box:fill-box; }
+.house-piece.is-hidden { opacity:0; transform:translateY(-14px); }
+.house-count { font-weight:700; font-size:1rem; white-space:nowrap; }
+@media(prefers-reduced-motion:reduce) { .house-piece { transition:none; } }
 
 /* A welcoming, grade-first entrance to mathematics. */
 .math-grade-shortcuts { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; margin:0 0 24px; }.math-grade-shortcuts a { display:grid; place-items:center; min-height:54px; border:2px solid #d0dbbf; border-bottom-width:4px; border-radius:13px; background:#edf2e2; color:#4d6848; font-size:1.444rem; font-weight:700; text-decoration:none; }.math-grade-shortcuts a:nth-child(2n) { background:#e7efeb; border-color:#c6d9d0; }.math-grade-shortcuts a:hover { background:#dce8cc; border-color:#95b480; }
@@ -1236,6 +1241,12 @@ input, select, textarea { font-size:var(--font-body); }
 .island-stage[data-phase="complete"] .island-rover { transform:translateX(125px); }
 .island-stage[data-phase="complete"] .island-drone { transform:translate(80px,-105px); }
 .island-stage[data-phase="complete"] .island-explorer { transform:translateX(300px); transition-delay:.65s; }
+/* Grade 4 plane story: hidden future parts, the tarp that comes off, the take-off. */
+.plane-stage .plane-hidden { display:none; }
+.plane-stage .plane-leave { transition:opacity .65s ease; }
+.plane-stage[data-phase="complete"] .plane-leave { opacity:0; }
+.plane-stage .plane-takeoff { transition:transform 1.4s ease-in .4s; transform-box:fill-box; transform-origin:center; }
+.plane-stage[data-phase="complete"] .plane-takeoff { transform:translate(330px,-160px) rotate(-10deg); }
 .island-scene-caption { font-size:.8rem; text-align:center; margin:.5rem 1rem; color:#4e6366; }
 .island-choices input { max-width:100%; min-height:48px; padding:.5rem; border:2px solid #708c8c; border-radius:10px; font:inherit; }
 .island-colors { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; }
@@ -1346,46 +1357,82 @@ input, select, textarea { font-size:var(--font-body); }
 .moon-adventure [data-moon-badge]{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:50%;border:2px solid #7892aa;margin-left:6px;font-weight:700}
 .moon-adventure [data-moon-badge].is-done{background:#354d7a;color:#fff;border-color:#354d7a}
 
-/* Grade 6: Ocean Expedition. Narrative scenery and quantitative models stay separate. */
-.ocean-adventure{--ocean-paint:#378d8b}
-.ocean-adventure .city-map-hero{background:#dfefec}
-.ocean-adventure .city-primary{background:#225e72;color:white}
-.ocean-adventure .city-kicker{color:#376577}
-.ocean-stage{overflow:hidden;border-radius:24px}.ocean-stage svg{display:block;width:100%;height:auto}
-.ocean-built,.ocean-done{opacity:0;transition:opacity .7s ease}
-.ocean-stage[data-phase="building"] .ocean-built,.ocean-stage[data-phase="complete"] :is(.ocean-built,.ocean-done){opacity:1}
-.ocean-ship,.ocean-sub,.ocean-robot,.ocean-order,.ocean-marker{transition:transform 1.5s ease}
-.ocean-stage[data-phase="complete"] .ocean-ship{transform:translateX(280px)}
-.ocean-stage[data-phase="complete"] .ocean-sub{transform:translate(85px,55px)}
-.ocean-stage[data-phase="building"] .ocean-robot,.ocean-stage[data-phase="complete"] .ocean-robot{transform:translate(130px,-30px)}
-.ocean-stage[data-phase="complete"] .ocean-order{transform:translateX(370px)}
-.ocean-stage[data-phase="complete"] .ocean-marker{transform:translate(340px,-150px)}
-.ocean-scene-caption{font-size:.8rem;text-align:center;margin:.5rem 1rem;color:#4b6870}
-.ocean-choices input{max-width:100%;min-height:48px;padding:.5rem;border:2px solid #708c8c;border-radius:10px;font:inherit}
-.ocean-colors{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
-.ocean-colors button{min-height:48px;padding:.6rem 1rem;border:2px solid #6c8583;border-radius:14px;background:white;color:#254a50;font:inherit;cursor:pointer}
-.ocean-colors button[aria-pressed="true"]{background:#d6e9dc;border-color:#244e55;box-shadow:inset 0 0 0 2px #244e55}
-.ocean-adventure [data-ocean-badge]{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:50%;border:2px solid #7892aa;margin-left:6px;font-weight:700}
-.ocean-adventure [data-ocean-badge].is-done{background:#225e72;color:white;border-color:#225e72}
-.ocean-adventure [hidden]{display:none!important}
-.ocean-adventure :is(a,button,input,summary):focus-visible{outline:3px solid #a74e25;outline-offset:4px}
-.ocean-context{padding:1rem;background:#f3ecd9;border-radius:12px}
-.ocean-model{margin:1.2rem 0;padding:1rem;background:#edf5f2;border:1px solid #b4ccc0;border-radius:18px;color:#244e55}
-.ocean-model figcaption{margin-bottom:1rem;font-size:.9rem;font-weight:600}
-.ocean-model svg{display:block;width:100%;max-width:470px;margin:auto}.ocean-model svg text{font-size:16px;fill:#244e55}
-.ocean-place{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.ocean-place>span{display:flex;flex-direction:column;text-align:center;padding:.5rem;background:white;border-radius:8px}
-.ocean-place small{font-size:14px;min-height:3em}.ocean-place b{font-size:1.5rem}
-.ocean-records{display:flex;flex-wrap:wrap;gap:.5rem}.ocean-records span{padding:.5rem .8rem;background:white;border:1px solid #72969b;border-radius:8px}
-.ocean-hundred{display:grid;grid-template-columns:repeat(10,1fr);width:min(100%,280px);aspect-ratio:1;border:2px solid #32676b}
-.ocean-hundred span{background:white;border-right:1px solid #32676b;border-bottom:1px solid #32676b}.ocean-hundred .shaded{background:#64a79c}
-.ocean-signal-list>div{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.6rem 0}.ocean-signal-list span{padding:.5rem;border:2px solid #96b3b6;border-radius:8px}
-[data-ocean-model][data-solved="true"] .ocean-common{background:#efcf85;border-color:#89703b}
-.ocean-piles{display:flex;gap:1rem;align-items:end;min-height:140px;padding:1rem 0}
-.ocean-piles>div{display:grid;align-items:end}.ocean-piles span{grid-area:1/1;width:40px;background:repeating-linear-gradient(to top,#6da298 0px,#6da298 10px,#e6f1ec 10px,#e6f1ec 12px);transition:opacity .6s}
-.ocean-piles .ocean-after{opacity:0}[data-solved="true"] .ocean-piles .ocean-before{opacity:0}[data-solved="true"] .ocean-piles .ocean-after{opacity:1}
-@media(max-width:520px){.ocean-model{padding:.65rem}.ocean-place{grid-template-columns:1fr}.ocean-place>span{display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left}.ocean-place small{min-height:0;font-size:16px}.ocean-scene-caption{font-size:14px}.ocean-adventure .city-scene-top{flex-wrap:wrap;gap:.5rem}}
-@media(prefers-reduced-motion:reduce){.ocean-stage *,.ocean-model *{transition:none!important;animation:none!important}}
+/* Grade 6: Math Racing. Narrative scenery and quantitative models stay separate. */
+.race-adventure{--race-paint:#d4453b}
+.race-adventure .city-map-hero{background:#fbe9df}
+.race-adventure .city-primary{background:#a8322a;color:white}
+.race-adventure .city-primary:hover{background:#86251f}
+.race-adventure .city-kicker{color:#8a3a2c}
+.race-stage{overflow:hidden;border-radius:24px}.race-stage svg{display:block;width:100%;height:auto}
+.race-car{transform:translateX(var(--race-from));transition:transform 1.4s ease}
+.race-stage[data-phase="building"] .race-car{transform:translateX(var(--race-mid))}
+.race-stage[data-phase="complete"] .race-car{transform:translateX(var(--race-to))}
+.race-burst{opacity:0;transition:opacity .4s}
+.race-stage:is([data-phase="building"],[data-phase="complete"]) .race-burst{opacity:1}
+.race-rain{animation:race-rain 1.2s linear infinite}
+@keyframes race-rain{from{transform:translate(0,0)}to{transform:translate(-10px,26px)}}
+.race-scene-caption{font-size:14px;text-align:center;margin:.5rem 1rem;color:#6a4b43}
+.race-chapter-opening{margin:.5rem 1rem 0}
+.race-choices input{max-width:100%;min-height:48px;padding:.5rem;border:2px solid #8c6b63;border-radius:10px;font:inherit}
+.race-colors{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
+.race-colors button{min-height:48px;padding:.6rem 1rem;border:2px solid #8c6b63;border-radius:14px;background:white;color:#4a2a24;font:inherit;cursor:pointer}
+.race-colors button:hover{background:#fbe9df}
+.race-colors button[aria-pressed="true"]{background:#f6d6c8;border-color:#6b2a22;box-shadow:inset 0 0 0 2px #6b2a22}
+.race-powers{display:flex;gap:6px}
+.race-powers [data-race-power]{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;border-radius:50%;border:2px dashed #b08b80;font-size:1.3rem;opacity:.45;transition:opacity .4s,transform .4s}
+.race-powers [data-race-power].is-done{opacity:1;border-style:solid;border-color:#a8322a;background:#fff3c9;transform:scale(1.08)}
+.race-powers .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.race-reward strong{color:#8a3a2c}
+.race-adventure [hidden]{display:none!important}
+.race-adventure :is(a,button,input,summary):focus-visible{outline:3px solid #1f6f8b;outline-offset:4px}
+.race-model{margin:1.2rem 0;padding:1rem;background:#f4f1ec;border:1px solid #cdbfb1;border-radius:18px;color:#3a2f2a}
+.race-model figcaption{margin-bottom:1rem;font-size:.9rem;font-weight:600}
+.race-model svg{display:block;width:100%;max-width:470px;margin:auto}.race-model svg text{font-size:16px;fill:#3a2f2a}
+.race-place{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.race-place>span{display:flex;flex-direction:column;text-align:center;padding:.5rem;background:white;border-radius:8px}
+.race-place small{font-size:14px;min-height:3em}.race-place b{font-size:1.5rem}
+.race-records{display:flex;flex-wrap:wrap;gap:.5rem}.race-records span{padding:.5rem .8rem;background:white;border:1px solid #9c8b7d;border-radius:8px}
+.race-hundred{display:grid;grid-template-columns:repeat(10,1fr);width:min(100%,280px);aspect-ratio:1;border:2px solid #5a4a42}
+.race-hundred span{background:white;border-right:1px solid #5a4a42;border-bottom:1px solid #5a4a42}.race-hundred .shaded{background:#e0795f}
+.race-signal-list>div{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.6rem 0}.race-signal-list span{padding:.5rem;border:2px solid #b8a597;border-radius:8px}
+[data-race-model][data-solved="true"] .race-common{background:#efcf85;border-color:#89703b}
+.race-piles{display:flex;gap:1rem;align-items:end;min-height:140px;padding:1rem 0}
+.race-piles>div{display:grid;align-items:end}.race-piles span{grid-area:1/1;width:40px;background:repeating-linear-gradient(to top,#e0795f 0px,#e0795f 10px,#f7e6df 10px,#f7e6df 12px);transition:opacity .6s}
+.race-piles .race-after{opacity:0}[data-solved="true"] .race-piles .race-before{opacity:0}[data-solved="true"] .race-piles .race-after{opacity:1}
+@media(max-width:520px){.race-model{padding:.65rem}.race-place{grid-template-columns:1fr}.race-place>span{display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left}.race-place small{min-height:0;font-size:16px}.race-adventure .city-scene-top{flex-wrap:wrap;gap:.5rem}}
+.race-garage{margin:1.2rem 0;padding:1rem;background:#fffaf3;border:1px solid #e1d3c2;border-radius:20px}
+.race-garage-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.5rem}.race-garage-head h2{margin:0;font-size:1.2rem}.race-garage-head span{font-weight:700;color:#8a3a2c}
+.race-garage svg{display:block;width:100%;height:auto;margin:.6rem 0}
+.race-part{transition:opacity .6s,transform .6s;transform-box:fill-box;transform-origin:center}
+.race-part[data-state="locked"],.race-part[data-state="incoming"]{opacity:.13}
+.race-part[data-state="installed"]{opacity:1}
+.race-part[data-race-part-question][data-state="installed"]{animation:race-pop .7s ease}
+@keyframes race-pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.race-garage-list ul{display:flex;flex-wrap:wrap;gap:.5rem;padding:0;list-style:none}
+.race-garage-list li{display:flex;align-items:center;gap:.4rem;padding:.4rem .7rem;border:2px solid #d9c9b8;border-radius:999px;background:white;color:#7b6b60}
+.race-garage-list li small{font-size:14px}
+.race-part-mark::before{content:"🔒"}
+.race-garage-list li[data-state="installed"]{border-color:#a8322a;color:#3a2f2a;background:#fff3c9}.race-garage-list li[data-state="installed"] .race-part-mark::before{content:"✅"}
+.race-garage-list li[data-state="incoming"] .race-part-mark::before{content:"⏳"}
+.race-garage-list summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700}
+.race-duel{margin:1.5rem 0;padding:1.2rem;background:#fff3c9;border:2px solid #e3b84c;border-radius:22px}
+.race-duel h2{margin:.2rem 0 .8rem}
+.race-duel-track svg{display:block;width:100%;height:auto}
+.race-duel-chispa,.race-duel-nico{transform:translateX(var(--end))}
+.race-duel[data-result="ahead"] .race-duel-chispa,.race-duel[data-result="solo"] .race-duel-chispa{--end:760px}
+.race-duel[data-result="ahead"] .race-duel-nico{--end:640px}
+.race-duel[data-result="behind"] .race-duel-chispa{--end:640px}.race-duel[data-result="behind"] .race-duel-nico{--end:760px}
+.race-duel[data-result="tie"] :is(.race-duel-chispa,.race-duel-nico){--end:720px}
+.race-duel[data-playing="true"] :is(.race-duel-chispa,.race-duel-nico){animation:race-duel-drive 2.6s cubic-bezier(.3,.1,.3,1) both}
+.race-duel[data-playing="true"] .race-duel-nico{animation-timing-function:cubic-bezier(.1,.3,.6,1)}
+@keyframes race-duel-drive{from{transform:translateX(20px)}}
+.race-duel-effects{display:flex;flex-wrap:wrap;gap:.5rem;padding:0;list-style:none}
+.race-duel-effects li{padding:.4rem .8rem;background:white;border:2px solid #e3b84c;border-radius:999px;font-weight:700}
+.race-duel[data-playing="true"] .race-duel-effects li{animation:race-fade .5s both;animation-delay:calc(var(--i) * .35s)}
+.race-duel-result{font-size:1.15rem;font-weight:700}
+.race-duel[data-playing="true"] .race-duel-result{animation:race-fade .6s 2.4s both}
+@keyframes race-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.race-stage *,.race-model *,.race-garage *,.race-duel *{transition:none!important;animation:none!important}}
 
 /* Grade 7: Park of the Future. Narrative scenery and quantitative models stay separate. */
 .park-adventure{--park-paint:#378d8b}

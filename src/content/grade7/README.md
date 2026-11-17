@@ -35,3 +35,11 @@ Validation: `npm run lint`, `npm test`, `npm run build:worker`, plus browser che
 of controls, answer feedback, both locales, and generated lesson/prerequisite links.
 
 Readability revision: visible worked examples precede challenges; 66 bilingual action hints are separate from answer explanations. Clarified unit price, algebraic steps, scaling notation, relative frequency and independent trials. Added diagrams for a quadrilateral diagonal, compass construction, a cube net, and truncated versus zero-based bars. Editorial review does not replace classroom usability testing.
+
+Game layer (November 2026): detective story "Agencia Lupa and the Riddles of the Sphinx"
+(`detectiveStory.ts`, scenario in `docs/grade-7-detective-scenario.md`). Every lesson check
+is a step of the investigation in Buenos Aires; each mission has its own introduction and one
+reward per check. G07-05 and G07-10 are side cases that never block the main case. Outside
+the 66 checks there are 10 optional logic riddles, a map-piece number cipher, and a final
+deduction (story steps, not scored or saved). No crimes: the candidates are people who might
+be the riddle-maker.

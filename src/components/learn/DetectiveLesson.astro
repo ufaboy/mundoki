@@ -1,0 +1,66 @@
+---
+// Grade 7 mission page: "Agencia Lupa and the Riddles of the Sphinx".
+// Introductions and rewards may name the chosen hero, so they render through HeroText.
+import type { Locale } from '../../math/core/types';
+import { GRADE_SEVEN_LESSONS, GRADE_SEVEN_PROJECT } from '../../content/grade7';
+import { GRADE_SEVEN_ASSESSMENTS } from '../../content/grade7/assessments';
+import { DETECTIVE_MISSIONS, DETECTIVE_CHAPTERS, nextDetectiveMission, CIPHER_PUZZLE, DEDUCTION_PUZZLE, DEDUCTION_HINT } from '../../content/grade7/detectiveStory';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import { getGradeSevenHints } from '../../content/grade7/hints';
+import HeroText from '../shared/HeroText.astro';
+import ParkWorkedDiagram from './ParkWorkedDiagram.astro';
+import ParkModel from './ParkModel.astro';
+import DetectiveScene from './DetectiveScene.astro';
+import DetectivePuzzle from './DetectivePuzzle.astro';
+import CandidateBoard from './CandidateBoard.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+import GradeSevenLab from './GradeSevenLab.astro';
+import GradeSixLab from './GradeSixLab.astro';
+import UpperPrimaryLab from './UpperPrimaryLab.astro';
+const { locale, lessonId } = Astro.props as { locale: Locale; lessonId: string };
+const es = locale === 'es-AR';
+const index = GRADE_SEVEN_LESSONS.findIndex((l) => l.id === lessonId);
+const lesson = GRADE_SEVEN_LESSONS[index], mission = DETECTIVE_MISSIONS[index];
+if (!lesson || mission.id !== lesson.id) throw new Error(`Missing detective mission: ${lessonId}`);
+const chapter = DETECTIVE_CHAPTERS.find((c) => c.id === lesson.packageId)!;
+const next = nextDetectiveMission(lesson.id);
+const sourceNext = GRADE_SEVEN_LESSONS[index + 1];
+const hints = getGradeSevenHints(lessonId);
+const lastInPackage = !sourceNext || sourceNext.packageId !== lesson.packageId;
+const capsule = lesson.id === 'G07-11-L01';
+const caseLabel = chapter.optional ? (es ? 'EXPEDIENTE EXTRA' : 'SIDE CASE') : (es ? 'CASO' : 'CASE');
+---
+<article class="city-adventure city-lesson detective-adventure" data-detective-root data-locale={locale}>
+ <nav class="city-top"><a href={`${buildGradeUrl(locale, 'grade-7')}#${lesson.packageId.toLowerCase()}`}>← {es ? 'Mapa del caso' : 'Case map'}</a><span>{es ? 'MISIÓN' : 'MISSION'} {index + 1} / {GRADE_SEVEN_LESSONS.length}</span></nav>
+ <header class="city-heading"><p class="city-kicker">{chapter.icon} {caseLabel} {chapter.number} · {chapter.place[locale]}</p><h1>{mission.title[locale]}</h1><p><HeroText text={mission.introduction[locale]} /></p>{chapter.optional && <p class="det-optional">{es ? 'Expediente extra · podés volver al mapa y seguir el caso principal.' : 'Side case · you can return to the map and continue the main case.'}</p>}</header>
+ <div class="city-scene-frame"><div class="city-scene-top"><span aria-hidden="true">🔎</span><span>Agencia Lupa</span><div aria-label={es ? 'Pasos de esta misión' : 'Mission steps'}>{lesson.checks.map((_, i) => <span data-detective-badge={i}>{i + 1}</span>)}</div></div><DetectiveScene kind={mission.scene} cards={lesson.checks.length} /><p class="det-caption">{es ? 'Escena del caso · los datos del desafío están abajo.' : 'Case scene · the challenge data are below.'}</p>{mission.rewards.map((reward, i) => <p class="city-reward" data-detective-reward={i} role="status" aria-live="polite" hidden><HeroText text={reward[locale]} /></p>)}</div>
+ <CandidateBoard locale={locale} upTo={lesson.packageId} />
+ <section class="city-notebook park-worked-example" aria-label={es ? 'Ejemplo paso a paso' : 'Step-by-step example'}><p class="city-example-heading">{es ? 'Miremos un ejemplo' : 'Let’s try an example'}</p><div><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><h3>{es ? 'Ejemplo paso a paso' : 'Step-by-step example'}</h3><figure class="city-example" data-scene><div>{lesson.scene.items.map((item, i) => <button type="button" data-scene-item aria-pressed="false" aria-label={`${es ? 'Tarjeta' : 'Card'} ${i + 1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="city-secondary" data-scene-reset>{es ? 'Borrar marcas' : 'Clear marks'}</button></figure><ol>{lesson.steps.map((step) => <li>{step[locale]}</li>)}</ol><ParkWorkedDiagram locale={locale} lessonId={lesson.id} /><p>{lesson.misconception[locale]}</p><GradeSevenLab locale={locale} packageId={lesson.packageId} />{lesson.packageId === 'G07-03' && <GradeSixLab locale={locale} packageId="G06-06" />}{lesson.packageId === 'G07-09' && <GradeSixLab locale={locale} packageId="G06-12" />}<UpperPrimaryLab locale={locale} packageId={lesson.packageId} /></div></section>
+ <section class="city-challenge">
+  <p>{es ? 'Ahora te toca. Leé la pregunta y probá.' : 'Your turn. Read the question and give it a try.'}</p>
+  {lesson.checks.map((check, i) => <div data-detective-question={i} hidden={i !== 0} data-answer={check.answer}><p class="city-kicker">{es ? 'DESAFÍO' : 'CHALLENGE'} {i + 1} / {lesson.checks.length}</p><h2 tabindex="-1" data-detective-question-title>{check.prompt[locale]}</h2>
+   <ParkModel locale={locale} lessonId={lesson.id} question={i} />
+   <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option, j) => <button type="button" data-detective-answer={j}>{option[locale]}</button>)}</div><p class="city-hint" data-detective-hint hidden>🦊 {hints[i][locale]}</p><p class="city-hint" data-detective-explanation hidden>{check.explanation[locale]}</p></div>)}
+  <p class="city-feedback" data-detective-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-detective-help>{es ? 'Una pista de Átomo' : 'A hint from Átomo'}</button><button type="button" class="city-secondary" data-detective-reset>{es ? 'Volver a jugar' : 'Play again'}</button><button type="button" class="city-primary" data-detective-next hidden>{es ? 'Siguiente desafío' : 'Next challenge'} →</button><a class="city-primary" data-detective-finish hidden href={next ? buildSchoolLessonUrl(locale, 'grade-7', next.id) : '#detective-celebration'}>{next ? (es ? 'Siguiente misión' : 'Next mission') : (es ? '¡Caso cerrado!' : 'Case closed!')} →</a></div>
+ </section>
+ {(capsule || (lastInPackage && chapter.riddle)) && <div data-detective-after hidden>
+  {lastInPackage && chapter.riddle && <DetectivePuzzle locale={locale} puzzle={chapter.riddle} kicker={es ? 'OPCIONAL · TARJETA DORADA' : 'OPTIONAL · GOLD CARD'} />}
+  {capsule && <><DetectivePuzzle locale={locale} puzzle={CIPHER_PUZZLE} kicker={es ? 'EL CÓDIGO DE LAS PIEZAS' : 'THE CODE ON THE PIECES'} /><CandidateBoard locale={locale} upTo="G07-99" open /><DetectivePuzzle locale={locale} puzzle={DEDUCTION_PUZZLE} hint={DEDUCTION_HINT} kicker={es ? 'DEDUCCIÓN FINAL' : 'FINAL DEDUCTION'} /></>}
+ </div>}
+ {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es ? 'Un desafío extra: cinco preguntas' : 'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_SEVEN_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-detective-check`} assessment /></div></details>}
+ <details class="city-notebook"><summary>{es ? 'Para explorar con un adulto' : 'Explore with a grown-up'}</summary><div><p>{lesson.warmup[locale]}</p><p>{lesson.exit[locale]}</p><p>{es ? 'Revisen juntos el dibujo y la explicación. Cada misión muestra una etapa del caso; las respuestas no se guardan ni otorgan puntos de dominio.' : 'Review the drawing and explanation together. Each mission shows a stage of the case; answers are not saved and do not award mastery points.'}</p></div></details>
+ {!next && <section class="city-celebration" id="detective-celebration" data-detective-celebration hidden><p class="city-kicker">{es ? 'CASO CERRADO' : 'CASE CLOSED'}</p><h2>{es ? '¡Se abrió la cápsula del tiempo!' : 'The time capsule is open!'}</h2><DetectiveScene kind="yard" preview /><p><HeroText text={es ? 'En la fiesta de egresados, {name}, Juli, Los Halcones, Don Aurelio y Señora Inés leen las cartas del primer 7.º grado. La Esfinge guardó su último acertijo para el año que viene.' : 'At the graduation party, {name}, Juli, the Halcones, Don Aurelio, and Señora Inés read the letters from the first 7th grade. The Sphinx kept one last riddle for next year.'} /></p><a class="city-primary" href={buildGradeUrl(locale, 'grade-7')}>{es ? 'Volver al mapa' : 'Back to the case map'} →</a><details class="city-notebook"><summary>{es ? 'Proyecto en familia: la fiesta de fin de primaria' : 'Family project: the end-of-primary party'}</summary><div><p>{GRADE_SEVEN_PROJECT.introduction[locale]}</p><ol>{GRADE_SEVEN_PROJECT.tasks.map((task) => <li>{task[locale]}</li>)}</ol><ul>{GRADE_SEVEN_PROJECT.rubric.map((item) => <li>{item[locale]}</li>)}</ul></div></details></section>}
+ <noscript><p>{es ? 'Activá JavaScript para resolver el caso. Podés leer los ejemplos del cuaderno sin activarlo.' : 'Enable JavaScript to solve the case. You can read the notebook examples without it.'}</p></noscript>
+</article>
+<script>import '../../scripts/detectiveAdventure';</script>
+<style>
+.detective-adventure{--det-ink:#2f3a4a}
+.detective-adventure .city-primary{background:#2f3a4a;color:#fff}
+.detective-adventure .city-kicker{color:#a3352a}
+.detective-adventure [data-detective-badge]{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:50%;border:2px solid #8a7a66;margin-left:6px;font-weight:700}
+.detective-adventure [data-detective-badge].is-done{background:#2f3a4a;color:#fff;border-color:#2f3a4a}
+.detective-adventure [hidden]{display:none!important}
+.detective-adventure :is(a,button,summary):focus-visible{outline:3px solid #a3352a;outline-offset:4px}
+.det-caption{font-size:1rem;text-align:center;margin:.5rem 1rem;color:#5b5348}
+.det-optional{padding:.7rem 1rem;border-left:4px solid #b8473a;background:#f7e9dc;font-size:1rem}
+</style>

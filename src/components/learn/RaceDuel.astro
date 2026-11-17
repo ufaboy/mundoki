@@ -1,0 +1,31 @@
+---
+// Last-lap duel with Nico that closes a chapter. It appears after the last
+// challenge of the chapter's last mission and replays the advantages Chispa
+// earned during the stage, then the story-fixed result.
+import type { Locale } from '../../math/core/types';
+import { RACE_EFFECTS, type RaceChapter, type RaceEffect } from '../../content/grade6/racingAdventure';
+import HeroText from '../shared/HeroText.astro';
+const { locale, chapter, stage } = Astro.props as { locale: Locale; chapter: RaceChapter; stage: number };
+const es = locale === 'es-AR';
+const counts = new Map<RaceEffect, number>();
+for (const m of chapter.missions) for (const r of m.rewards) if (r.effect !== 'points') counts.set(r.effect, (counts.get(r.effect) ?? 0) + 1);
+const result = chapter.duel.result;
+const heading = result === 'solo' ? (es ? 'Vuelta de clasificación' : 'Qualifying lap') : (es ? 'Duelo con Nico' : 'Duel with Nico');
+const cars = [
+ ...(result === 'solo' ? [] : [{ y: 122, className: 'race-duel-nico', fill: '#2e6fd1', burst: false }]),
+ { y: 40, className: 'race-duel-chispa', fill: 'var(--race-paint,#d4453b)', burst: true },
+];
+---
+<section class="race-duel" data-race-duel data-result={result} data-playing="false" hidden aria-labelledby={`race-duel-${chapter.id}`}>
+ <p class="city-kicker">🏁 {es ? 'Etapa' : 'Stage'} {stage} · {chapter.title[locale]}</p>
+ <h2 id={`race-duel-${chapter.id}`}>{heading}</h2>
+ <div class="race-duel-track" aria-hidden="true"><svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="200" rx="18" fill="#4a4f57"/><path d="M0 100H900" stroke="#e9e3c9" stroke-width="4" stroke-dasharray="40 30"/>
+  <g>{Array.from({ length: 26 }, (_, i) => <rect x={800 + (i % 2) * 14} y={Math.floor(i / 2) * 16} width="14" height="16" fill={(i + Math.floor(i / 2)) % 2 ? '#111' : '#fff'}/>)}</g>
+  {cars.map(c => <g transform={`translate(0 ${c.y})`}><g class={c.className}>{c.burst && <path d="M-70 14h55M-90 26h70M-60 38h45" stroke="#f2c14e" stroke-width="6" stroke-linecap="round"/>}<path d="M0 30 15 12 55 8 70 0h25l5 10 20 8v14H0Z" fill={c.fill} stroke="#222" stroke-width="2"/><circle cx="72" cy="6" r="7" fill="#f2f2f2"/><circle cx="25" cy="34" r="11" fill="#1d1f22"/><circle cx="95" cy="34" r="11" fill="#1d1f22"/></g></g>)}
+ </svg></div>
+ <p>{es ? 'Ventajas que ganaste en esta etapa:' : 'Advantages you earned this stage:'}</p>
+ <ul class="race-duel-effects">{[...counts].map(([effect, n], i) => <li style={`--i:${i}`}><span aria-hidden="true">{RACE_EFFECTS[effect].icon}</span> {RACE_EFFECTS[effect].label[locale]} × {n}</li>)}</ul>
+ <p class="race-duel-result"><HeroText text={chapter.duel.text[locale]}/></p>
+ <button type="button" class="city-secondary" data-race-duel-replay>{es ? 'Ver de nuevo' : 'Watch again'}</button>
+</section>

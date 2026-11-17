@@ -1,0 +1,8 @@
+---
+import type {Locale} from '../../math/core/types';
+import {RACE_EMBLEMS} from '../../scripts/raceState';
+const {locale}=Astro.props as {locale:Locale};const es=locale==='es-AR';
+const colors=[['red','Rojo','Red'],['teal','Turquesa','Teal'],['gold','Dorado','Gold']] as const;
+const emblems=[['star','Estrella','Star'],['bolt','Rayo','Bolt'],['flag','Bandera','Flag']] as const;
+---
+<details class="city-notebook race-choices"><summary>{es?'Personalizá tu escudería':'Make the team yours'}</summary><div><label>{es?'Nombre de la escudería':'Team name'} <input data-race-name maxlength="24" autocomplete="off" placeholder="Escudería Pampa"/></label><div class="race-colors" role="group" aria-label={es?'Color de Chispa':'Chispa’s color'}>{colors.map(([id,esName,enName])=><button type="button" data-race-color={id} aria-pressed="false">{es?esName:enName}</button>)}</div><div class="race-colors" role="group" aria-label={es?'Emblema del casco':'Helmet emblem'}>{emblems.map(([id,esName,enName])=><button type="button" data-race-emblem={id} aria-pressed="false">{RACE_EMBLEMS[id]} {es?esName:enName}</button>)}</div></div></details>

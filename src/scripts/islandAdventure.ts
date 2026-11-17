@@ -6,7 +6,7 @@ document.querySelectorAll<HTMLElement>('[data-island-root]').forEach(root=>{
  try{preferences=cleanIslandPreferences(JSON.parse(localStorage.getItem('mundoki-island-style-v1')??'null'));}catch{}
  const renderPreferences=()=>{
   root.style.setProperty('--island-paint',({teal:'#378d8b',coral:'#cd806b',gold:'#c59a39'})[preferences.color]);
-  root.querySelectorAll('[data-island-name-display]').forEach(el=>{el.textContent=preferences.name||(es?'Mi expedición':'My expedition');});
+  root.querySelectorAll('[data-island-name-display]').forEach(el=>{el.textContent=preferences.name||(es?'Bitácora de vuelo':'Flight logbook');});
   root.querySelectorAll<HTMLElement>('[data-island-color]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.islandColor===preferences.color)));
  };
  const save=()=>{try{localStorage.setItem('mundoki-island-style-v1',JSON.stringify(preferences));}catch{}};
@@ -26,8 +26,8 @@ document.querySelectorAll<HTMLElement>('[data-island-root]').forEach(root=>{
   const updated=answerIsland(state,i,Number(b.dataset.islandAnswer)===Number(q.dataset.answer));
   if(updated===state){get('feedback').textContent=es?'Probá otra vez. Mirá el ejemplo de arriba o pedí una pista.':'Try again. Look at the example above or ask for a hint.';return;}
   state=updated;q.querySelectorAll<HTMLButtonElement>('[data-island-answer]').forEach(button=>{button.disabled=true;});b.classList.add('is-correct');q.querySelector<HTMLElement>('[data-island-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-island-explanation]')!.hidden=false;
-  get('reward').textContent=q.dataset.reward!;get('reward').hidden=false;
-  get('feedback').textContent=es?'¡Lo lograste! Mirá tu invento.':'You did it! Look at your invention.';
+  get('reward').replaceChildren(...[...q.querySelector<HTMLElement>('[data-island-reward-source]')!.childNodes].map(node=>node.cloneNode(true)));get('reward').hidden=false;
+  get('feedback').textContent=es?'¡Lo lograste! Mirá la escena.':'You did it! Look at the scene.';
   get('next').hidden=state.solved===state.count;get('finish').hidden=state.solved!==state.count;render();
  })));
  get('next').addEventListener('click',()=>{
