@@ -53,6 +53,16 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
   </a>
 
   <nav class="mk-topbar__nav" aria-label={t(locale, 'navMain')}>
+    <ul class="mk-nav mk-nav--dock">
+      {items.map((item) => (
+        <li>
+          <a href={item.href} aria-current={item.current ? 'page' : undefined}>
+            <svg class:list={['mk-icon', { 'mk-icon--fill': item.fill }]} viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
     {breadcrumbs && breadcrumbs.length > 0 ? (
       <ol class="mk-topbar__crumbs" aria-label="Breadcrumb">
         {breadcrumbs.map((crumb, idx) => (
@@ -69,43 +79,106 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
         ))}
       </ol>
     ) : null}
-    <ul class="mk-nav mk-nav--dock">
+  </nav>
+
+  <div class="mk-topbar__actions">
+    <a class:list={['mk-btn', { 'is-current': familyCurrent }]} href={buildAccountUrl(locale)} aria-current={familyCurrent ? 'page' : undefined}>
+      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0" /></svg>
+      <span class="mk-topbar__label" id="header-account-link">{t(locale, 'navFamily')}</span>
+    </a>
+
+    <button
+      type="button"
+      class="mk-btn mk-menu-toggle"
+      id="mk-drawer-open"
+      aria-expanded="false"
+      aria-controls="mk-mobile-drawer"
+      aria-label={t(locale, 'navMain')}
+    >
+      <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mk-ui mk-drawer-backdrop" id="mk-drawer-backdrop" hidden></div>
+<aside
+  class="mk-ui mk-drawer"
+  id="mk-mobile-drawer"
+  aria-label={t(locale, 'navMain')}
+  aria-hidden="true"
+  hidden
+>
+  <div class="mk-drawer__head">
+    <span class="mk-brand">
+      <span class="mk-brand__mark" aria-hidden="true">★</span>
+      Mundoki
+    </span>
+    <button type="button" class="mk-btn" id="mk-drawer-close" aria-label={locale === 'en-US' ? 'Close menu' : 'Cerrar menú'}>
+      ✕
+    </button>
+  </div>
+
+  {breadcrumbs && breadcrumbs.length > 0 ? (
+    <ol class="mk-drawer__crumbs" aria-label="Breadcrumb">
+      {breadcrumbs.map((crumb, idx) => (
+        <>
+          {idx > 0 && <li aria-hidden="true">/</li>}
+          <li>
+            {crumb.href ? (
+              <a href={crumb.href}>{crumb.label}</a>
+            ) : (
+              <span aria-current="page">{crumb.label}</span>
+            )}
+          </li>
+        </>
+      ))}
+    </ol>
+  ) : null}
+
+  <nav aria-label={t(locale, 'navMain')}>
+    <ul class="mk-drawer__list">
       {items.map((item) => (
         <li>
-          <a href={item.href} aria-current={item.current ? 'page' : undefined}>
+          <a href={item.href} class:list={['mk-drawer__link', { 'is-current': item.current }]} aria-current={item.current ? 'page' : undefined}>
             <svg class:list={['mk-icon', { 'mk-icon--fill': item.fill }]} viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon} /></svg>
             {item.label}
           </a>
         </li>
       ))}
+      <li>
+        <a href={buildAccountUrl(locale)} class:list={['mk-drawer__link', { 'is-current': familyCurrent }]} aria-current={familyCurrent ? 'page' : undefined}>
+          <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0" /></svg>
+          {t(locale, 'navFamily')}
+        </a>
+      </li>
     </ul>
   </nav>
-
-  <a class:list={['mk-btn', { 'is-current': familyCurrent }]} href={buildAccountUrl(locale)} aria-current={familyCurrent ? 'page' : undefined}>
-    <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5a7.5 7.5 0 0 1 15 0" /></svg>
-    <span class="mk-topbar__label" id="header-account-link">{t(locale, 'navFamily')}</span>
-  </a>
-</header>
+</aside>
 
 <style>
   .mk-topbar__nav {
-    flex-direction: column;
+    display: none;
+  }
+
+  .mk-topbar__actions {
+    display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
   }
 
   .mk-topbar__crumbs {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    justify-content: center;
     gap: 6px;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 14px;
+    border-left: 2px solid var(--mk-line);
     font-size: 0.9rem;
     font-weight: 700;
     color: var(--mk-ink-soft);
+    white-space: nowrap;
   }
 
   .mk-topbar__crumbs a {
@@ -121,9 +194,133 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
     color: var(--mk-ink);
     font-weight: 800;
   }
+
+  @media (min-width: 52rem) {
+    .mk-topbar__nav {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: nowrap;
+    }
+
+    .mk-menu-toggle,
+    .mk-drawer,
+    .mk-drawer-backdrop {
+      display: none !important;
+    }
+  }
+
+  .mk-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 36, 67, 0.45);
+    z-index: 60;
+  }
+
+  .mk-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(300px, 85vw);
+    background: var(--mk-canvas);
+    border-left: 2px solid var(--mk-line);
+    box-shadow: -8px 0 28px rgba(28, 36, 67, 0.18);
+    z-index: 70;
+    padding: var(--mk-s4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mk-s4);
+  }
+
+  .mk-drawer[hidden],
+  .mk-drawer-backdrop[hidden] {
+    display: none;
+  }
+
+  .mk-drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mk-drawer__crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--mk-sunk);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--mk-ink-soft);
+  }
+
+  .mk-drawer__crumbs a {
+    color: var(--mk-sky);
+    text-decoration: none;
+  }
+
+  .mk-drawer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mk-drawer__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 800;
+    color: var(--mk-ink);
+    background: var(--mk-surface);
+    border: 1.5px solid var(--mk-line);
+  }
+
+  .mk-drawer__link.is-current {
+    background: var(--mk-sky-tint);
+    color: var(--mk-sky-deep);
+    border-color: var(--mk-sky);
+  }
 </style>
 
 <script is:inline>
+  // Mobile side drawer toggle
+  (function () {
+    var openBtn = document.getElementById('mk-drawer-open');
+    var closeBtn = document.getElementById('mk-drawer-close');
+    var drawer = document.getElementById('mk-mobile-drawer');
+    var backdrop = document.getElementById('mk-drawer-backdrop');
+    if (!openBtn || !drawer || !backdrop) return;
+
+    function setOpen(open) {
+      drawer.hidden = !open;
+      backdrop.hidden = !open;
+      drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+      openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open && closeBtn) closeBtn.focus();
+      if (!open) openBtn.focus();
+    }
+
+    openBtn.addEventListener('click', function () { setOpen(true); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
+    backdrop.addEventListener('click', function () { setOpen(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !drawer.hidden) setOpen(false);
+    });
+  })();
+
   // Show the signed-in adult's name on the Familia button.
   try {
     var mkUser = JSON.parse(window.localStorage.getItem('mundoki_user') || 'null');
