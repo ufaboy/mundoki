@@ -1,0 +1,42 @@
+---
+// Grade 7 map: the case file of "Agencia Lupa and the Riddles of the Sphinx".
+import type { Locale } from '../../math/core/types';
+import { DETECTIVE_CHAPTERS, DETECTIVE_MISSIONS } from '../../content/grade7/detectiveStory';
+import { GRADE_SEVEN_LESSONS, GRADE_SEVEN_PROJECT } from '../../content/grade7';
+import { buildCatalogUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+const { locale } = Astro.props as { locale: Locale };
+const es = locale === 'es-AR';
+// Pins on a stylised city map, in chapter order.
+const pins: [number, number][] = [[150, 250], [430, 130], [330, 170], [520, 230], [610, 300], [250, 60], [180, 140], [380, 250], [470, 70], [120, 70], [90, 270]];
+---
+<div class="city-adventure city-map detective-adventure" data-detective-root data-detective-map data-locale={locale}>
+ <nav class="city-top"><a href={buildCatalogUrl(locale)}>← {es ? 'Todos los grados' : 'All grades'}</a><span>{es ? '7.º GRADO' : 'GRADE 7'}</span><a href="#detective-families">{es ? 'Para familias' : 'For families'}</a></nav>
+ <header class="city-map-hero"><div><p class="city-kicker">{es ? 'INVESTIGÁ · DEDUCÍ · COMPROBÁ' : 'INVESTIGATE · DEDUCE · CHECK'}</p><h1>{es ? 'Agencia Lupa y los acertijos de la Esfinge' : 'Agencia Lupa and the Riddles of the Sphinx'}</h1><p>{es ? 'Un sobre misterioso aparece en la biblioteca de la escuela. Seguí los números por Buenos Aires y descubrí quién es la Esfinge.' : 'A mysterious envelope turns up in the school library. Follow the numbers across Buenos Aires and find out who the Sphinx is.'}</p><a class="city-primary" href={buildSchoolLessonUrl(locale, 'grade-7', DETECTIVE_MISSIONS[0].id)}>{es ? '¡Abrir el primer sobre!' : 'Open the first envelope!'} →</a><a class="city-pick" href="#detective-missions">{es ? 'Elegir una misión ↓' : 'Choose a mission ↓'}</a></div>
+  <div class="city-map-preview"><span>{es ? 'El mapa del caso' : 'The case map'}</span>
+   <svg class="det-city" viewBox="0 0 700 340" role="img" aria-label={es ? 'Mapa de Buenos Aires con los 11 lugares del caso' : 'Map of Buenos Aires with the 11 places of the case'}>
+    <rect width="700" height="340" rx="20" fill="#efe6d4"/><path d="M640 0Q600 170 690 340H700V0Z" fill="#b9d3dc"/>
+    <g stroke="#fff" stroke-width="10" fill="none"><path d="M0 120H640M0 220H620M200 0V340M420 0V340M40 340L520 0"/></g>
+    <path d={`M${pins.map(([x, y]) => `${x} ${y}`).join(' L')}`} fill="none" stroke="#b8473a" stroke-width="3" stroke-dasharray="6 6"/>
+    {pins.map(([x, y], i) => <g><circle cx={x} cy={y} r="17" fill={DETECTIVE_CHAPTERS[i].optional ? '#e2b65c' : '#b8473a'}/><text x={x} y={y + 6} text-anchor="middle" font-size="16" font-weight="700" fill="#fff">{i + 1}</text></g>)}
+   </svg>
+  </div>
+ </header>
+ <section id="detective-missions"><div class="city-map-section"><h2>{es ? 'El expediente' : 'The case file'}</h2><span>{DETECTIVE_MISSIONS.length} {es ? 'misiones · todas disponibles' : 'missions · all available'}</span></div>
+ {DETECTIVE_CHAPTERS.map((chapter, i) => <details class="city-district" id={chapter.id.toLowerCase()} open={i === 0}><summary><span class="city-district-icon" aria-hidden="true">{chapter.icon}</span><span><span class="city-kicker">{chapter.optional ? (es ? 'EXPEDIENTE EXTRA' : 'SIDE CASE') : (es ? 'CASO' : 'CASE')} {chapter.number} · {chapter.place[locale]}</span><strong>{chapter.title[locale]}</strong></span><span class="city-district-arrow" aria-hidden="true">⌄</span></summary><p class="det-summary">{chapter.summary[locale]}</p><ol class="city-mission-list" start={DETECTIVE_MISSIONS.indexOf(chapter.missions[0]) + 1}>{chapter.missions.map((mission) => <li><a href={buildSchoolLessonUrl(locale, 'grade-7', mission.id)}><span class="city-mission-number">{DETECTIVE_MISSIONS.indexOf(mission) + 1}</span><strong>{mission.title[locale]}</strong><span class="city-mission-play">{es ? 'Jugar' : 'Play'} →</span></a></li>)}</ol></details>)}
+ </section>
+ <details class="city-notebook" id="detective-families"><summary>{es ? 'Para familias: qué aprendemos' : 'For families: what we learn'}</summary><div>
+  <p>{es ? 'Argumentos y contraejemplos, números racionales, proporciones, patrones, geometría, datos y azar, dentro de un caso de detectives sin delitos: la Esfinge es alguien que inventa acertijos. Los expedientes extra (fórmulas y azar) son opcionales y nada depende de ellos. Al final de cada caso hay un acertijo lógico opcional.' : 'Arguments and counterexamples, rational numbers, proportions, patterns, geometry, data, and chance, inside a detective case without crimes: the Sphinx is someone who invents riddles. The side cases (formulas and chance) are optional and nothing depends on them. Each case ends with an optional logic riddle.'}</p>
+  <p>{es ? 'Todas las misiones están disponibles. Las escenas muestran etapas del caso, no un historial guardado. Las respuestas no se guardan ni otorgan puntos de dominio.' : 'All missions are available. Scenes show stages of the case, not saved history. Answers are not saved and do not award mastery points.'}</p>
+  <ul>{DETECTIVE_CHAPTERS.map((chapter) => <li><a href={buildSchoolLessonUrl(locale, 'grade-7', chapter.missions[0].id)}>{GRADE_SEVEN_LESSONS.find((l) => l.packageId === chapter.id)!.objective[locale]}</a></li>)}</ul>
+  <section id="project"><h2>{GRADE_SEVEN_PROJECT.title[locale]}</h2><p>{GRADE_SEVEN_PROJECT.introduction[locale]}</p><ol>{GRADE_SEVEN_PROJECT.tasks.map((task) => <li>{task[locale]}</li>)}</ol><details><summary>{es ? 'Cómo acompañar' : 'How to help'}</summary><ul>{GRADE_SEVEN_PROJECT.rubric.map((item) => <li>{item[locale]}</li>)}</ul></details></section>
+ </div></details>
+</div>
+<script>import '../../scripts/detectiveAdventure';</script>
+<style>
+.detective-adventure .city-map-hero{background:#f1e7d6}
+.detective-adventure .city-primary{background:#2f3a4a;color:#fff}
+.detective-adventure .city-kicker{color:#a3352a}
+.det-city{display:block;width:100%;height:auto}
+.det-summary{margin:.5rem 1rem 0;font-size:1rem}
+.detective-adventure :is(a,button,summary):focus-visible{outline:3px solid #a3352a;outline-offset:4px}
+</style>

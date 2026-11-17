@@ -1,0 +1,20 @@
+---
+// The case's candidate board: who might be the Sphinx, with the evidence the
+// earlier chapters revealed. `upTo` hides clues from this chapter onward so
+// the board never spoils a challenge.
+import type { Locale } from '../../math/core/types';
+import { CANDIDATES, CANDIDATE_CLUES } from '../../content/grade7/detectiveStory';
+interface Props { locale: Locale; upTo: string; open?: boolean }
+const { locale, upTo, open = false } = Astro.props;
+const es = locale === 'es-AR';
+const clues = CANDIDATE_CLUES.filter((c) => c.chapter < upTo);
+const marks = { possible: es ? '✔ posible' : '✔ possible', ruledOut: es ? '✘ descartado' : '✘ ruled out', linked: es ? '🔗 relacionado' : '🔗 linked' };
+---
+{clues.length > 0 && <details class="city-notebook det-board" open={open}><summary>{es ? 'Tablero de candidatos: ¿quién es la Esfinge?' : 'Candidate board: who is the Sphinx?'}</summary><div>
+ <ul>{CANDIDATES.map((c) => <li><strong>{c.name}</strong> · {c.role[locale]}<ul>{clues.filter((clue) => clue.candidate === c.id).map((clue) => <li data-mark={clue.mark}><span>{marks[clue.mark]}</span> {clue.note[locale]}</li>)}</ul></li>)}</ul>
+</div></details>}
+<style>
+.det-board ul{padding-left:1.1rem}.det-board li{margin:.35rem 0}
+.det-board [data-mark] span{font-weight:700}
+.det-board [data-mark="ruledOut"] span{color:#a3352a}.det-board [data-mark="possible"] span{color:#2f7d4f}.det-board [data-mark="linked"] span{color:#6a4fa0}
+</style>

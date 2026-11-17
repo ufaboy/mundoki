@@ -1,0 +1,70 @@
+---
+// Grade 6 Math Racing scene: the chapter's circuit, Chispa (team color) and
+// Nico's blue car. Chispa moves along the track as the mission's challenges
+// are solved (data-phase start → building → complete); `step`/`steps` place
+// this mission on the chapter's stretch of track.
+import type { RaceSceneKind } from '../../content/grade6/racingAdventure';
+const { kind = 'garage', step = 0, steps = 1, preview = false } = Astro.props as { kind?: RaceSceneKind; step?: number; steps?: number; preview?: boolean };
+const span = 560 / steps;
+const from = 40 + span * step, to = from + span, mid = from + span / 2;
+const sky: Record<RaceSceneKind, string> = { garage: '#efe6d8', river: '#cfe7f3', andes: '#d7e8f4', sierras: '#f7e3c0', jungle: '#a9bbb5', wind: '#e2ebef', night: '#1b2540', final: '#d5e9fb' };
+const night = kind === 'night';
+---
+<div class="race-stage" data-race-stage data-kind={kind} data-phase={preview ? 'complete' : 'start'} style={`--race-from:${from}px;--race-mid:${mid}px;--race-to:${to}px`} aria-hidden="true"><svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="380" rx="24" fill={sky[kind]}/>
+{kind === 'garage' && <>
+ <rect x="60" y="40" width="780" height="200" rx="10" fill="#d8c8af"/>
+ <rect x="110" y="70" width="300" height="150" fill="#bfae94"/>{[0,1,2,3,4,5,6].map(i => <path d={`M110 ${82 + i * 20}h300`} stroke="#a89878" stroke-width="5"/>)}
+ <rect x="470" y="70" width="170" height="110" rx="8" fill="#6d7d86"/>{[0,1,2].map(i => <path d={`M${500 + i * 50} 95v50m-12 0h24`} stroke="#e3e0d4" stroke-width="7" stroke-linecap="round"/>)}
+ {[0,1,2].map(i => <circle cx="720" cy={210 - i * 34} r="20" fill="#2f3237" stroke="#5c6168" stroke-width="7"/>)}
+ <text x="560" y="215" text-anchor="middle" font-size="22" font-weight="800" fill="#7a2d24">ESCUDERÍA PAMPA</text>
+</>}
+{kind === 'river' && <>
+ <rect y="200" width="900" height="60" fill="#6fb3cf"/>
+ {[80,140,190,260,330,610,680,740,800].map((x, i) => <rect x={x} y={200 - (40 + (i * 37) % 90)} width="46" height={40 + (i * 37) % 90} fill="#9bb3c4"/>)}
+ <path d="M380 200q90-80 180 0" fill="none" stroke="#e9eef2" stroke-width="10"/><path d="M380 200h180" stroke="#e9eef2" stroke-width="8"/>
+</>}
+{kind === 'andes' && <>
+ <path d="M0 250 170 70 300 210 450 40 610 220 750 90 900 230V260H0Z" fill="#8c97a8"/>
+ <path d="M170 70 205 107 185 112 160 98 140 102ZM450 40 497 90 470 96 445 82 420 72ZM750 90 790 132 765 136 742 124 722 118Z" fill="#fbfdff"/>
+ <circle cx="80" cy="60" r="26" fill="#f6dc8c"/>
+</>}
+{kind === 'sierras' && <>
+ <circle cx="760" cy="70" r="34" fill="#f2b65a"/>
+ <path d="M0 200Q150 120 320 190T640 170T900 190V260H0Z" fill="#a9b67a"/><path d="M0 235Q200 180 420 225T900 215V260H0Z" fill="#8ea063"/>
+</>}
+{kind === 'jungle' && <>
+ <rect x="640" y="40" width="70" height="220" fill="#dff1f6"/><path d="M640 40h70" stroke="#7c9a88" stroke-width="12"/>
+ {[60,170,520,820].map(x => <g><path d={`M${x} 260V140`} stroke="#6b5435" stroke-width="10"/><path d={`M${x} 140q-50 0-70 30M${x} 140q50 0 70 30M${x} 140q-30-35-60-35M${x} 140q30-35 60-35`} fill="none" stroke="#3f7d4a" stroke-width="12" stroke-linecap="round"/></g>)}
+ <g class="race-rain">{Array.from({ length: 28 }, (_, i) => <path d={`M${(i * 67) % 900} ${(i * 41) % 200}l-10 26`} stroke="#eaf4f7" stroke-width="3" stroke-linecap="round"/>)}</g>
+</>}
+{kind === 'wind' && <>
+ <rect y="190" width="900" height="70" fill="#d9c99b"/>
+ <path d="M700 190V120" stroke="#6b5a40" stroke-width="10"/><path d="M700 125q60-10 110 15M700 140q50-5 95 20" fill="none" stroke="#7d8f55" stroke-width="12" stroke-linecap="round"/>
+ {[60,110,160].map((y, i) => <path class="race-wind" d={`M${80 + i * 140} ${y}q60-20 120 0t120 0`} fill="none" stroke="#9fb4c0" stroke-width="5" stroke-linecap="round"/>)}
+ {[200,330,470].map(x => <path d={`M${x} 260v-60h70v60`} fill="#e8edf0" stroke="#7d8d96" stroke-width="4"/>)}
+</>}
+{night && <>
+ {Array.from({ length: 30 }, (_, i) => <circle cx={(i * 131) % 900} cy={(i * 53) % 150 + 10} r={i % 3 === 0 ? 3 : 2} fill="#f5f2d9"/>)}
+ <path d="M0 120Q220 40 450 110T900 80" fill="none" stroke="#6fe0a8" stroke-width="22" opacity=".35"/>
+ <path d="M0 260 150 150 280 230 420 140 560 230 720 160 900 240V260H0Z" fill="#2b3550"/>
+ {[120,330,540,750].map(x => <g><path d={`M${x} 280V200`} stroke="#59627a" stroke-width="6"/><circle cx={x} cy="198" r="10" fill="#ffe7a3"/></g>)}
+</>}
+{kind === 'final' && <>
+ <rect x="60" y="80" width="780" height="150" rx="10" fill="#9fb2c8"/>
+ {Array.from({ length: 60 }, (_, i) => <circle cx={90 + (i % 20) * 37} cy={110 + Math.floor(i / 20) * 38} r="11" fill={['#e46b5d', '#f2c14e', '#5aa0d8', '#7cc49a'][i % 4]}/>)}
+ {[100,450,800].map(x => <g><path d={`M${x} 80V30`} stroke="#5b6470" stroke-width="5"/><path d={`M${x} 30h40v24h-40z`} fill={x === 450 ? '#f2c14e' : '#e46b5d'}/></g>)}
+</>}
+<rect y="270" width="900" height="90" fill={night ? '#2c3038' : '#4a4f57'}/>
+<path d="M0 270H900" stroke="#f3f3f3" stroke-width="8" stroke-dasharray="30 30"/><path d="M0 270H900" stroke="#d4453b" stroke-width="8" stroke-dasharray="30 30" stroke-dashoffset="30"/>
+<path d="M0 318H900" stroke="#e9e3c9" stroke-width="4" stroke-dasharray="40 30" opacity=".7"/>
+<g>{Array.from({ length: 12 }, (_, i) => <rect x={800 + (i % 2) * 14} y={274 + Math.floor(i / 2) * 14} width="14" height="14" fill={(i + Math.floor(i / 2)) % 2 ? '#111' : '#fff'}/>)}</g>
+<g class="race-rival" transform="translate(660 314)"><path d="M0 30 15 12 55 8 70 0h25l5 10 20 8v14H0Z" fill="#2e6fd1"/><circle cx="72" cy="6" r="7" fill="#f2f2f2"/><circle cx="25" cy="34" r="11" fill="#1d1f22"/><circle cx="95" cy="34" r="11" fill="#1d1f22"/></g>
+<g class="race-car-track" transform="translate(0 274)"><g class="race-car">
+ <g class="race-burst"><path d="M-70 14h55M-90 26h70M-60 38h45" stroke="#f2c14e" stroke-width="6" stroke-linecap="round"/></g>
+ <path d="M0 30 15 12 55 8 70 0h25l5 10 20 8v14H0Z" fill="var(--race-paint,#d4453b)" stroke="#5a1f1a" stroke-width="2"/>
+ <circle cx="44" cy="22" r="9" fill="#fff"/><text x="44" y="27" text-anchor="middle" font-size="12" font-weight="800" fill="#222">23</text>
+ <circle cx="72" cy="6" r="7" fill="#f6d36b"/>
+ <circle cx="25" cy="34" r="11" fill="#1d1f22"/><circle cx="95" cy="34" r="11" fill="#1d1f22"/><circle cx="25" cy="34" r="4" fill="#9aa1a8"/><circle cx="95" cy="34" r="4" fill="#9aa1a8"/>
+</g></g>
+</svg></div>

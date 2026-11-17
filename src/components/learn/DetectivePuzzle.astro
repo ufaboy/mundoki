@@ -1,0 +1,27 @@
+---
+// An optional story step outside the lesson checks: a Sphinx riddle, the
+// capsule lock, or the final deduction. Solving it pins a gold card; a wrong
+// choice only shows Átomo's nudge. Nothing is saved or scored.
+import type { Locale } from '../../math/core/types';
+import type { DetectivePuzzle } from '../../content/grade7/detectiveStory';
+import type { LocalizedText } from '../../math/core/types';
+interface Props { locale: Locale; puzzle: DetectivePuzzle; hint?: LocalizedText; kicker: string }
+const { locale, puzzle, hint, kicker } = Astro.props;
+const es = locale === 'es-AR';
+---
+<section class="det-puzzle" data-detective-puzzle={puzzle.id} data-answer={puzzle.answer} aria-labelledby={`${puzzle.id}-title`}>
+ <p class="city-kicker">{kicker}</p>
+ <h2 id={`${puzzle.id}-title`}>{puzzle.title[locale]}</h2>
+ <p class="det-typed">{puzzle.prompt[locale]}</p>
+ <div class="city-answer-options" role="group" aria-label={puzzle.title[locale]}>
+  {puzzle.options.map((option, j) => <button type="button" data-puzzle-option={j}>{option[locale]}</button>)}
+ </div>
+ <p class="city-feedback" data-puzzle-feedback role="status" aria-live="polite" data-wrong={hint ? hint[locale] : (es ? 'Todavía no. Revisá las pistas y probá otra vez.' : 'Not yet. Check the clues and try again.')}></p>
+ <p class="city-hint" data-puzzle-explanation hidden><strong>{es ? '★ Tarjeta dorada · ' : '★ Gold card · '}</strong>{puzzle.explanation[locale]}</p>
+</section>
+<style>
+.det-puzzle{margin:1.5rem 0;padding:1.25rem;border:3px dashed #b8473a;border-radius:20px;background:#fff7e6}
+.det-puzzle h2{margin:.25rem 0 .75rem}
+.det-typed{font-family:'Courier New',Courier,monospace;font-size:1.05rem;line-height:1.5}
+.det-puzzle [data-puzzle-option].is-correct{outline:3px solid #2f7d4f}
+</style>

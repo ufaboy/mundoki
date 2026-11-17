@@ -1,0 +1,59 @@
+---
+// Grade 3 mission page: the hero builds a house for the family. Story header,
+// house scene (one piece per correct answer), worked example, two challenges,
+// and the housewarming epilogue after the last mission. Story texts may name
+// the chosen hero ({name}), so they render through HeroText.
+// Class and data-city-* names are shared with the other primary worlds' styles.
+import type { Locale } from '../../math/core/types';
+import { GRADE_THREE_LESSONS, GRADE_THREE_PROJECT } from '../../content/grade3';
+import { GRADE_THREE_ASSESSMENTS } from '../../content/grade3/assessments';
+import { getGradeThreeHints } from '../../content/grade3/hints';
+import { HOUSE_MISSIONS, HOUSE_EPILOGUE, HOUSE_PIECES, houseChapterAt } from '../../content/grade3/houseStory';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import HouseScene from './HouseScene.astro';
+import HouseChoices from './HouseChoices.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+import UpperPrimaryLab from './UpperPrimaryLab.astro';
+import HeroText from '../shared/HeroText.astro';
+import { MISSION_PRACTICE, MISSION_PRACTICE_CHECK } from '../../math/practice/generators';
+import { GRADES_CATALOG } from '../../math/curriculum';
+import { t } from '../../i18n/translations';
+const {locale,lessonId}=Astro.props as {locale:Locale;lessonId:string};
+const es=locale==='es-AR';
+const index=GRADE_THREE_LESSONS.findIndex(l=>l.id===lessonId);
+const lesson=GRADE_THREE_LESSONS[index],mission=HOUSE_MISSIONS[index];
+if(!lesson||mission?.id!==lesson.id)throw new Error(`Missing house mission: ${lessonId}`);
+const hints=getGradeThreeHints(lesson.id);
+const chapter=houseChapterAt(index);
+const next=GRADE_THREE_LESSONS[index+1];
+const lastInPackage=!next||next.packageId!==lesson.packageId;
+const practiceSkill=MISSION_PRACTICE[lesson.id];
+// Results bucket for this grade's mission answers (see missionProgress.ts).
+const topicId=GRADES_CATALOG.find(grade=>grade.id==='grade-3')!.primaryTopicId;
+const placeLabels=es?['Palés de 1.000','Pilas de 100','Paquetes de 10','Sueltos']:['Pallets of 1,000','Stacks of 100','Packs of 10','Loose'];
+---
+<article class="city-adventure city-lesson house-adventure" data-city-root data-city-lesson data-city-index={index} data-locale={locale} data-lesson-id={lesson.id} data-topic-id={topicId}>
+ <nav class="city-top"><a href={`${buildGradeUrl(locale,'grade-3')}#${chapter.id}`}>← {es?'Mapa de la obra':'Building-site map'}</a><span>{es?'MISIÓN':'MISSION'} {index+1} / {HOUSE_MISSIONS.length}</span></nav>
+ <header class="city-heading"><p class="city-kicker">{chapter.icon} {es?'ETAPA':'STAGE'} {chapter.number}: {chapter.title[locale]}</p><h1>{mission.title[locale]}</h1><p><HeroText text={mission.introduction[locale]} /></p></header>
+ <div class="city-scene-frame">
+  <div class="city-scene-top"><span data-city-name-display>{es?'Nuestra casa':'Our house'}</span><span class="house-count" aria-label={es?'Piezas de la casa':'House pieces'}>🧱 <span data-house-count>{index*2}</span> / {HOUSE_PIECES}</span><div aria-label={es?'Pasos de esta misión':'Mission steps'}><span data-city-badge="0">1</span><span aria-hidden="true">—</span><span data-city-badge="1">2</span></div></div>
+  <HouseScene progress={index*2}/>
+  {mission.rewards.map((reward,i)=><p class="city-reward" data-city-reward={i} role="status" aria-live="polite" hidden><HeroText text={reward[locale]} /></p>)}
+ </div>
+ <HouseChoices locale={locale}/>
+ <section class="city-notebook city-worked-example" aria-label={es?'Ejemplo paso a paso':'Step-by-step example'}><p class="city-example-heading">{es?'Miremos un ejemplo':'Let’s try an example'}</p><div><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><figure class="city-example" data-scene><div>{lesson.scene.items.map((item,i)=><button type="button" data-scene-item aria-pressed="false" aria-label={`${es?'Tarjeta':'Card'} ${i+1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="city-secondary" data-scene-reset>{es?'Borrar marcas':'Clear marks'}</button></figure><ol>{lesson.steps.map(step=><li>{step[locale]}</li>)}</ol><p>{lesson.misconception[locale]}</p><UpperPrimaryLab locale={locale} packageId={lesson.packageId}/></div></section>
+ <section class="city-challenge">
+ <span class="mk-ui mk-chip mk-chip--sun mk-mission-stars" data-mission-stars hidden><span aria-hidden="true">★</span> <span data-mission-stars-value></span></span>
+ <p>{es?'Ahora te toca. Leé la pregunta y probá.':'Now it’s your turn. Read the question and try it.'}</p>
+ {lesson.packageId==='G03-09' && <figure class="city-question-map"><figcaption>{lesson.scene.caption[locale]}</figcaption><table aria-label={es?'Plano para estos desafíos':'Map for these challenges'}><tbody>{lesson.scene.items.map(row=><tr>{row.split(' ').map(cell=><td>{cell}</td>)}</tr>)}</tbody></table></figure>}
+ {lesson.checks.map((check,i)=><div data-city-question={i} hidden={i!==0} data-answer={check.answer} data-practice-skill={i===MISSION_PRACTICE_CHECK?practiceSkill:undefined}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / 2</p><h2 tabindex="-1" data-city-question-title>{check.prompt[locale]}</h2>
+ {index===0 && i===0 && <div class="city-place-model"><p>{es?'Tocá una cifra para ver cuántos ladrillos vale.':'Tap a digit to see how many bricks it is worth.'}</p><div>{[3,5,2,8].map((digit,j)=><button type="button" data-city-place={`${digit} × ${[1000,100,10,1][j]} = ${digit*[1000,100,10,1][j]}`} aria-pressed="false"><span>{placeLabels[j]}</span><strong>{digit}</strong></button>)}</div><p data-city-place-result role="status" aria-live="polite"></p></div>}
+ <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option,j)=><button type="button" data-city-answer={j}>{option[locale]}</button>)}</div>{i===MISSION_PRACTICE_CHECK&&practiceSkill&&<button type="button" class="mk-ui mk-btn mk-new-numbers" data-city-new-numbers><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M17 4l3 3-3 3M17 14l3 3-3 3"/></svg>{t(locale,'practiceNew')}</button>}<p class="city-hint" data-city-hint hidden>{hints[i][locale]}</p><p class="city-hint" data-city-explanation hidden>{check.explanation[locale]}</p></div>)}
+ <p class="city-feedback" data-city-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-city-help>{es?'Una pista de Átomo':'A hint from Átomo'}</button><button type="button" class="city-secondary" data-city-reset>{es?'Volver a jugar':'Play again'}</button><button type="button" class="city-primary" data-city-next hidden>{es?'Siguiente desafío':'Next challenge'} →</button><a class="city-primary" data-city-finish hidden href={next?buildSchoolLessonUrl(locale,'grade-3',next.id):'#city-celebration'}>{next?(es?'Siguiente misión':'Next mission'):(es?'¡A la fiesta!':'Let’s celebrate!')} →</a></div>
+ </section>
+ {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es?'Un desafío extra: cinco preguntas':'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_THREE_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-city-check`} assessment/></div></details>}
+ <details class="city-notebook"><summary>{es?'Para explorar con un adulto':'Explore with a grown-up'}</summary><div><p>{lesson.warmup[locale]}</p><p>{lesson.exit[locale]}</p><p>{es?'Revisen juntos el dibujo y la explicación. Cada misión muestra una etapa de la construcción de la casa. El nombre de la casa y el color se guardan solo en este navegador.':'Review the drawing and explanation together. Each mission shows a stage of building the house. The house name and colour are saved only in this browser.'}</p></div></details>
+ {!next && <section class="city-celebration" id="city-celebration" data-city-celebration hidden><p class="city-kicker">{es?'LA FIESTA DE LA CASA NUEVA':'THE HOUSEWARMING PARTY'}</p><h2>{es?'¡Bienvenidos a casa!':'Welcome home!'}</h2><HouseScene progress={HOUSE_PIECES}/><p><HeroText text={HOUSE_EPILOGUE[locale]} /></p><a class="city-primary" href={buildGradeUrl(locale,'grade-3')}>{es?'Volver a la obra':'Back to the building site'} →</a><details class="city-notebook"><summary>{es?'Proyecto en familia: planificar la fiesta':'Family project: plan the party'}</summary><div><p>{GRADE_THREE_PROJECT.introduction[locale]}</p><ol>{GRADE_THREE_PROJECT.tasks.map(task=><li>{task[locale]}</li>)}</ol><ul>{GRADE_THREE_PROJECT.rubric.map(item=><li>{item[locale]}</li>)}</ul></div></details></section>}
+ <noscript><p>{es?'Activá JavaScript para construir la casa. Podés leer los ejemplos del cuaderno sin activarlo.':'Enable JavaScript to build the house. You can read the notebook examples without it.'}</p></noscript>
+</article>
+<script>import '../../scripts/houseAdventure';</script>

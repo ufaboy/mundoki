@@ -1,0 +1,7 @@
+---
+// "Make the house yours": a name for the house and the wall colour.
+// Class and data-city-* names are shared with the other primary worlds' styles.
+import type { Locale } from '../../math/core/types';
+const {locale}=Astro.props as {locale:Locale};const es=locale==='es-AR';
+---
+<details class="city-choices"><summary>{es?'Dale tu estilo a la casa':'Make the house yours'} <span aria-hidden="true">✎</span></summary><div class="city-choices-body"><label>{es?'Nombre de la casa':'House name'}<input type="text" maxlength="24" data-city-name placeholder={es?'Nuestra casa':'Our house'} autocomplete="off"/></label><div role="group" aria-label={es?'Color de las paredes':'Wall colour'} class="city-color-options">{[['terracotta',es?'Terracota':'Terracotta'],['sage',es?'Verde':'Green'],['blue',es?'Azul':'Blue']].map(([color,label])=><button type="button" data-city-color={color} aria-pressed={color==='terracotta'?'true':'false'}><span class={`city-swatch-${color}`} aria-hidden="true"></span>{label}</button>)}</div><p>{es?'El nombre y el color se recuerdan en este navegador.':'The name and colour are remembered in this browser.'}</p></div></details>

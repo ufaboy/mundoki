@@ -1,136 +1,137 @@
 import { text } from '../lessonModel';
+// Átomo’s hints: one per lesson check, about the case objects, never the answer.
 const hints: Record<string, [string, string]> = {
  "G07-01-L01": [
-  "Buscá la posición del 4: unidades, decenas o centenas.|Find the position of 4: ones, tens, or hundreds.",
-  "Sumá las cifras y buscá qué sobra al formar grupos de nueve.|Add the digits and find what remains after making groups of nine."
+  "Mirá en qué columna está el 4 de 2405: unidades, decenas, centenas o miles.|Look at which column the 4 in 2405 is in: ones, tens, hundreds, or thousands.",
+  "Sumá las cifras de 451 y fijate qué sobra al armar grupos de nueve.|Add the digits of 451 and see what is left after making groups of nine."
  ],
  "G07-01-L02": [
-  "Imaginá juntar dos colecciones de grupos completos de cinco.|Imagine combining two collections of complete groups of five.",
-  "Probá dividir cada sumando por tres por separado.|Try dividing each addend by three separately."
+  "Imaginá juntar las filas de los dos carritos: ¿queda alguna fila incompleta?|Imagine putting the rows of both carts together: is any row incomplete?",
+  "Probá repartir solo la caja de 2 libros en 3 grupos iguales.|Try sharing only the box of 2 books into 3 equal groups."
  ],
  "G07-01-L03": [
-  "Buscá una opción que tenga divisores además de uno y de sí misma.|Find an option with divisors besides one and itself.",
-  "Listá los divisores de dos y comprobá si es par.|List the divisors of two and check whether it is even."
+  "Buscá el casillero cuyo número tiene un divisor además de 1 y de sí mismo.|Find the locker whose number has a divisor besides 1 and itself.",
+  "Escribí los divisores de dos y fijate si es par.|Write down the divisors of two and check whether it is even."
  ],
  "G07-02-L01": [
-  "Dividí siete entre ocho y verificá multiplicando por ocho.|Divide seven by eight and check by multiplying by eight.",
-  "Sumá los centésimos y compará con cien centésimos.|Add the hundredths and compare with one hundred hundredths."
+  "Dividí 7 entre 8 hasta que no sobre nada; después compará con las marcas de la jarra.|Divide 7 by 8 until nothing is left; then compare with the jug marks.",
+  "Sumá los centésimos de la tarjeta y compará con cien centésimos.|Add the hundredths on the card and compare with one hundred hundredths."
  ],
  "G07-02-L02": [
-  "Primero calculá tres veces un sexto; después agregá un medio.|First calculate three times one sixth; then add one half.",
-  "Resolvé primero lo que está entre paréntesis.|Work out what is inside the parentheses first."
+  "Antes de sumar, calculá cuánto son tres sextos de taza.|Before adding, work out how much three sixths of a cup is.",
+  "Primero averiguá cuánto café hay en total; después repartilo en los dos frascos.|First find how much coffee there is in total; then share it between the two jars."
  ],
  "G07-02-L03": [
-  "Expresá las dos cantidades en décimos y contá grupos de tres.|Express both quantities in tenths and count groups of three.",
-  "0,2 es un quinto. Pensá qué parte de cinco estás tomando.|0.2 is one fifth. Think about what part of five you are taking."
+  "Pasá los litros a décimos: ¿cuántas veces entra 3 en 24?|Turn the liters into tenths: how many times does 3 fit into 24?",
+  "0,2 es un quinto. ¿Cuánto es un quinto de 5 cafés?|0.2 is one fifth. How much is one fifth of 5 coffees?"
  ],
  "G07-03-L01": [
-  "Repartí el costo total entre las ocho etiquetas.|Share the total cost among the eight labels.",
-  "Elegí una misma cantidad de lápices como referencia para ambos paquetes.|Choose the same number of pencils as a reference for both packs."
+  "Repartí las 20 cuadras entre los 8 minutos: ¿cuántas tocan a cada minuto?|Share the 20 blocks among the 8 minutes: how many go to each minute?",
+  "Pensá en la tabla de coartadas: ¿qué columna permite comparar a Aurelio con Clara?|Think about the alibi table: which column lets you compare Aurelio with Clara?"
  ],
  "G07-03-L02": [
-  "Reemplazá x por dos y medio; 4x significa cuatro veces x.|Replace x with two and a half; 4x means four times x.",
-  "Calculá el costo por unidad con x = 1 y con x = 2.|Calculate cost per unit with x = 1 and with x = 2."
+  "En la recta de Rayo, multiplicá los km por el precio de un km.|On Rayo’s line, multiply the km by the price of one km.",
+  "Calculá el costo dividido por los km para 1 km y para 2 km en la recta de Cóndor.|Work out the cost divided by the km for 1 km and for 2 km on Cóndor’s line."
  ],
  "G07-03-L03": [
-  "Hallá un cuarto de 80 y restalo del precio original.|Find one quarter of 80 and subtract it from the original price.",
-  "Pasá del plano a la realidad multiplicando por 200; después convertí cm a m.|Go from plan to reality by multiplying by 200; then convert cm to m."
+  "Multiplicá los 5 cm del mapa por 20.000 y pasá el resultado de cm a km.|Multiply the 5 cm on the map by 20,000 and convert the result from cm to km.",
+  "Calculá el 25 % de 80 lupas y restalo del precio del libro.|Work out 25% of 80 lupas and subtract it from the book’s price."
  ],
  "G07-04-L01": [
-  "Contá cuatro palitos al empezar y tres por cada cuadrado nuevo.|Count four sticks to start and three for each new square.",
-  "Buscá el lado que el cuadrado nuevo comparte con el anterior.|Find the side the new square shares with the previous one."
+  "Contá los barrotes del primer cuadrado y después solo los nuevos de cada cuadrado.|Count the bars of the first square, then only the new bars of each square.",
+  "Dibujá un cuadrado más en la reja y contá solo los barrotes nuevos.|Draw one more square on the gate and count only the new bars."
  ],
  "G07-04-L02": [
-  "Separá el primer cuadrado de los que se agregan después.|Separate the first square from those added later.",
-  "Pensá si podrías continuar esos tres números de dos maneras distintas.|Think whether you could continue those three numbers in two different ways."
+  "En una reja de 12 cuadrados, tapá el primero: ¿cuántos quedan?|In a gate of 12 squares, cover the first one: how many are left?",
+  "¿Podría otra reja empezar con 4, 7, 10 y seguir distinto?|Could another gate start with 4, 7, 10 and continue differently?"
  ],
  "G07-04-L03": [
-  "Reemplazá n por seis y multiplicá antes de sumar.|Replace n with six and multiply before adding.",
-  "Recordá qué cuenta n: ¿se permiten cuadrados incompletos en esta fila?|Recall what n counts: are incomplete squares allowed in this row?"
+  "Reemplazá n por 6: primero multiplicá 3 por 6 y después sumá 1.|Replace n with 6: first multiply 3 by 6, then add 1.",
+  "Mirá una reja real: ¿se puede construir medio cuadrado de barrotes?|Look at a real gate: can half a square of bars be built?"
  ],
  "G07-05-L01": [
-  "Buscá en el enunciado qué medida puede cambiar.|Find the measurement that can change in the description.",
-  "El perímetro recorre el borde. Pensá qué unidad usarías para medirlo.|Perimeter follows the boundary. Think what unit you would use to measure it."
+  "Leé la orden: ¿qué medida de la foto cambia de un marco a otro?|Read the order: which measurement of the photo changes from one frame to another?",
+  "El listón rodea la foto: ¿mide una longitud o una superficie?|The strip goes around the photo: does it measure a length or a surface?"
  ],
  "G07-05-L02": [
-  "Sustituí w por siete y hacé primero la multiplicación.|Replace w with seven and multiply first.",
-  "Recorré el borde del rectángulo y anotá cada longitud.|Follow the rectangle boundary and write down each length."
+  "Reemplazá w por 7: multiplicá 2 por 7 y después sumá 4.|Replace w with 7: multiply 2 by 7, then add 4.",
+  "Recorré con el dedo el borde de la foto y sumá cada tramo del listón.|Trace the photo’s edge with your finger and add each piece of the strip."
  ],
  "G07-05-L03": [
-  "El primer número es el ancho. Usalo en la fórmula y compará con el segundo.|The first number is width. Use it in the formula and compare with the second.",
-  "Dividí el perímetro por el ancho en dos filas de la tabla.|Divide perimeter by width in two rows of the table."
+  "Para w = 4, calculá 2 × 4 + 4 y buscá el punto con ese segundo número.|For w = 4, work out 2 × 4 + 4 and find the point with that second number.",
+  "Dividí el listón por el ancho en dos filas de la tabla del cartel y compará.|Divide the strip by the width in two rows of the sign’s table and compare."
  ],
  "G07-06-L01": [
-  "Completá media vuelta: restá el ángulo conocido de 180°.|Complete a half turn: subtract the known angle from 180°.",
-  "Buscá el ángulo que queda enfrente, sin compartir un lado.|Find the angle across the vertex, with no shared side."
+  "Sobre la calle recta, los dos ángulos juntos forman media vuelta.|Along the straight street, the two angles together make half a turn.",
+  "Mirá qué ángulo del cruce está enfrentado al de 72°, tocándolo solo por el vértice.|Look at which angle of the crossing faces the 72° angle, touching it only at the vertex."
  ],
  "G07-06-L02": [
-  "Sumá los dos ángulos conocidos y completá 180°.|Add the two known angles and complete 180°.",
-  "Trazá una diagonal y contá los triángulos que aparecen.|Draw a diagonal and count the triangles it makes."
+  "Sumá las dos esquinas de la plazoleta y restá de 180°.|Add the two corners of the square and subtract from 180°.",
+  "Trazá una diagonal de la manzana: ¿qué figuras aparecen?|Draw a diagonal of the block: which shapes appear?"
  ],
  "G07-06-L03": [
-  "Sumá los dos lados cortos y compará con el más largo.|Add the two shorter sides and compare with the longest.",
-  "Recordá que todos los puntos del arco están a la misma distancia del centro.|Recall that all points on the arc are the same distance from its center."
+  "Sumá los dos cordones más cortos y compará con el más largo.|Add the two shortest strings and compare with the longest.",
+  "Un arco reúne todos los puntos a la misma distancia del centro: ¿qué medida fija?|An arc collects all the points at the same distance from the center: what measurement does it fix?"
  ],
  "G07-07-L01": [
-  "Aplicá el factor tres a cada medida por separado.|Apply the factor three to each measurement separately.",
-  "Compará las razones entre los lados antes y después de sumar.|Compare the side-length ratios before and after adding."
+  "Ampliar por tres es multiplicar: aplicalo al ancho y al largo del negativo.|Enlarging by three means multiplying: apply it to both the width and length of the negative.",
+  "Probá con una copia de 2 × 4: sumá 3 a cada lado y compará las razones.|Try a 2 × 4 copy: add 3 to each side and compare the ratios."
  ],
  "G07-07-L02": [
-  "Contá cuántas copias entran por fila y cuántas filas hay.|Count copies per row and the number of rows.",
-  "El perímetro suma los lados. Pensá qué pasa si cada sumando se divide por dos.|Perimeter adds the side lengths. Think what happens when each term is halved."
+  "Dibujá cuántas copias de la foto original entran en la ampliación: filas por columnas.|Draw how many copies of the original photo fit in the enlargement: rows times columns.",
+  "El marco es el borde: ¿qué le pasa a cada tramo si cada lado se reduce a la mitad?|The frame is the edge: what happens to each piece if every side is halved?"
  ],
  "G07-07-L03": [
-  "Sumá los cuatro lados de cada rectángulo y compará.|Add all four sides of each rectangle and compare.",
-  "Buscá dos rectángulos con el mismo borde pero distinta superficie.|Find two rectangles with the same boundary length but different areas."
+  "Calculá el cerco de cada cantero sumando sus cuatro lados.|Work out each bed’s fence by adding its four sides.",
+  "Buscá el par de canteros con el mismo cerco y compará cuánta tierra tiene cada uno.|Find the pair of beds with the same fence and compare how much soil each has."
  ],
  "G07-08-L01": [
-  "Buscá la cara opuesta: debe tener las mismas dos medidas.|Find the opposite face: it must have the same two measurements.",
-  "Imaginá plegar una fila de seis cuadrados: ¿cerraría sin superponer caras?|Imagine folding a row of six squares: would it close without overlapping faces?"
+  "Las caras gemelas están enfrentadas en la caja: ¿qué medidas tiene la de enfrente?|Twin faces are opposite each other in the box: what size is the opposite face?",
+  "Imaginá plegar seis cuadrados en una fila larga: ¿se cierra la caja?|Imagine folding six squares in one long row: does the box close?"
  ],
  "G07-08-L02": [
-  "Pensá si estás contando cuadrados para cubrir o cubos para llenar.|Think whether you are counting squares to cover or cubes to fill.",
-  "Contá los cubitos de una capa y multiplicá por la cantidad de capas.|Count cubes in one layer and multiply by the number of layers."
+  "El cubito tiene largo, ancho y alto: ¿qué unidad tiene tres dimensiones?|The cube has length, width, and height: which unit has three dimensions?",
+  "Contá los cubitos de una capa de 2 × 2 y multiplicá por las capas.|Count the cubes in one 2 × 2 layer and multiply by the number of layers."
  ],
  "G07-08-L03": [
-  "Hallá las áreas de los tres tipos de cara y recordá que hay dos de cada tipo.|Find the areas of the three face types and remember there are two of each.",
-  "Para comparar material, revisá qué se mantiene igual y qué se mide.|To compare material, check what stays the same and what is measured."
+  "Calculá el área de cada tipo de cara de la caja de 2 × 2 × 6 y recordá que hay dos de cada una.|Work out the area of each type of face of the 2 × 2 × 6 box and remember there are two of each.",
+  "Para comparar papel, ¿qué tiene que ser igual en las dos cajas?|To compare paper, what must be the same in both boxes?"
  ],
  "G07-09-L01": [
-  "Escribí las seis respuestas de dibujo como parte del total de veinte.|Write the six drawing votes as a fraction of all twenty votes.",
-  "Compará los valores escritos, no solo los tramos visibles desde cinco.|Compare the written values, not just the visible portions above five."
+  "Dividí los que eligieron dibujo por el total de la encuesta.|Divide the number who chose drawing by the survey total.",
+  "Leé los números del eje, no solo la altura de las barras.|Read the numbers on the axis, not only the height of the bars."
  ],
  "G07-09-L02": [
-  "Sumá los cuatro datos y repartí el total en cuatro partes iguales.|Add all four values and share the total into four equal parts.",
-  "Contá cuántas veces aparece cada número.|Count how often each number appears."
+  "Sumá los acertijos de las cuatro semanas y dividí por cuatro.|Add the riddles of the four weeks and divide by four.",
+  "Buscá qué cantidad de acertijos aparece más veces en la lista.|Find which number of riddles appears most often in the list."
  ],
  "G07-09-L03": [
-  "Restá el mínimo del máximo en cada grupo.|Subtract the minimum from the maximum in each group.",
-  "Pensá si esas cuatro personas representan a todos los habitantes.|Think whether those four people represent all residents."
+  "En cada grupo de letras, restá la altura menor a la mayor.|In each group of letters, subtract the smallest height from the largest.",
+  "Pensá a quiénes preguntaron Los Halcones y a quiénes no.|Think about whom the Halcones asked and whom they did not."
  ],
  "G07-10-L01": [
-  "Enumerá las caras del dado y quedate con las menores que tres.|List the die faces and keep those less than three.",
-  "Pensá si un dado podría estar cargado aunque tenga seis caras.|Think whether a die could be loaded even though it has six faces."
+  "Escribí las caras del dado y marcá solo las menores que tres.|Write the faces of the die and mark only those less than three.",
+  "Un dado tallado a mano puede ser desparejo: ¿alcanza con nombrar las caras?|A hand-carved die can be uneven: is naming the faces enough?"
  ],
  "G07-10-L02": [
-  "Revisá si hay alguna ficha azul dentro de la bolsa.|Check whether there is a blue counter in the bag.",
-  "Buscá una opción que incluya todos los colores de la bolsa.|Find an option covering every color in the bag."
+  "Mirá dentro de la bolsa: ¿hay alguna bolita azul?|Look inside the bag: is there any blue marble?",
+  "Buscá el evento que ocurre con cualquier bolita que saques.|Find the event that happens with any marble you draw."
  ],
  "G07-10-L03": [
-  "Dividí la cantidad de caras por el total de lanzamientos.|Divide the number of heads by the total number of tosses.",
-  "Pensá si los resultados anteriores cambian las posibilidades del siguiente lanzamiento.|Think whether earlier outcomes change the chances on the next toss."
+  "Escribí las caras como fracción del total de tiradas y pasala a porcentaje.|Write the heads as a fraction of all the tosses and turn it into a percentage.",
+  "¿La moneda recuerda lo que salió antes?|Does the coin remember what came up before?"
  ],
  "G07-11-L01": [
-  "Calculá el área total y quitá el cuarto reservado para lectura.|Calculate the total area and remove the quarter reserved for reading.",
-  "Convertí seis metros a centímetros antes de dividir por cien.|Convert six meters to centimeters before dividing by one hundred."
+  "Calculá el área de toda la huerta y restá la franja de lectura.|Work out the area of the whole garden and subtract the reading strip.",
+  "Pasá 6 m a cm y dividí por 100.|Convert 6 m to cm and divide by 100."
  ],
  "G07-11-L02": [
-  "Restá el porcentaje descontado de 100% y escribí lo que queda como decimal.|Subtract the discount percentage from 100% and write the remainder as a decimal.",
-  "Separá los gastos con descuento de los que conservan su precio.|Separate discounted expenses from those that keep their price."
+  "Si descuentan el 30 % de las mesas, ¿qué parte del precio queda?|If 30% is taken off the tables, what part of the price remains?",
+  "Leé la condición: ¿sobre qué compras vale el descuento?|Read the condition: which purchases does the discount apply to?"
  ],
  "G07-11-L03": [
-  "Duplicá filas y columnas: contá cuántas copias del rectángulo original caben.|Double rows and columns: count how many copies of the original rectangle fit.",
-  "Compará el costo por unidad para distintas cantidades.|Compare cost per unit for different quantities."
+  "Dibujá el cantero con lados dobles y contá cuántas copias del original entran.|Draw the bed with doubled sides and count how many copies of the original fit.",
+  "Recordá las dos mensajerías: ¿qué tenía Cóndor que Rayo no tenía?|Remember the two couriers: what did Cóndor have that Rayo did not?"
  ]
 };
 export function getGradeSevenHints(id: string) {

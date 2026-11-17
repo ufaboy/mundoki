@@ -8,7 +8,7 @@ document.querySelectorAll<HTMLElement>('[data-moon-root]').forEach(root=>{
   root.style.setProperty('--moon-paint',({teal:'#378d8b',coral:'#cd806b',gold:'#c59a39'})[preferences.color]);
   root.querySelectorAll('[data-moon-emblem-display]').forEach(el=>{el.textContent=({star:'★',moon:'☾',planet:'♄'})[preferences.emblem];});
   root.querySelectorAll<HTMLElement>('[data-moon-emblem]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.moonEmblem===preferences.emblem)));
-  root.querySelectorAll('[data-moon-name-display]').forEach(el=>{el.textContent=preferences.name||(es?'Mi expedición':'My expedition');});
+  root.querySelectorAll('[data-moon-name-display]').forEach(el=>{el.textContent=preferences.name||(es?'Misión Cóndor':'Cóndor mission');});
   root.querySelectorAll<HTMLElement>('[data-moon-color]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.moonColor===preferences.color)));
  };
  const save=()=>{try{localStorage.setItem('mundoki-moon-style-v1',JSON.stringify(preferences));}catch{}};
@@ -30,7 +30,8 @@ document.querySelectorAll<HTMLElement>('[data-moon-root]').forEach(root=>{
   const updated=answerMoon(state,i,Number(b.dataset.moonAnswer)===Number(q.dataset.answer));
   if(updated===state){get('feedback').textContent=es?'Probá otra vez. Mirá el ejemplo de arriba o pedí una pista.':'Try again. Look at the example above or ask for a hint.';return;}
   state=updated;q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(button=>{button.disabled=true;});b.classList.add('is-correct');q.querySelector<HTMLElement>('[data-moon-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-moon-explanation]')!.hidden=false;
-  get('reward').textContent=q.dataset.reward!;get('reward').hidden=false;
+  // The reward is rendered per hero by HeroText; copy it so CSS keeps choosing the hero.
+  get('reward').replaceChildren(...[...q.querySelector<HTMLElement>('[data-moon-reward-source]')!.childNodes].map(node=>node.cloneNode(true)));get('reward').hidden=false;
   get('feedback').textContent=es?'¡Lo lograste! Mirá qué cambió en la misión.':'You did it! Look at what changed in the mission.';
   get('next').hidden=state.solved===state.count;get('finish').hidden=state.solved!==state.count;render();
  })));
@@ -41,7 +42,7 @@ document.querySelectorAll<HTMLElement>('[data-moon-root]').forEach(root=>{
  get('help').addEventListener('click',()=>{if(state.solved>state.current)return;questions[state.current].querySelector<HTMLElement>('[data-moon-hint]')!.hidden=false;});
  get('reset').addEventListener('click',()=>{
   state=initialMoonState(questions.length);questions.forEach((q,i)=>{q.hidden=i!==0;q.querySelector<HTMLElement>('[data-moon-hint]')!.hidden=true;q.querySelector<HTMLElement>('[data-moon-explanation]')!.hidden=true;q.querySelectorAll<HTMLButtonElement>('[data-moon-answer]').forEach(b=>{b.disabled=false;b.classList.remove('is-correct');});});
-  ['next','finish','reward'].forEach(name=>{get(name).hidden=true;});get('reward').textContent='';get('feedback').textContent='';render();questions[0].querySelector<HTMLElement>('[data-moon-question-title]')!.focus();
+  ['next','finish','reward'].forEach(name=>{get(name).hidden=true;});get('reward').replaceChildren();get('feedback').textContent='';render();questions[0].querySelector<HTMLElement>('[data-moon-question-title]')!.focus();
  });render();
 });
 function revealMoonAnchor(){

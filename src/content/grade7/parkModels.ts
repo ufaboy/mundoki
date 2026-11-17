@@ -13,8 +13,8 @@ const rows:string[][][]=[
  ],
  [
   [
-   "5a + 5b",
-   "a, b: enteros|a, b: integers"
+   "35 = 5 × 7",
+   "45 = 5 × 9"
   ],
   [
    "2 + 4 = 6",
@@ -62,12 +62,12 @@ const rows:string[][][]=[
  ],
  [
   [
-   "8 etiquetas → 20|8 labels → 20",
-   "1 etiqueta → ?|1 label → ?"
+   "20 cuadras → 8 min|20 blocks → 8 min",
+   "1 min → ?"
   ],
   [
-   "Costo ÷ cantidad|Cost ÷ quantity",
-   "La misma unidad|The same unit"
+   "Clara: 30 cuadras → 15 min|Clara: 30 blocks → 15 min",
+   "Aurelio: 20 cuadras → 8 min|Aurelio: 20 blocks → 8 min"
   ]
  ],
  [
@@ -83,26 +83,26 @@ const rows:string[][][]=[
  ],
  [
   [
-   "80",
+   "80 lupas",
    "Descuento: 25%|Discount: 25%"
   ],
   [
    "5 cm",
-   "1:200",
-   "1 m = 100 cm"
+   "1:20.000|1:20,000",
+   "1 km = 100.000 cm|1 km = 100,000 cm"
   ]
  ],
  [
   [
-   "4 cuadrados contiguos|4 adjacent squares"
+   "Reja de 4 cuadrados|Gate of 4 squares"
   ],
   [
-   "Un lado compartido|One shared side"
+   "Un barrote compartido|One shared bar"
   ]
  ],
  [
   [
-   "12 cuadrados contiguos|12 adjacent squares",
+   "Reja de 12 cuadrados|Gate of 12 squares",
    "Primero + agregados|First + additions"
   ],
   [
@@ -242,9 +242,9 @@ const rows:string[][][]=[
  ],
  [
   [
-   "Ajedrez: 8|Chess: 8",
+   "Lectura: 8|Reading: 8",
    "Dibujo: 6|Drawing: 6",
-   "Música: 6|Music: 6",
+   "Deporte: 6|Sport: 6",
    "Total: 20"
   ],
   [
@@ -265,7 +265,7 @@ const rows:string[][][]=[
  [
   [
    "A: 4, 4, 4, 4",
-   "B: 1, 1, 7, 7"
+   "B: 2, 3, 5, 6"
   ],
   [
    "4 observaciones|4 observations",
@@ -301,8 +301,8 @@ const rows:string[][][]=[
  ],
  [
   [
-   "8 × 6 m",
-   "Lectura: 1/4 del área|Reading: 1/4 of the area"
+   "Huerta: 8 × 6 m|Garden: 8 × 6 m",
+   "Franja de lectura: 2 × 6 m|Reading strip: 2 × 6 m"
   ],
   [
    "6 m",

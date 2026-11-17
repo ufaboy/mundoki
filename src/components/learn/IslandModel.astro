@@ -15,7 +15,7 @@ const strips:Record<string,[number,number][][]>={
 const fractions=strips[lessonId]?.[question]??[];
 const angles:Record<string,number[]>={'G04-10-L01':[180,90],'G04-10-L02':[65,135],'G04-10-L03':[60,60]};
 const angle=angles[lessonId]?.[question];
-const line=lessonId==='G04-06-L03'?(question===0?4:8):0;
+const line=lessonId==='G04-06-L03'?(question===0?8:4):0;
 const array=lessonId==='G04-03-L01'&&question===0;
 const place=lessonId==='G04-01-L01'&&question===0;
 const net=lessonId==='G04-12-L03';

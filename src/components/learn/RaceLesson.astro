@@ -1,0 +1,63 @@
+---
+// Grade 6 Math Racing mission page: race header, circuit scene, worked
+// example, two challenges whose answers trigger race effects, and the podium
+// epilogue after the last mission. Story texts can name the chosen hero
+// ({name}), so they render through HeroText.
+import type { Locale } from '../../math/core/types';
+import { GRADE_SIX_LESSONS, GRADE_SIX_PROJECT } from '../../content/grade6';
+import { GRADE_SIX_ASSESSMENTS } from '../../content/grade6/assessments';
+import { RACE_MISSIONS, RACE_CHAPTERS, RACE_EFFECTS, RACE_EPILOGUE, racePartsBefore } from '../../content/grade6/racingAdventure';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import { getGradeSixHints } from '../../content/grade6/hints';
+import RaceWorkedDiagram from './RaceWorkedDiagram.astro';
+import RaceModel from './RaceModel.astro';
+import RaceScene from './RaceScene.astro';
+import RaceChoices from './RaceChoices.astro';
+import RaceGarage from './RaceGarage.astro';
+import RaceDuel from './RaceDuel.astro';
+import GradeOneChecks from './GradeOneChecks.astro';
+import GradeSixLab from './GradeSixLab.astro';
+import UpperPrimaryLab from './UpperPrimaryLab.astro';
+import HeroText from '../shared/HeroText.astro';
+import { t } from '../../i18n/translations';
+import { MISSION_PRACTICE, MISSION_PRACTICE_CHECK } from '../../math/practice/generators';
+import { GRADES_CATALOG } from '../../math/curriculum';
+const {locale,lessonId}=Astro.props as {locale:Locale;lessonId:string};
+const es=locale==='es-AR';
+const index=GRADE_SIX_LESSONS.findIndex(l=>l.id===lessonId);
+const lesson=GRADE_SIX_LESSONS[index],mission=RACE_MISSIONS[index];
+if(!lesson||mission.id!==lesson.id)throw new Error(`Missing race mission: ${lessonId}`);
+const chapterIndex=RACE_CHAPTERS.findIndex(c=>c.missions.includes(mission));
+const chapter=RACE_CHAPTERS[chapterIndex];
+const next=GRADE_SIX_LESSONS[index+1];
+const hints=getGradeSixHints(lessonId);
+const lastInPackage=!next||next.packageId!==lesson.packageId;
+const lastInChapter=chapter.missions.at(-1)===mission;
+// "New numbers" for the mission's computational challenge, and the results bucket for stars.
+const practiceSkill=MISSION_PRACTICE[lesson.id];
+const topicId=GRADES_CATALOG.find(grade=>grade.id==='grade-6')!.primaryTopicId;
+const incoming=mission.rewards.flatMap((reward,question)=>reward.part?[{part:reward.part,question}]:[]);
+---
+<article class="city-adventure city-lesson race-adventure" data-race-root data-race-lesson data-locale={locale} data-lesson-id={lesson.id} data-topic-id={topicId}>
+ <nav class="city-top"><a href={`${buildGradeUrl(locale,'grade-6')}#race-${chapter.id}`}>← {es?'Mapa del campeonato':'Championship map'}</a><span>{es?'MISIÓN':'MISSION'} {index+1} / {GRADE_SIX_LESSONS.length}</span></nav>
+ <header class="city-heading"><p class="city-kicker">{chapter.icon} {es?'Etapa':'Stage'} {chapterIndex+1} · {chapter.title[locale]}</p><h1>{mission.title[locale]}</h1><p><HeroText text={mission.introduction[locale]}/></p></header>
+ <div class="city-scene-frame"><div class="city-scene-top"><span data-race-emblem-display aria-hidden="true">★</span><span data-race-name-display>Escudería Pampa</span><div class="race-powers" aria-label={es?'Ventajas de esta misión':'This mission’s advantages'}>{mission.rewards.map((reward,i)=><span data-race-power={i} title={RACE_EFFECTS[reward.effect].label[locale]}><span aria-hidden="true">{RACE_EFFECTS[reward.effect].icon}</span><span class="visually-hidden">{RACE_EFFECTS[reward.effect].label[locale]}</span></span>)}</div></div><RaceScene kind={mission.scene} step={mission.step} steps={mission.steps}/><p class="race-scene-caption">{es?'Escena de la carrera · los datos del desafío están abajo.':'Race scene · challenge data are below.'}</p><p class="city-reward race-reward" data-race-reward role="status" aria-live="polite" hidden></p></div>
+ <RaceGarage locale={locale} installed={racePartsBefore(index)} incoming={incoming}/>
+ <RaceChoices locale={locale}/>
+ <section class="city-notebook race-worked-example" aria-label={es?'Ejemplo paso a paso':'Step-by-step example'}><p class="city-example-heading">{es?'Miremos un ejemplo':'Let’s try an example'}</p><div><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><h3>{es?'Ejemplo paso a paso':'Step-by-step example'}</h3><figure class="city-example" data-scene><div>{lesson.scene.items.map((item,i)=><button type="button" data-scene-item aria-pressed="false" aria-label={`${es?'Tarjeta':'Card'} ${i+1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="city-secondary" data-scene-reset>{es?'Borrar marcas':'Clear marks'}</button></figure><ol>{lesson.steps.map(step=><li>{step[locale]}</li>)}</ol><RaceWorkedDiagram locale={locale} lessonId={lesson.id}/><p>{lesson.misconception[locale]}</p><GradeSixLab locale={locale} packageId={lesson.packageId}/><UpperPrimaryLab locale={locale} packageId={lesson.packageId}/></div></section>
+ <section class="city-challenge">
+ <span class="mk-ui mk-chip mk-chip--sun mk-mission-stars" data-mission-stars hidden><span aria-hidden="true">★</span> <span data-mission-stars-value></span></span>
+ <p>{es?'Ahora te toca. Cada respuesta correcta le da una ventaja a Chispa.':'Your turn. Every correct answer gives Chispa an advantage.'}</p>
+ {lesson.checks.map((check,i)=>{const effect=RACE_EFFECTS[mission.rewards[i].effect];return <div data-race-question={i} hidden={i!==0} data-answer={check.answer} data-practice-skill={i===MISSION_PRACTICE_CHECK?practiceSkill:undefined}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / {lesson.checks.length} · {effect.icon} {effect.label[locale]}</p><h2 tabindex="-1" data-race-question-title>{check.prompt[locale]}</h2>
+ <RaceModel locale={locale} lessonId={lesson.id} question={i}/>
+ <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option,j)=><button type="button" data-race-answer={j}>{option[locale]}</button>)}</div>{i===MISSION_PRACTICE_CHECK&&practiceSkill&&<button type="button" class="mk-ui mk-btn mk-new-numbers" data-race-new-numbers><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M17 4l3 3-3 3M17 14l3 3-3 3"/></svg>{t(locale,'practiceNew')}</button>}<p class="city-hint" data-race-hint hidden><span aria-hidden="true">🦊 </span>{hints[i][locale]}</p><p class="city-hint" data-race-explanation hidden>{check.explanation[locale]}</p><div data-race-reward-source hidden><strong>{effect.icon} {effect.label[locale]}:</strong> <HeroText text={mission.rewards[i].text[locale]}/></div><div data-race-generated-reward hidden><strong>{effect.icon} {effect.label[locale]}:</strong> {es?'¡Cuenta correcta con números nuevos! Chispa gana la ventaja.':'Correct with new numbers! Chispa gains the advantage.'}</div></div>;})}
+ <p class="city-feedback" data-race-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-race-help>{es?'Una pista de Átomo':'A hint from Átomo'}</button><button type="button" class="city-secondary" data-race-reset>{es?'Volver a jugar':'Play again'}</button><button type="button" class="city-primary" data-race-next hidden>{es?'Siguiente desafío':'Next challenge'} →</button><a class="city-primary" data-race-finish hidden href={next?buildSchoolLessonUrl(locale,'grade-6',next.id):'#race-podium'}>{next?(es?'Siguiente misión':'Next mission'):(es?'¡Al podio!':'To the podium!')} →</a></div>
+ </section>
+ {lastInChapter && <RaceDuel locale={locale} chapter={chapter} stage={chapterIndex+1}/>}
+
+ {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es?'Un desafío extra: cinco preguntas':'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_SIX_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-race-check`} assessment/></div></details>}
+ <details class="city-notebook"><summary>{es?'Para explorar con un adulto':'Explore with a grown-up'}</summary><div><p>{lesson.warmup[locale]}</p><p>{lesson.exit[locale]}</p><p>{es?'Revisen juntos el dibujo y la explicación. Cada misión muestra una parte de la temporada; los resultados de las carreras son parte de la historia. Las respuestas no se guardan ni otorgan puntos de dominio. El nombre de la escudería, el color y el emblema se guardan solo en este navegador.':'Review the drawing and explanation together. Each mission shows part of the season; race results are part of the story. Answers are not saved and do not award mastery points. The team name, color, and emblem are saved only in this browser.'}</p></div></details>
+ {!next && <section class="city-celebration" id="race-podium" data-race-celebration hidden><p class="city-kicker">{es?'¡CAMPEONES DE LA COPA MUNDOKI!':'COPA MUNDOKI CHAMPIONS!'}</p><h2>{es?'El podio':'The podium'}</h2><RaceScene kind="final" preview/><p><HeroText text={RACE_EPILOGUE[locale]}/></p><a class="city-primary" href={buildGradeUrl(locale,'grade-6')}>{es?'Volver al mapa del campeonato':'Back to the championship map'} →</a><details class="city-notebook"><summary>{es?'Proyecto en familia':'Family project'}</summary><div><p>{GRADE_SIX_PROJECT.introduction[locale]}</p><ol>{GRADE_SIX_PROJECT.tasks.map(task=><li>{task[locale]}</li>)}</ol><ul>{GRADE_SIX_PROJECT.rubric.map(item=><li>{item[locale]}</li>)}</ul></div></details></section>}
+ <noscript><p>{es?'Activá JavaScript para correr la carrera. Podés leer los ejemplos sin activarlo.':'Enable JavaScript to race. You can read the examples without it.'}</p></noscript>
+</article>
+<script>import '../../scripts/racingAdventure';</script>

@@ -1,0 +1,92 @@
+---
+// Grade 7 story picture: the chapter's place on the left, the case corkboard
+// on the right. data-phase (start → building → complete) reveals what the
+// detectives found; one evidence card is pinned per solved challenge.
+import type { DetectiveScene } from '../../content/grade7/detectiveStory';
+interface Props { kind: DetectiveScene; cards?: number; preview?: boolean }
+const { kind, cards = 2, preview = false } = Astro.props;
+const ink = '#2f3a4a';
+---
+<div class="det-stage" data-detective-stage data-kind={kind} data-phase={preview ? 'complete' : 'start'} aria-hidden="true">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+ <rect width="900" height="380" fill="#f3ede1"/>
+ <path d="M0 300H900V380H0Z" fill="#ddd2bd"/>
+ <g stroke={ink} stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+ {kind==='library'&&<g>
+  {[0,1,2].map(s=><g><rect x={60+s*130} y="70" width="110" height="230" fill="#c9a77c"/>{[0,1,2,3].map(r=><g>{[0,1,2,3,4].map(b=><rect x={68+s*130+b*19} y={82+r*55} width="15" height="44" fill={['#c96f53','#5f8f8a','#e2b65c','#7b6fa8','#d78c6b'][(b+r+s)%5]}/>)}</g>)}</g>)}
+  <g class="det-built"><rect x="200" y="250" width="110" height="70" rx="6" fill="#fff7e6"/><path d="M200 252L255 290L310 252" fill="none"/><circle cx="255" cy="300" r="10" fill="#b8473a"/></g>
+  <g class="det-done"><rect x="330" y="260" width="44" height="40" rx="6" fill="#e2b65c"/><path d="M340 260V245Q352 228 364 245" fill="none"/></g>
+ </g>}
+ {kind==='cafe'&&<g>
+  <rect x="40" y="40" width="430" height="150" fill="#cfe1e3"/><path d="M40 40H470" stroke-width="10" stroke="#7a4e3a"/>
+  <text x="255" y="130" text-anchor="middle" font-size="44" font-family="Georgia, serif" fill="#7a4e3a" stroke="none">CAFÉ</text>
+  {[120,330].map(x=><g><ellipse cx={x} cy="250" rx="85" ry="22" fill="#eee7da"/><path d={`M${x} 270V330M${x-40} 330H${x+40}`} fill="none"/></g>)}
+  <g class="det-built"><path d="M100 225h30v20h-30z" fill="#fff"/><path d="M130 230q12 0 10 10" fill="none"/></g>
+  <g class="det-done"><rect x="300" y="215" width="60" height="38" fill="#fff7e6" transform="rotate(-8 330 234)"/><text x="330" y="244" text-anchor="middle" font-size="20" stroke="none" fill={ink}>8</text></g>
+ </g>}
+ {kind==='alibi'&&<g>
+  <path d="M0 300H520" stroke-width="2"/><rect x="40" y="90" width="130" height="210" fill="#e6c9a3"/><rect x="190" y="130" width="110" height="170" fill="#c9d7c7"/><rect x="320" y="70" width="150" height="230" fill="#d9b8b0"/>
+  <circle cx="410" cy="120" r="34" fill="#fff"/><path d="M410 120V98M410 120L397 128" fill="none"/>
+  <g class="det-built"><circle cx="120" cy="320" r="22" fill="none"/><circle cx="190" cy="320" r="22" fill="none"/><path d="M120 320L150 290H180L190 320M150 290L160 320" fill="none"/></g>
+  <g class="det-done"><rect x="250" y="255" width="190" height="60" rx="14" fill="#e2b65c"/>{[0,1,2,3].map(i=><rect x={265+i*42} y="265" width="30" height="22" fill="#cfe1e3"/>)}</g>
+ </g>}
+ {kind==='gates'&&<g>
+  <rect x="40" y="40" width="440" height="260" fill="#e7b9a2"/><rect x="40" y="40" width="440" height="30" fill="#c96f53"/>
+  <g fill="none" stroke-width="6">{[0,1,2,3].map(i=><rect x={90+i*80} y="120" width="80" height="80"/>)}</g>
+  <g class="det-built"><text x="260" y="250" text-anchor="middle" font-size="30" stroke="none" fill={ink}>4 · 7 · 10 · 13</text></g>
+  <g class="det-done"><rect x="400" y="215" width="60" height="85" fill="#7a4e3a"/><text x="430" y="250" text-anchor="middle" font-size="24" stroke="none" fill="#fff">19</text></g>
+ </g>}
+ {kind==='frames'&&<g>
+  {['#d94b3c','#e2b65c','#3c8bc4','#5aa36b'].map((c,i)=><rect x={50+i*110} y="60" width="95" height="230" fill={c}/>)}
+  <g class="det-built"><rect x="150" y="150" width="210" height="100" fill="#fff7e6" stroke-width="10" stroke="#7a4e3a"/></g>
+  <g class="det-done">{[0,1,2,3,4].map(i=><circle cx={185+i*35} cy="200" r="11" fill="#c9a77c"/>)}</g>
+ </g>}
+ {kind==='palermo'&&<g>
+  <rect x="30" y="40" width="470" height="260" fill="#d8e3c7"/><path d="M30 190H500" stroke-width="30" stroke="#f3ede1"/><path d="M60 300L440 40" stroke-width="30" stroke="#f3ede1"/>
+  <path d="M310 175A40 40 0 0 1 342 152" fill="none" stroke="#b8473a"/>
+  <g class="det-built"><path d="M120 250L220 250L170 205Z" fill="#a9c98f"/></g>
+  <g class="det-done"><circle cx="420" cy="250" r="14" fill="#b8473a"/><path d="M350 250A70 70 0 0 1 420 180" fill="none" stroke-dasharray="8 8"/></g>
+ </g>}
+ {kind==='printshop'&&<g>
+  <rect x="50" y="170" width="200" height="120" rx="10" fill="#9aa7b4"/><rect x="80" y="140" width="140" height="40" fill="#fff"/>
+  <g class="det-built"><rect x="290" y="60" width="200" height="140" fill="#fff" /><rect x="305" y="75" width="170" height="110" fill="#a9c98f"/>{[0,1,2].map(i=><rect x={320+i*52} y="120" width="40" height="50" fill="#7a4e3a"/>)}</g>
+  <g class="det-done"><rect x="300" y="230" width="90" height="60" fill="#c9a77c"/><rect x="400" y="245" width="70" height="45" fill="#c9a77c"/></g>
+ </g>}
+ {kind==='post'&&<g>
+  <rect x="40" y="200" width="460" height="100" fill="#c9a77c"/><rect x="40" y="60" width="460" height="40" fill="#e2b65c"/><text x="270" y="90" text-anchor="middle" font-size="26" stroke="none" fill={ink}>CORREO</text>
+  <g class="det-built"><path d="M180 200V140L250 120L320 140V200Z" fill="#a8743f"/><path d="M180 140L250 160L320 140M250 160V200" fill="none"/></g>
+  <g class="det-done">{[0,1,2,3].map(i=><rect x={340+(i%2)*26} y={150+Math.floor(i/2)*26} width="24" height="24" fill="#e2b65c"/>)}</g>
+ </g>}
+ {kind==='archive'&&<g>
+  {[0,1,2,3].map(i=><rect x={60+i*100} y={200-i*30} width="90" height={100+i*30} fill="#eee7da"/>)}
+  <g class="det-built"><rect x="120" y="70" width="180" height="120" fill="#fff"/><path d="M135 95H285M135 120H285M135 145H240" fill="none" stroke-width="3"/></g>
+  <g class="det-done"><circle cx="350" cy="120" r="45" fill="#cfe1e3" fill-opacity=".7"/><path d="M382 152L430 200" stroke-width="12"/></g>
+ </g>}
+ {kind==='fair'&&<g>
+  <path d="M60 120L270 70L480 120Z" fill="#d94b3c"/><rect x="80" y="120" width="380" height="180" fill="#f7e3c4"/>
+  <g class="det-built"><rect x="130" y="200" width="60" height="60" rx="8" fill="#fff"/>{[[145,215],[175,245],[160,230]].map(([x,y])=><circle cx={x} cy={y} r="5" fill={ink}/>)}<path d="M240 210q30-30 60 0v50h-60z" fill="#c9a77c"/></g>
+  <g class="det-done"><circle cx="390" cy="230" r="30" fill="#e2b65c"/><text x="390" y="239" text-anchor="middle" font-size="22" stroke="none" fill={ink}>$</text></g>
+ </g>}
+ {kind==='yard'&&<g>
+  <rect x="40" y="60" width="200" height="140" fill="#e7b9a2"/><path d="M30 60L140 20L250 60Z" fill="#c96f53"/>
+  <rect x="270" y="190" width="230" height="110" fill="#a9c98f"/><rect x="270" y="190" width="60" height="110" fill="#e2b65c"/>
+  <g class="det-built"><path d="M330 190H500V300H330Z" fill="none" stroke="#b8473a" stroke-dasharray="10 8"/></g>
+  <g class="det-done"><rect x="430" y="250" width="56" height="40" fill="#9aa7b4"/><path d="M430 250L458 236L486 250" fill="none"/>{[[300,120],[360,90],[420,130],[470,95]].map(([x,y],i)=><circle cx={x} cy={y} r="7" fill={['#d94b3c','#3c8bc4','#e2b65c','#5aa36b'][i]}/>)}</g>
+ </g>}
+ </g>
+ <g stroke={ink} stroke-width="3">
+  <rect x="560" y="40" width="300" height="260" rx="10" fill="#c99a62"/>
+  <rect x="572" y="52" width="276" height="236" rx="6" fill="#d9b07a" stroke="none"/>
+  <text x="710" y="80" text-anchor="middle" font-size="18" font-weight="700" stroke="none" fill={ink}>EXPEDIENTE</text>
+  {Array.from({length:cards},(_,i)=><g class="det-card" data-detective-card={i}><rect x={600+i*(240/cards)} y={110+(i%2)*40} width={Math.min(110,240/cards-16)} height="90" fill="#fff7e6" transform={`rotate(${i%2?4:-4} ${655+i*(240/cards)} ${155+(i%2)*40})`}/><circle cx={600+i*(240/cards)+Math.min(110,240/cards-16)/2} cy={114+(i%2)*40} r="7" fill="#b8473a"/></g>)}
+  <path class="det-done" d={`M${640} 160 C 700 230, 760 120, ${600+(cards-1)*(240/cards)+40} ${170+((cards-1)%2)*40}`} fill="none" stroke="#b8473a"/>
+ </g>
+</svg>
+</div>
+<style>
+.det-stage{overflow:hidden;border-radius:24px}.det-stage svg{display:block;width:100%;height:auto}
+.det-built,.det-done,.det-card{opacity:0;transition:opacity .6s ease}
+.det-card.is-pinned{opacity:1}
+.det-stage[data-phase="building"] .det-built,.det-stage[data-phase="complete"] :is(.det-built,.det-done,.det-card){opacity:1}
+@media (prefers-reduced-motion:reduce){.det-stage *{transition:none!important}}
+</style>

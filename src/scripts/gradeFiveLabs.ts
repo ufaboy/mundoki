@@ -43,11 +43,11 @@ function start(){document.querySelectorAll<HTMLElement>('[data-g5-lab]').forEach
    else summary.textContent=p.difference<0?(es?'Para esta resta, elegí A mayor o igual que B.':'For this subtraction, choose A greater than or equal to B.'):`${decimal(a)} − ${decimal(b)} = ${decimal(p.difference)}; ${a} − ${b} = ${p.difference}`+(es?' centésimos.':' hundredths.');
   }else{
    const counts=frequencies.map(x=>x.valueAsNumber),m=modeModel(counts);
-   summary.textContent=(es?`Total: ${m.total} personas. `:`Total: ${m.total} people. `)+(m.total===0?(es?'Sin datos.':'No data.'):m.uniform?(es?'Todas las respuestas observadas empatan: no hay moda destacada.':'All observed responses tie: no distinguished mode.'):(es?`Moda(s): ${m.modes.join(', ')} libros; frecuencia ${m.max}.`:`Mode(s): ${m.modes.join(', ')} books; frequency ${m.max}.`));
+   summary.textContent=(es?`Total: ${m.total} cuadrados. `:`Total: ${m.total} squares. `)+(m.total===0?(es?'Sin datos.':'No data.'):m.uniform?(es?'Todos los valores observados empatan: no hay moda destacada.':'All observed values tie: no distinguished mode.'):(es?`Moda(s): ${m.modes.join(', ')} cráteres; frecuencia ${m.max}.`:`Mode(s): ${m.modes.join(', ')} craters; frequency ${m.max}.`));
    const table=document.createElement('table');table.className='g5-frequency-table';
-   const head=document.createElement('tr');for(const label of es?['Libros','Personas (frecuencia)']:['Books','People (frequency)']){const th=document.createElement('th');th.scope='col';th.textContent=label;head.append(th);}table.append(head);
+   const head=document.createElement('tr');for(const label of es?['Cráteres','Cuadrados (frecuencia)']:['Craters','Squares (frequency)']){const th=document.createElement('th');th.scope='col';th.textContent=label;head.append(th);}table.append(head);
    counts.forEach((count,value)=>{const tr=document.createElement('tr'),th=document.createElement('th'),td=document.createElement('td');th.scope='row';th.textContent=String(value);td.textContent=String(count);const bar=document.createElement('span');bar.className='g5-bar';bar.style.width=`${count*8}%`;bar.setAttribute('aria-hidden','true');td.append(bar);tr.append(th,td);table.append(tr);});model.append(table);
-   caption(es?'Escala: cada aumento de una persona añade el mismo largo a la barra; cero no tiene barra.':'Scale: each increase of one person adds the same bar length; zero has no bar.');
+   caption(es?'Escala: cada cuadrado más añade el mismo largo a la barra; cero no tiene barra.':'Scale: each extra square adds the same bar length; zero has no bar.');
   }
  }
  root.addEventListener('input',update);update();

@@ -1,0 +1,33 @@
+---
+// Side view of La Golondrina, nose to the right. Each part gets a class from
+// the scene (shown / island-built / island-done / plane-hidden), so the plane
+// grows answer by answer. A part missing from `parts` is shown.
+export type PlanePart = 'engine'|'panels'|'stripe'|'name'|'wingOutline'|'rivetsCorner'|'wingLeft'|'wingRight'|'rivetsRight'|'aileronLeft'|'aileronRight'|'ribsRight'|'ribBolts'|'strut'|'dials'|'propeller';
+interface Props { parts?: Partial<Record<PlanePart,string>>; transform?: string; class?: string }
+const {parts={},transform,class:className}=Astro.props;
+const c=(part:PlanePart)=>parts[part]??'';
+---
+<g class={className} transform={transform}>
+ <path d="M300 232 L262 160 H292 L335 206Z" fill="var(--island-paint,#378d8b)" stroke="#2f4b54" stroke-width="4"/>
+ <path d="M300 232 Q300 202 340 196 L560 190 Q602 196 606 226 Q602 252 560 256 L340 260 Q304 257 300 232Z" fill="#f4efe2" stroke="#2f4b54" stroke-width="4"/>
+ <path d="M500 196 L548 192 Q560 205 556 222 H500Z" fill="#bfe3ee" stroke="#2f4b54" stroke-width="3"/>
+ <g class={c('dials')}>{[512,527,542].map(x=><circle cx={x} cy="214" r="5" fill="#f2c761" stroke="#2f4b54" stroke-width="1.5"/>)}</g>
+ <path d="M430 258 L420 285 M540 255 L555 285" stroke="#2f4b54" stroke-width="6"/>
+ <circle cx="420" cy="290" r="13" fill="#2f4b54"/><circle cx="555" cy="290" r="13" fill="#2f4b54"/>
+ <g class={c('panels')}><path d="M340 200 L500 196 V256 L340 259 Q306 256 304 232 Q306 204 340 200Z" fill="#dfe6e8" stroke="#2f4b54" stroke-width="3"/>{[350,380,410,440,470].map(x=><g fill="#7b8d93"><circle cx={x} cy="206" r="2.5"/><circle cx={x} cy="250" r="2.5"/></g>)}</g>
+ <path class={c('stripe')} d="M306 238 H602" stroke="#2f6fa8" stroke-width="10"/>
+ <g class={c('name')}><text x="360" y="222" font-size="15" font-weight="800" fill="#2f4b54" font-family="Nunito, sans-serif">LA GOLONDRINA</text></g>
+ <g class={c('strut')}><path d="M505 184 L525 238 M565 183 L548 236" stroke="#2f4b54" stroke-width="5"/></g>
+ <path class={c('wingOutline')} d="M360 176 Q470 160 585 172 L583 186 Q470 178 362 190Z" fill="#fbf7ec" stroke="#2f4b54" stroke-width="3" stroke-dasharray="6 5"/>
+ <path class={c('wingLeft')} d="M360 176 Q415 166 470 165 L470 182 Q415 183 362 190Z" fill="var(--island-paint,#378d8b)" stroke="#2f4b54" stroke-width="3"/>
+ <path class={c('wingRight')} d="M470 165 Q530 165 585 172 L583 186 Q530 180 470 182Z" fill="var(--island-paint,#378d8b)" stroke="#2f4b54" stroke-width="3"/>
+ <g class={c('rivetsCorner')} fill="#2f4b54">{[0,1,2].flatMap(i=>[0,1,2,3].map(j=><circle cx={368+i*6} cy={176+j*3.5} r="1.6"/>))}</g>
+ <g class={c('rivetsRight')} fill="#e8eef0">{[490,510,530,550,570].map(x=><circle cx={x} cy="174" r="2"/>)}</g>
+ 
+ <g class={c('ribsRight')} stroke="#e8eef0" stroke-width="2">{[495,520,545].map(x=><path d={`M${x} 167 V182`}/>)}</g>
+ <g class={c('ribBolts')} fill="#f2c761">{[495,520,545].flatMap(x=>[171,177].map(y=><circle cx={x} cy={y} r="2.2"/>))}</g>
+ <path class={c('aileronLeft')} d="M380 188 L425 184 L426 193 L381 197Z" fill="#f2c761" stroke="#2f4b54" stroke-width="2.5"/>
+ <path class={c('aileronRight')} d="M520 182 L565 184 L564 193 L520 191Z" fill="#f2c761" stroke="#2f4b54" stroke-width="2.5"/>
+ <g class={c('engine')}><path d="M604 204 H630 Q640 225 630 248 H604 Q612 226 604 204Z" fill="#7d8f96" stroke="#2f4b54" stroke-width="4"/><circle cx="640" cy="226" r="6" fill="#2f4b54"/></g>
+ <g class={c('propeller')}><path d="M641 180 Q650 226 641 272 Q634 226 641 180Z" fill="#a4683f" stroke="#2f4b54" stroke-width="3"/></g>
+</g>
