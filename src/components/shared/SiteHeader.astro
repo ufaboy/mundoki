@@ -187,14 +187,29 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
     font-weight: 800;
   }
 
-  @media (min-width: 52rem) {
+  @media (min-width: 64rem) {
+    .mk-topbar--site {
+      gap: 12px;
+    }
+
     .mk-topbar__nav {
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      min-width: 0;
       flex-wrap: nowrap;
+    }
+
+    .mk-topbar--site .mk-nav {
+      gap: 4px;
+    }
+
+    .mk-topbar--site .mk-nav a {
+      padding: 0 10px;
+      gap: 6px;
+      font-size: 0.94rem;
+      white-space: nowrap;
     }
 
     .mk-menu-toggle,
