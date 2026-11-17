@@ -61,7 +61,6 @@ export function initSkillGame(): void {
   const feedbackEl = document.getElementById('skill-feedback');
   const scoreEl = document.getElementById('skill-score');
   const streakEl = document.getElementById('skill-streak');
-  const motionBtn = document.getElementById('skill-motion-btn') as HTMLButtonElement | null;
   const diffButtons = Array.from(
     root.querySelectorAll<HTMLButtonElement>('[data-skill-diff]')
   );
@@ -96,25 +95,13 @@ export function initSkillGame(): void {
   let streak = 0;
   let busy = false;
   let roundWon = false;
-  let reducedMotion =
+  const reducedMotion =
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const scene = createScene(skill, locale);
   let challenge: SkillChallenge = generateSkillChallenge(skill, difficulty, seed);
   scene.reset(challenge);
-
-  const updateMotionLabel = () => {
-    if (!motionBtn) return;
-    motionBtn.setAttribute('aria-pressed', reducedMotion ? 'true' : 'false');
-    motionBtn.textContent = reducedMotion
-      ? es
-        ? 'Movimiento reducido: Sí'
-        : 'Reduced motion: On'
-      : es
-        ? 'Movimiento reducido: No'
-        : 'Reduced motion: Off';
-  };
 
   const setFeedback = (msg: string, tone: 'neutral' | 'ok' | 'retry') => {
     if (!feedbackEl) return;
@@ -150,13 +137,7 @@ export function initSkillGame(): void {
     renderChallengeUI();
   };
 
-  updateMotionLabel();
   renderChallengeUI();
-
-  motionBtn?.addEventListener('click', () => {
-    reducedMotion = !reducedMotion;
-    updateMotionLabel();
-  });
 
   diffButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
