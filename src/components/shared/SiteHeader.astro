@@ -5,27 +5,37 @@
 // row inside the header.
 import type { Locale } from '../../math/core/types';
 import { t } from '../../i18n/translations';
-import { buildAccountUrl, buildHomeUrl, buildPlayUrl, buildProgressUrl, type SiteNavId } from '../../i18n/routes';
-
-export interface BreadcrumbItem {
-  label: string;
-  href?: string;
-}
+import {
+  buildAccountUrl,
+  buildCatalogUrl,
+  buildHomeUrl,
+  buildPlayUrl,
+  buildProgressUrl,
+  buildTrainHubUrl,
+  type SiteNavId,
+} from '../../i18n/routes';
 
 interface Props {
   locale: Locale;
   activeNav?: SiteNavId;
-  breadcrumbs?: BreadcrumbItem[];
 }
 
-const { locale, activeNav = 'home', breadcrumbs } = Astro.props;
+const { locale, activeNav = 'home' } = Astro.props;
+const es = locale === 'es-AR';
 
 const items = [
   {
     href: buildHomeUrl(locale),
     label: t(locale, 'navHome'),
-    current: activeNav === 'home' || activeNav === 'learn',
+    current: activeNav === 'home',
     icon: 'M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z',
+    fill: false,
+  },
+  {
+    href: buildCatalogUrl(locale),
+    label: t(locale, 'navLearn'),
+    current: activeNav === 'learn',
+    icon: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5V21',
     fill: false,
   },
   {
@@ -33,6 +43,13 @@ const items = [
     label: t(locale, 'navPlay'),
     current: activeNav === 'play',
     icon: 'M8 5.5v13l11-6.5z',
+    fill: true,
+  },
+  {
+    href: buildTrainHubUrl(locale),
+    label: es ? 'Entrenar' : 'Train',
+    current: activeNav === 'train',
+    icon: 'M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12z',
     fill: true,
   },
   {
@@ -63,22 +80,6 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
         </li>
       ))}
     </ul>
-    {breadcrumbs && breadcrumbs.length > 0 ? (
-      <ol class="mk-topbar__crumbs" aria-label="Breadcrumb">
-        {breadcrumbs.map((crumb, idx) => (
-          <>
-            {idx > 0 && <li class="mk-topbar__sep" aria-hidden="true">/</li>}
-            <li>
-              {crumb.href ? (
-                <a href={crumb.href}>{crumb.label}</a>
-              ) : (
-                <span aria-current="page">{crumb.label}</span>
-              )}
-            </li>
-          </>
-        ))}
-      </ol>
-    ) : null}
   </nav>
 
   <div class="mk-topbar__actions">
@@ -117,23 +118,6 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
       ✕
     </button>
   </div>
-
-  {breadcrumbs && breadcrumbs.length > 0 ? (
-    <ol class="mk-drawer__crumbs" aria-label="Breadcrumb">
-      {breadcrumbs.map((crumb, idx) => (
-        <>
-          {idx > 0 && <li aria-hidden="true">/</li>}
-          <li>
-            {crumb.href ? (
-              <a href={crumb.href}>{crumb.label}</a>
-            ) : (
-              <span aria-current="page">{crumb.label}</span>
-            )}
-          </li>
-        </>
-      ))}
-    </ol>
-  ) : null}
 
   <nav aria-label={t(locale, 'navMain')}>
     <ul class="mk-drawer__list">

@@ -3,7 +3,7 @@
 // Legacy pages still use BaseLayout; both share SiteHeader and SiteFooter, so
 // the header and menu never change between them.
 import DesignHead from '../components/shared/DesignHead.astro';
-import SiteHeader, { type BreadcrumbItem } from '../components/shared/SiteHeader.astro';
+import SiteHeader from '../components/shared/SiteHeader.astro';
 import SiteFooter from '../components/shared/SiteFooter.astro';
 import type { Locale } from '../math/core/types';
 import { t } from '../i18n/translations';
@@ -15,7 +15,6 @@ interface Props {
   locale: Locale;
   activeNav?: SiteNavId;
   switchLocaleHref?: string;
-  breadcrumbs?: BreadcrumbItem[];
 }
 
 const {
@@ -26,7 +25,6 @@ const {
     : 'Mundoki — matemática visual para primaria y secundaria.',
   activeNav = 'home',
   switchLocaleHref,
-  breadcrumbs,
 } = Astro.props;
 ---
 
@@ -45,7 +43,7 @@ const {
   </head>
   <body class="mk-body mk-ui">
     <a href="#main-content" class="mk-skip">{t(locale, 'skipToContent')}</a>
-    <SiteHeader locale={locale} activeNav={activeNav} breadcrumbs={breadcrumbs} />
+    <SiteHeader locale={locale} activeNav={activeNav} />
     <main id="main-content" class="mk-page">
       <slot />
     </main>

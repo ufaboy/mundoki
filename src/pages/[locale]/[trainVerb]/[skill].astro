@@ -2,8 +2,6 @@
 import AppLayout from '../../../layouts/AppLayout.astro';
 import SkillGameArena from '../../../components/arcade/SkillGameArena.astro';
 import {
-  buildHomeUrl,
-  buildTrainHubUrl,
   buildTrainSkillUrl,
   normalizeUrlLocale,
 } from '../../../i18n/routes';
@@ -33,29 +31,14 @@ const skill = resolveSkillFromSlug(Astro.params.skill || '') ?? 'addition';
 const meta = getSkillGameMeta(skill);
 const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
 const switchHref = buildTrainSkillUrl(otherLocale, skill);
-const es = locale === 'es-AR';
-const skillShortLabels: Record<string, string> = {
-  addition: es ? 'Suma' : 'Addition',
-  subtraction: es ? 'Resta' : 'Subtraction',
-  multiplication: es ? 'Multiplicación' : 'Multiplication',
-  division: es ? 'División' : 'Division',
-  'sea-cannon': es ? 'Batalla Naval' : 'Sea Cannon',
-  'chain-ops': es ? 'Combinadas' : 'Combined',
-};
-const breadcrumbs = [
-  { label: es ? 'Inicio' : 'Home', href: buildHomeUrl(locale) },
-  { label: es ? 'Juegos de Cálculo' : 'Skill Games', href: buildTrainHubUrl(locale) },
-  { label: skillShortLabels[skill] ?? meta.title[locale] },
-];
 ---
 
 <AppLayout
   title={meta.title[locale]}
   description={meta.subtitle[locale]}
   locale={locale}
-  activeNav="play"
+  activeNav="train"
   switchLocaleHref={switchHref}
-  breadcrumbs={breadcrumbs}
 >
   <SkillGameArena locale={locale} skill={skill} />
 </AppLayout>
