@@ -1,5 +1,5 @@
 ---
-import { buildHomeUrl, buildTrainHubUrl, buildTrainSkillUrl } from '../../i18n/routes';
+import { buildTrainSkillUrl } from '../../i18n/routes';
 import {
   getSkillGameMeta,
   SKILL_GAMES_META,
@@ -25,42 +25,23 @@ const isXY = meta.inputMode === 'xy';
   data-input-mode={meta.inputMode ?? 'single'}
   class="mk-stack"
 >
-  <!-- Header Breadcrumbs & Compact Skill Switcher -->
-  <div class="mk-skill-nav">
-    <nav class="mk-skill-crumbs" aria-label="Breadcrumb">
-      <ol>
-        <li><a href={buildHomeUrl(locale)}>{es ? 'Inicio' : 'Home'}</a></li>
-        <li aria-hidden="true">/</li>
-        <li><a href={buildTrainHubUrl(locale)}>{es ? 'Juegos de Cálculo' : 'Skill Games'}</a></li>
-        <li aria-hidden="true">/</li>
-        <li aria-current="page">
-          {skill === 'addition' && (es ? 'Suma' : 'Addition')}
-          {skill === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
-          {skill === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
-          {skill === 'division' && (es ? 'División' : 'Division')}
-          {skill === 'sea-cannon' && (es ? 'Batalla Naval' : 'Sea Cannon')}
-          {skill === 'chain-ops' && (es ? 'Combinadas' : 'Combined')}
-        </li>
-      </ol>
-    </nav>
-
-    <nav class="mk-skill-tabs" aria-label={es ? 'Cambiar juego' : 'Switch game'}>
-      {SKILL_GAMES_META.map((item) => (
-        <a
-          href={buildTrainSkillUrl(locale, item.id)}
-          class:list={['mk-skill-tab', { 'is-active': item.id === skill }]}
-          aria-current={item.id === skill ? 'page' : undefined}
-        >
-          {item.id === 'addition' && (es ? 'Suma' : 'Addition')}
-          {item.id === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
-          {item.id === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
-          {item.id === 'division' && (es ? 'División' : 'Division')}
-          {item.id === 'sea-cannon' && (es ? 'Batalla Naval' : 'Sea Cannon')}
-          {item.id === 'chain-ops' && (es ? 'Combinadas' : 'Combined')}
-        </a>
-      ))}
-    </nav>
-  </div>
+  <!-- Compact Skill Switcher -->
+  <nav class="mk-skill-tabs" aria-label={es ? 'Cambiar juego' : 'Switch game'}>
+    {SKILL_GAMES_META.map((item) => (
+      <a
+        href={buildTrainSkillUrl(locale, item.id)}
+        class:list={['mk-skill-tab', { 'is-active': item.id === skill }]}
+        aria-current={item.id === skill ? 'page' : undefined}
+      >
+        {item.id === 'addition' && (es ? 'Suma' : 'Addition')}
+        {item.id === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
+        {item.id === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
+        {item.id === 'division' && (es ? 'División' : 'Division')}
+        {item.id === 'sea-cannon' && (es ? 'Batalla Naval' : 'Sea Cannon')}
+        {item.id === 'chain-ops' && (es ? 'Combinadas' : 'Combined')}
+      </a>
+    ))}
+  </nav>
 
   <!-- Top Bar: Title + Stats -->
   <div class="mk-card mk-row mk-row--between mk-skill-top">

@@ -7,12 +7,18 @@ import type { Locale } from '../../math/core/types';
 import { t } from '../../i18n/translations';
 import { buildAccountUrl, buildHomeUrl, buildPlayUrl, buildProgressUrl, type SiteNavId } from '../../i18n/routes';
 
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
 interface Props {
   locale: Locale;
   activeNav?: SiteNavId;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
-const { locale, activeNav = 'home' } = Astro.props;
+const { locale, activeNav = 'home', breadcrumbs } = Astro.props;
 
 const items = [
   {
@@ -47,6 +53,22 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
   </a>
 
   <nav class="mk-topbar__nav" aria-label={t(locale, 'navMain')}>
+    {breadcrumbs && breadcrumbs.length > 0 ? (
+      <ol class="mk-topbar__crumbs" aria-label="Breadcrumb">
+        {breadcrumbs.map((crumb, idx) => (
+          <>
+            {idx > 0 && <li class="mk-topbar__sep" aria-hidden="true">/</li>}
+            <li>
+              {crumb.href ? (
+                <a href={crumb.href}>{crumb.label}</a>
+              ) : (
+                <span aria-current="page">{crumb.label}</span>
+              )}
+            </li>
+          </>
+        ))}
+      </ol>
+    ) : null}
     <ul class="mk-nav mk-nav--dock">
       {items.map((item) => (
         <li>
@@ -64,6 +86,42 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
     <span class="mk-topbar__label" id="header-account-link">{t(locale, 'navFamily')}</span>
   </a>
 </header>
+
+<style>
+  .mk-topbar__nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mk-topbar__crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--mk-ink-soft);
+  }
+
+  .mk-topbar__crumbs a {
+    color: var(--mk-sky);
+    text-decoration: none;
+  }
+
+  .mk-topbar__crumbs a:hover {
+    text-decoration: underline;
+  }
+
+  .mk-topbar__crumbs [aria-current='page'] {
+    color: var(--mk-ink);
+    font-weight: 800;
+  }
+</style>
 
 <script is:inline>
   // Show the signed-in adult's name on the Familia button.
