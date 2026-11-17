@@ -1,0 +1,121 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import {
+  buildPlayUrl,
+  buildTrainHubUrl,
+  buildTrainSkillUrl,
+  normalizeUrlLocale,
+} from '../../../i18n/routes';
+import { SKILL_GAMES_META } from '../../../math/arcade/skillGames';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [
+    { params: { locale: 'es-ar', trainVerb: 'entrenar' } },
+    { params: { locale: 'en-us', trainVerb: 'train' } },
+  ];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const es = locale === 'es-AR';
+const otherLocale = es ? 'en-US' : 'es-AR';
+const switchHref = buildTrainHubUrl(otherLocale);
+
+const icons: Record<string, string> = {
+  addition: '💧',
+  subtraction: '🎈',
+  multiplication: '🎯',
+  division: '💎',
+};
+---
+
+<AppLayout
+  title={es ? 'Juegos de Cálculo' : 'Skill Training Games'}
+  description={
+    es
+      ? 'Entrená suma, resta, multiplicación y división con minijuegos animados.'
+      : 'Train addition, subtraction, multiplication, and division with animated mini-games.'
+  }
+  locale={locale}
+  activeNav="play"
+  switchLocaleHref={switchHref}
+>
+  <div class="mk-stack mk-stack--loose">
+    <section class="mk-card mk-card--sky mk-stack mk-stack--tight">
+      <div class="mk-row mk-row--between" style="flex-wrap: wrap; gap: 12px;">
+        <div class="mk-stack mk-stack--tight">
+          <h1 class="mk-display" style="margin: 0;">
+            {es ? 'Juegos de Cálculo' : 'Skill Training Games'}
+          </h1>
+          <p class="mk-text" style="margin: 0;">
+            {es
+              ? 'Elegí una operación y resolvé cada desafío para activar la escena animada.'
+              : 'Pick an operation and solve each challenge to trigger the animated scene.'}
+          </p>
+        </div>
+        <a href={buildPlayUrl(locale)} class="mk-btn">
+          {es ? 'Ir a Aventura Espacial' : 'Open Space Adventure'}
+        </a>
+      </div>
+    </section>
+
+    <section class="mk-arcade-grid" aria-label={es ? 'Operaciones' : 'Operations'}>
+      {SKILL_GAMES_META.map((game) => (
+        <article class={`mk-card mk-arcade-card mk-arcade-card--${game.accent}`}>
+          <div class="mk-arcade-card__head">
+            <span class="mk-arcade-card__icon" aria-hidden="true">{icons[game.id]}</span>
+            <h2 class="mk-title" style="margin: 0;">{game.title[locale]}</h2>
+          </div>
+          <p class="mk-text" style="margin: 0;">{game.subtitle[locale]}</p>
+          <div style="margin-top: auto; padding-top: 8px;">
+            <a href={buildTrainSkillUrl(locale, game.id)} class="mk-btn mk-btn--primary">
+              {es ? 'Jugar ahora' : 'Play now'} →
+            </a>
+          </div>
+        </article>
+      ))}
+    </section>
+  </div>
+</AppLayout>
+
+<style>
+  .mk-arcade-grid {
+    display: grid;
+    gap: var(--mk-s4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 720px) {
+    .mk-arcade-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .mk-arcade-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mk-s3);
+    border-width: 2px;
+  }
+
+  .mk-arcade-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--mk-s3);
+  }
+
+  .mk-arcade-card__icon {
+    font-size: 2rem;
+    line-height: 1;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mk-sunk);
+    border: var(--mk-border) solid var(--mk-line);
+    flex-shrink: 0;
+  }
+</style>

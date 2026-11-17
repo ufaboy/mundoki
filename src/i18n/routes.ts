@@ -1,6 +1,7 @@
 import { GradeId, Locale, TopicId } from '../math/core/types';
 import { getGradeById } from '../math/curriculum';
 import { TOPICS_CATALOG } from '../math/topics/generators';
+import { getSkillGameMeta, type SkillGameId } from '../math/arcade/skillGames';
 
 export function normalizeUrlLocale(param?: string): Locale {
   if (!param) return 'es-AR';
@@ -73,6 +74,23 @@ export function buildPlayUrl(locale: Locale, topicId?: TopicId): string {
   const base = `/${localeToUrlPrefix(locale)}/${getPlayVerbSlug(locale)}/`;
   if (!topicId) return base;
   return `${base}${getTopicSlug(topicId, locale)}/`;
+}
+
+export function getTrainVerbSlug(locale: Locale): 'entrenar' | 'train' {
+  return locale === 'en-US' ? 'train' : 'entrenar';
+}
+
+export function getSkillSlug(skill: SkillGameId, locale: Locale): string {
+  const meta = getSkillGameMeta(skill);
+  return locale === 'en-US' ? meta.slugEn : meta.slugEs;
+}
+
+export function buildTrainHubUrl(locale: Locale): string {
+  return `/${localeToUrlPrefix(locale)}/${getTrainVerbSlug(locale)}/`;
+}
+
+export function buildTrainSkillUrl(locale: Locale, skill: SkillGameId): string {
+  return `${buildTrainHubUrl(locale)}${getSkillSlug(skill, locale)}/`;
 }
 
 export function buildProgressUrl(locale: Locale): string {

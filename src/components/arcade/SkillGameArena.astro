@@ -1,0 +1,265 @@
+---
+import { buildTrainHubUrl, buildTrainSkillUrl } from '../../i18n/routes';
+import {
+  getSkillGameMeta,
+  SKILL_GAMES_META,
+  type SkillGameId,
+} from '../../math/arcade/skillGames';
+import type { Locale } from '../../math/core/types';
+
+interface Props {
+  locale: Locale;
+  skill: SkillGameId;
+}
+
+const { locale, skill } = Astro.props;
+const es = locale === 'es-AR';
+const meta = getSkillGameMeta(skill);
+---
+
+<div id="skill-game-root" data-locale={locale} data-skill={skill} class="mk-stack">
+  <!-- Top Bar: Back + Skill Switcher + Stats -->
+  <div class="mk-card mk-row mk-row--between mk-skill-top">
+    <div class="mk-stack mk-stack--tight">
+      <div class="mk-row" style="gap: 8px; flex-wrap: wrap;">
+        <a href={buildTrainHubUrl(locale)} class="mk-btn">
+          ← {es ? 'Todos los juegos' : 'All games'}
+        </a>
+        {SKILL_GAMES_META.map((item) => (
+          <a
+            href={buildTrainSkillUrl(locale, item.id)}
+            class:list={['mk-btn', { 'mk-btn--primary': item.id === skill }]}
+            aria-current={item.id === skill ? 'page' : undefined}
+          >
+            {item.id === 'addition' && (es ? 'Suma' : 'Addition')}
+            {item.id === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
+            {item.id === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
+            {item.id === 'division' && (es ? 'División' : 'Division')}
+          </a>
+        ))}
+      </div>
+      <h1 class="mk-title" style="margin: 0;">{meta.title[locale]}</h1>
+      <p class="mk-text" style="margin: 0;">{meta.subtitle[locale]}</p>
+    </div>
+
+    <div class="mk-row" style="gap: 10px; flex-wrap: wrap;">
+      <div class="mk-skill-stat">
+        <span class="mk-skill-stat__label">{es ? 'Puntos' : 'Score'}</span>
+        <strong id="skill-score" class="mk-skill-stat__val">0</strong>
+      </div>
+      <div class="mk-skill-stat">
+        <span class="mk-skill-stat__label">{es ? 'Racha' : 'Streak'}</span>
+        <strong id="skill-streak" class="mk-skill-stat__val">0</strong>
+      </div>
+      <button type="button" id="skill-motion-btn" class="mk-btn" aria-pressed="false">
+        {es ? 'Movimiento reducido: No' : 'Reduced motion: Off'}
+      </button>
+    </div>
+  </div>
+
+  <!-- Game Stage + Controls -->
+  <div class="mk-skill-grid">
+    <!-- Left / Main: Animated Canvas Stage -->
+    <section class="mk-card mk-skill-stage" aria-label={meta.title[locale]}>
+      <div class="mk-skill-canvas-wrap">
+        <canvas
+          id="skill-game-canvas"
+          width="840"
+          height="440"
+          class="mk-skill-canvas"
+        ></canvas>
+      </div>
+      <p id="skill-prompt" class="mk-text mk-skill-prompt"></p>
+    </section>
+
+    <!-- Right / Bottom: Equation, Input, Keypad & Difficulty -->
+    <aside class="mk-card mk-stack mk-skill-panel">
+      <div class="mk-row mk-row--between">
+        <span class="mk-text" style="font-weight: 800;">
+          {es ? 'Nivel' : 'Level'}
+        </span>
+        <div class="mk-row" style="gap: 6px;">
+          <button type="button" class="mk-btn mk-btn--primary" data-skill-diff="1" aria-pressed="true">1 ★</button>
+          <button type="button" class="mk-btn" data-skill-diff="2" aria-pressed="false">2 ★★</button>
+          <button type="button" class="mk-btn" data-skill-diff="3" aria-pressed="false">3 ★★★</button>
+        </div>
+      </div>
+
+      <div id="skill-equation" class="mk-skill-eq" aria-live="polite"></div>
+
+      <form id="skill-answer-form" class="mk-stack mk-stack--tight">
+        <label for="skill-answer-input" class="mk-text" style="font-weight: 700;">
+          {meta.howToPlay[locale]}
+        </label>
+        <div class="mk-row" style="gap: 8px;">
+          <input
+            id="skill-answer-input"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="?"
+            class="mk-skill-input"
+          />
+          <button type="submit" id="skill-submit-btn" class="mk-btn mk-btn--primary mk-skill-go">
+            {meta.actionLabel[locale]}
+          </button>
+        </div>
+      </form>
+
+      <div id="skill-feedback" class="mk-skill-feedback" aria-live="polite" data-tone="neutral"></div>
+
+      <button type="button" id="skill-next-btn" class="mk-btn mk-btn--go" hidden>
+        {es ? 'Siguiente desafío →' : 'Next challenge →'}
+      </button>
+
+      <!-- Touch-friendly Keypad -->
+      <div class="mk-skill-keypad" role="group" aria-label={es ? 'Teclado numérico' : 'Number pad'}>
+        {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'back'].map((k) => (
+          <button type="button" class="mk-btn mk-skill-key" data-keypad={k}>
+            {k === 'clear' ? 'C' : k === 'back' ? '⌫' : k}
+          </button>
+        ))}
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  import '../../scripts/arcade/skillGameClient';
+</script>
+
+<style>
+  .mk-skill-top {
+    gap: var(--mk-s4);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .mk-skill-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--mk-s2) var(--mk-s4);
+    border-radius: 14px;
+    background: var(--mk-sunk);
+    border: var(--mk-border) solid var(--mk-line);
+    min-width: 82px;
+  }
+
+  .mk-skill-stat__label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--mk-ink-soft);
+  }
+
+  .mk-skill-stat__val {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: var(--mk-ink);
+  }
+
+  .mk-skill-grid {
+    display: grid;
+    gap: var(--mk-s4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 960px) {
+    .mk-skill-grid {
+      grid-template-columns: 1.65fr 1fr;
+      align-items: start;
+    }
+  }
+
+  .mk-skill-stage {
+    padding: var(--mk-s3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mk-s3);
+  }
+
+  .mk-skill-canvas-wrap {
+    width: 100%;
+    aspect-ratio: 840 / 440;
+    border-radius: 16px;
+    overflow: hidden;
+    border: var(--mk-border) solid var(--mk-line);
+    background: #eaf6ff;
+  }
+
+  .mk-skill-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .mk-skill-prompt {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.08rem;
+    color: var(--mk-ink);
+  }
+
+  .mk-skill-eq {
+    font-family: var(--mk-font-math);
+    font-size: 2rem;
+    font-weight: 900;
+    text-align: center;
+    padding: var(--mk-s3);
+    border-radius: 14px;
+    background: var(--mk-sky-tint);
+    color: var(--mk-ink);
+    border: var(--mk-border) solid var(--mk-sky);
+  }
+
+  .mk-skill-input {
+    width: 110px;
+    min-height: 52px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-align: center;
+    border-radius: 14px;
+    border: var(--mk-border) solid var(--mk-line-strong);
+    background: var(--mk-surface);
+    color: var(--mk-ink);
+    padding: 0 var(--mk-s2);
+  }
+
+  .mk-skill-input:focus {
+    outline: 3px solid var(--mk-sky);
+    outline-offset: 2px;
+  }
+
+  .mk-skill-go {
+    flex: 1;
+    min-height: 52px;
+    justify-content: center;
+  }
+
+  .mk-skill-feedback {
+    min-height: 28px;
+    font-weight: 800;
+    font-size: 1rem;
+  }
+
+  .mk-skill-feedback[data-tone='ok'] {
+    color: var(--mk-leaf);
+  }
+
+  .mk-skill-feedback[data-tone='retry'] {
+    color: var(--mk-coral);
+  }
+
+  .mk-skill-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .mk-skill-key {
+    min-height: 46px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    justify-content: center;
+  }
+</style>

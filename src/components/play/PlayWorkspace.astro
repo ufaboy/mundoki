@@ -1,7 +1,7 @@
 ---
 import MascotSvg from './MascotSvg.astro';
 import { t } from '../../i18n/translations';
-import { buildGradeUrl, buildLearnTopicUrl, buildPlayUrl } from '../../i18n/routes';
+import { buildGradeUrl, buildLearnTopicUrl, buildPlayUrl, buildTrainHubUrl } from '../../i18n/routes';
 import { Locale, TopicId } from '../../math/core/types';
 import { getGradeById, GRADES_CATALOG, SCHOOL_BLOCKS } from '../../math/curriculum';
 import { generateMathExercise, TOPICS_CATALOG } from '../../math/topics/generators';
@@ -30,6 +30,9 @@ const initialEx = generateMathExercise(topicId, 1, 104);
     </div>
 
     <div class="flex-row">
+      <a href={buildTrainHubUrl(locale)} class="btn btn-primary btn-sm">
+        🎮 {locale === 'es-AR' ? 'Juegos de Cálculo' : 'Skill Games'}
+      </a>
       <a href={buildGradeUrl(locale, gradeMeta.id)} class="btn btn-outline btn-sm">
         📋 {gradeMeta.labelShort[locale]}
       </a>
