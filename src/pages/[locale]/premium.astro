@@ -36,8 +36,20 @@ const otherLocale = locale === 'es-AR' ? 'en-US' : 'es-AR';
 
     <section id="promo-redeem" data-locale={locale} class="card stack-md">
       <h2>{promoText(locale, 'code')}</h2>
-      <label for="promo-code">{locale === 'es-AR' ? 'Código personal' : 'Personal code'}</label>
-      <div class="flex-row"><input id="promo-code" type="text" maxlength="64" autocomplete="off" spellcheck="false" /><button type="button" class="btn btn-outline" id="promo-review">{promoText(locale, 'review')}</button></div>
+      <label class="form-label" for="promo-code">{locale === 'es-AR' ? 'Código personal' : 'Personal code'}</label>
+      <div class="flex-row" style="align-items:stretch;">
+        <input
+          id="promo-code"
+          type="text"
+          class="input-field input-mono"
+          style="flex:1;min-width:180px;"
+          maxlength="64"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder={locale === 'es-AR' ? 'Ej: MUND-1234' : 'e.g. MUND-1234'}
+        />
+        <button type="button" class="btn btn-outline" id="promo-review">{promoText(locale, 'review')}</button>
+      </div>
       <p id="promo-summary" class="callout" aria-live="polite"></p>
       <label class="flex-row"><input id="promo-consent" type="checkbox" /><span>{promoText(locale, 'consent')}</span></label>
       <button type="button" class="btn btn-primary" id="promo-accept" disabled>{promoText(locale, 'accept')}</button>
