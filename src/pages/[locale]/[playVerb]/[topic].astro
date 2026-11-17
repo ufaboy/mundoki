@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AppLayout from '../../../layouts/AppLayout.astro';
 import PlayWorkspace from '../../../components/play/PlayWorkspace.astro';
 import {
   buildPlayUrl,
@@ -35,11 +35,11 @@ const switchHref = buildPlayUrl(otherLocale, topicId);
 const topicMeta = TOPICS_CATALOG.find((t) => t.id === topicId) || TOPICS_CATALOG[0];
 ---
 
-<BaseLayout
+<AppLayout legacyContent
   title={`${topicMeta.title[locale]} · ${locale === 'es-AR' ? 'Aventura' : 'Adventure'}`}
   locale={locale}
   activeNav="play"
   switchLocaleHref={switchHref}
 >
   <PlayWorkspace locale={locale} topicId={topicId} />
-</BaseLayout>
+</AppLayout>

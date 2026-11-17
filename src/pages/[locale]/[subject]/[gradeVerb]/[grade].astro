@@ -2,7 +2,7 @@
 import DetectiveMap from '../../../../components/learn/DetectiveMap.astro';
 import RaceMap from '../../../../components/learn/RaceMap.astro';
 import MoonMap from '../../../../components/learn/MoonMap.astro';
-import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import AppLayout from '../../../../layouts/AppLayout.astro';
 import SchoolCourseCatalog from '../../../../components/learn/SchoolCourseCatalog.astro';
 import IslandMap from '../../../../components/learn/IslandMap.astro';
 import HouseMap from '../../../../components/learn/HouseMap.astro';
@@ -79,7 +79,7 @@ const gradeLabel = currentGrade.labelShort[locale].replace('.°', '.º');
 const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentGrade.summary[locale];
 ---
 
-<BaseLayout
+<AppLayout legacyContent
   title={`${currentGrade.title[locale]} · ${currentBlock.title[locale]}`}
   description={currentGrade.summary[locale]}
   locale={locale}
@@ -117,4 +117,4 @@ const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentG
       ))}
     </GradeHub>
   )}
-</BaseLayout>
+</AppLayout>

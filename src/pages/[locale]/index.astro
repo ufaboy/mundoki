@@ -4,7 +4,8 @@ import HeroCharacter from '../../components/shared/HeroCharacter.astro';
 import HeroText from '../../components/shared/HeroText.astro';
 import { DEFAULT_HERO, HEROES, HERO_SKINS, type HeroId } from '../../content/heroes';
 import { t } from '../../i18n/translations';
-import { buildAccountUrl, buildGradeUrl, buildPlayUrl, normalizeUrlLocale } from '../../i18n/routes';
+import { buildAccountUrl, buildGradeUrl, buildPlayUrl, buildTrainHubUrl, buildTrainSkillUrl, normalizeUrlLocale } from '../../i18n/routes';
+import { SKILL_GAMES_META } from '../../math/arcade/skillGames';
 import { GRADES_CATALOG } from '../../math/curriculum';
 
 export const prerender = true;
@@ -111,6 +112,36 @@ const resumeCss = [
           </ul>
         </div>
       ))}
+    </section>
+
+    <section class="mk-card mk-stack mk-stack--tight" aria-labelledby="home-arcade">
+      <div class="mk-row mk-row--between" style="flex-wrap: wrap; gap: 12px;">
+        <div class="mk-stack mk-stack--tight">
+          <h2 class="mk-title" id="home-arcade">
+            {es ? 'Juegos de cálculo' : 'Skill training games'}
+          </h2>
+          <p class="mk-text">
+            {es
+              ? 'Practicá suma, resta, multiplicación, división, coordenadas y operaciones combinadas con escenas animadas.'
+              : 'Practice addition, subtraction, multiplication, division, coordinates, and combined operations with animated scenes.'}
+          </p>
+        </div>
+        <a class="mk-btn mk-btn--primary" href={buildTrainHubUrl(locale)}>
+          {es ? 'Ver todos' : 'See all'}
+        </a>
+      </div>
+      <div class="mk-row" style="flex-wrap: wrap; gap: 10px;">
+        {SKILL_GAMES_META.map((game) => (
+          <a class="mk-btn" href={buildTrainSkillUrl(locale, game.id)}>
+            {game.id === 'addition' && (es ? '💧 Suma' : '💧 Addition')}
+            {game.id === 'subtraction' && (es ? '🎈 Resta' : '🎈 Subtraction')}
+            {game.id === 'multiplication' && (es ? '🎯 Multiplicación' : '🎯 Multiplication')}
+            {game.id === 'division' && (es ? '💎 División' : '💎 Division')}
+            {game.id === 'sea-cannon' && (es ? '🚢 Batalla Naval' : '🚢 Sea Cannon')}
+            {game.id === 'chain-ops' && (es ? '⚙️ Combinadas' : '⚙️ Combined')}
+          </a>
+        ))}
+      </div>
     </section>
 
     <section class="mk-card mk-row mk-row--between" aria-labelledby="home-family">

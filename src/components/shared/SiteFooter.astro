@@ -3,7 +3,7 @@
 // it is a choice for adults, not something a child needs in the header.
 import type { Locale } from '../../math/core/types';
 import { t } from '../../i18n/translations';
-import { buildAccountUrl, buildHomeUrl, buildPremiumUrl } from '../../i18n/routes';
+import { buildAboutUrl, buildHomeUrl, buildPrivacyUrl, buildTermsUrl } from '../../i18n/routes';
 
 interface Props {
   locale: Locale;
@@ -11,15 +11,17 @@ interface Props {
 }
 
 const { locale, switchLocaleHref } = Astro.props;
-const otherLocale: Locale = locale === 'es-AR' ? 'en-US' : 'es-AR';
+const es = locale === 'es-AR';
+const otherLocale: Locale = es ? 'en-US' : 'es-AR';
 const otherHref = switchLocaleHref || buildHomeUrl(otherLocale);
 ---
 
 <footer class="mk-ui mk-footer">
   <span>Mundoki · {t(locale, 'footerNoAds')}</span>
-  <span class="mk-row">
-    <a href={buildAccountUrl(locale)}>{t(locale, 'navFamily')}</a>
-    <a href={buildPremiumUrl(locale)}>{t(locale, 'navPremium')}</a>
+  <span class="mk-row" style="flex-wrap: wrap; gap: 14px;">
+    <a href={buildAboutUrl(locale)}>{es ? 'Acerca de' : 'About'}</a>
+    <a href={buildPrivacyUrl(locale)}>{es ? 'Privacidad' : 'Privacy Policy'}</a>
+    <a href={buildTermsUrl(locale)}>{es ? 'Términos' : 'Terms'}</a>
     <a href={otherHref} hreflang={otherLocale} lang={otherLocale}>{otherLocale === 'en-US' ? 'English' : 'Español'}</a>
   </span>
 </footer>

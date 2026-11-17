@@ -169,8 +169,9 @@
   line-gap-override: 0%;
 }
 
-.mk-root {
+html.mk-root {
   font-size: 100%;
+  scrollbar-gutter: stable;
 }
 
 /* Legacy pages (global.css) run on an 18px root: undo it for this system. */
@@ -191,6 +192,7 @@
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: clip;
   background: var(--mk-canvas);
   -webkit-text-size-adjust: 100%;
 }

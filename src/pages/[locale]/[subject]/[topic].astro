@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AppLayout from '../../../layouts/AppLayout.astro';
 import InteractiveDiagram from '../../../components/learn/InteractiveDiagram.astro';
 import { t } from '../../../i18n/translations';
 import {
@@ -51,7 +51,7 @@ const topicMeta = TOPICS_CATALOG.find((t) => t.id === topicId) || TOPICS_CATALOG
 const gradeMeta = getGradeById(topicMeta.gradeId);
 ---
 
-<BaseLayout
+<AppLayout legacyContent
   title={lesson.title}
   description={lesson.summary}
   locale={locale}
@@ -202,4 +202,4 @@ const gradeMeta = getGradeById(topicMeta.gradeId);
       </a>
     </section>
   </article>
-</BaseLayout>
+</AppLayout>

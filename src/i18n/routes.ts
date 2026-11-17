@@ -1,6 +1,7 @@
 import { GradeId, Locale, TopicId } from '../math/core/types';
 import { getGradeById } from '../math/curriculum';
 import { TOPICS_CATALOG } from '../math/topics/generators';
+import { getSkillGameMeta, type SkillGameId } from '../math/arcade/skillGames';
 
 export function normalizeUrlLocale(param?: string): Locale {
   if (!param) return 'es-AR';
@@ -75,6 +76,23 @@ export function buildPlayUrl(locale: Locale, topicId?: TopicId): string {
   return `${base}${getTopicSlug(topicId, locale)}/`;
 }
 
+export function getTrainVerbSlug(locale: Locale): 'entrenar' | 'train' {
+  return locale === 'en-US' ? 'train' : 'entrenar';
+}
+
+export function getSkillSlug(skill: SkillGameId, locale: Locale): string {
+  const meta = getSkillGameMeta(skill);
+  return locale === 'en-US' ? meta.slugEn : meta.slugEs;
+}
+
+export function buildTrainHubUrl(locale: Locale): string {
+  return `/${localeToUrlPrefix(locale)}/${getTrainVerbSlug(locale)}/`;
+}
+
+export function buildTrainSkillUrl(locale: Locale, skill: SkillGameId): string {
+  return `${buildTrainHubUrl(locale)}${getSkillSlug(skill, locale)}/`;
+}
+
 export function buildProgressUrl(locale: Locale): string {
   return locale === 'en-US' ? '/en-us/progress/' : '/es-ar/progreso/';
 }
@@ -87,5 +105,17 @@ export function buildAccountUrl(locale: Locale): string {
   return locale === 'en-US' ? '/en-us/account/' : '/es-ar/cuenta/';
 }
 
+export function buildAboutUrl(locale: Locale): string {
+  return locale === 'en-US' ? '/en-us/about/' : '/es-ar/acerca/';
+}
+
+export function buildPrivacyUrl(locale: Locale): string {
+  return locale === 'en-US' ? '/en-us/privacy/' : '/es-ar/privacidad/';
+}
+
+export function buildTermsUrl(locale: Locale): string {
+  return locale === 'en-US' ? '/en-us/terms/' : '/es-ar/terminos/';
+}
+
 /** Which destination the header marks as current. */
-export type SiteNavId = 'home' | 'learn' | 'play' | 'progress' | 'premium' | 'account';
+export type SiteNavId = 'home' | 'learn' | 'play' | 'train' | 'progress' | 'premium' | 'account' | 'none';

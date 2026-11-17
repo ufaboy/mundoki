@@ -3,6 +3,15 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.1.0] - 2026-11-17
+
+### Added
+- Added six bilingual (`es-AR` / `en-US`) HTML5 Canvas skill-training mini-games under `/es-ar/entrenar/` and `/en-us/train/`: Water Locks (addition), Sky Balloon (subtraction), Angle Cannon (multiplication), Gem Express (division), Isometric Sea Cannon (`(X, Y)` coordinates), and Gear Bridge (combined operations).
+- Added localized About, Privacy Policy, and Terms of Use pages (`/es-ar/acerca/`, `/es-ar/privacidad/`, `/es-ar/terminos/` and `/en-us/about/`, `/en-us/privacy/`, `/en-us/terms/`).
+
+### Changed
+- Unified all pages onto a single site layout (`AppLayout`) with a desktop top navigation bar, mobile side drawer, and stable scrollbar gutter to prevent header layout shifts across pages.
+
 ## [2.0.0] - 2026-11-17
 
 ### Changed
