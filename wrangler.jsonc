@@ -37,5 +37,25 @@
 		"BETTER_AUTH_URL": "https://mundoki.mercosur.workers.dev",
 		"DEFAULT_LOCALE": "es-AR",
 		"PREMIUM_MONTHLY_ARS": "9999"
+	},
+	"env": {
+		"staging": {
+			"name": "mundoki-staging",
+			"workers_dev": true,
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "mundoki-d1-test",
+					"database_id": "76c681a4-f5ab-42c6-b730-c08c5b97c9c4",
+					"migrations_dir": "drizzle"
+				}
+			],
+			"vars": {
+				"APP_URL": "https://mundoki-staging.mercosur.workers.dev",
+				"BETTER_AUTH_URL": "https://mundoki-staging.mercosur.workers.dev",
+				"DEFAULT_LOCALE": "es-AR",
+				"PREMIUM_MONTHLY_ARS": "9999"
+			}
+		}
 	}
 }
