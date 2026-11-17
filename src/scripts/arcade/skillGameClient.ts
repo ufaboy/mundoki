@@ -50,6 +50,8 @@ export function initSkillGame(): void {
   const canvas = document.getElementById('skill-game-canvas') as HTMLCanvasElement | null;
   const promptEl = document.getElementById('skill-prompt');
   const eqEl = document.getElementById('skill-equation');
+  const eqXEl = document.getElementById('skill-eq-x');
+  const eqYEl = document.getElementById('skill-eq-y');
   const form = document.getElementById('skill-answer-form') as HTMLFormElement | null;
   const input = document.getElementById('skill-answer-input') as HTMLInputElement | null;
   const inputX = document.getElementById('skill-answer-x') as HTMLInputElement | null;
@@ -122,7 +124,12 @@ export function initSkillGame(): void {
 
   const renderChallengeUI = () => {
     if (promptEl) promptEl.textContent = challenge.prompt[locale];
-    if (eqEl) eqEl.textContent = challenge.equationText;
+    if (isXY) {
+      if (eqXEl) eqXEl.textContent = `${challenge.xExpr ?? ''} = ?`;
+      if (eqYEl) eqYEl.textContent = `${challenge.yExpr ?? ''} = ?`;
+    } else if (eqEl) {
+      eqEl.textContent = challenge.equationText;
+    }
     if (input) input.value = '';
     if (inputX) inputX.value = '';
     if (inputY) inputY.value = '';
@@ -236,7 +243,10 @@ export function initSkillGame(): void {
         streak += 1;
         if (scoreEl) scoreEl.textContent = String(score);
         if (streakEl) streakEl.textContent = String(streak);
-        if (eqEl && !isXY) {
+        if (isXY) {
+          if (eqXEl) eqXEl.textContent = `${challenge.xExpr ?? ''} = ${challenge.targetX ?? ''}`;
+          if (eqYEl) eqYEl.textContent = `${challenge.yExpr ?? ''} = ${challenge.targetY ?? ''}`;
+        } else if (eqEl) {
           eqEl.textContent = challenge.equationText.replace('?', String(challenge.answer));
         }
         setFeedback(

@@ -94,7 +94,20 @@ const isXY = meta.inputMode === 'xy';
         </div>
       </div>
 
-      <div id="skill-equation" class="mk-skill-eq" aria-live="polite"></div>
+      {isXY ? (
+        <div id="skill-equation" class="mk-skill-eq mk-skill-eq--xy" aria-live="polite">
+          <div class="mk-skill-eq-row">
+            <span class="mk-skill-axis mk-skill-axis--x">X</span>
+            <span id="skill-eq-x" class="mk-skill-eq-expr"></span>
+          </div>
+          <div class="mk-skill-eq-row">
+            <span class="mk-skill-axis mk-skill-axis--y">Y</span>
+            <span id="skill-eq-y" class="mk-skill-eq-expr"></span>
+          </div>
+        </div>
+      ) : (
+        <div id="skill-equation" class="mk-skill-eq" aria-live="polite"></div>
+      )}
 
       <form id="skill-answer-form" class="mk-stack mk-stack--tight">
         <label for={isXY ? 'skill-answer-x' : 'skill-answer-input'} class="mk-text" style="font-weight: 700;">
@@ -104,7 +117,7 @@ const isXY = meta.inputMode === 'xy';
           <div class="mk-stack mk-stack--tight">
             <div class="mk-row" style="gap: 8px;">
               <label class="mk-skill-xy-field">
-                <span>X =</span>
+                <span class="mk-skill-axis mk-skill-axis--x">X</span>
                 <input
                   id="skill-answer-x"
                   type="text"
@@ -115,7 +128,7 @@ const isXY = meta.inputMode === 'xy';
                 />
               </label>
               <label class="mk-skill-xy-field">
-                <span>Y =</span>
+                <span class="mk-skill-axis mk-skill-axis--y">Y</span>
                 <input
                   id="skill-answer-y"
                   type="text"
@@ -207,7 +220,7 @@ const isXY = meta.inputMode === 'xy';
 
   @media (min-width: 960px) {
     .mk-skill-grid {
-      grid-template-columns: 1.65fr 1fr;
+      grid-template-columns: 1.9fr minmax(280px, 1fr);
       align-items: start;
     }
   }
@@ -251,6 +264,51 @@ const isXY = meta.inputMode === 'xy';
     background: var(--mk-sky-tint);
     color: var(--mk-ink);
     border: var(--mk-border) solid var(--mk-sky);
+  }
+
+  .mk-skill-eq--xy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    padding: var(--mk-s3);
+  }
+
+  .mk-skill-eq-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--mk-surface);
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--mk-line);
+  }
+
+  .mk-skill-eq-expr {
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .mk-skill-axis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .mk-skill-axis--x {
+    background: #075A94;
+  }
+
+  .mk-skill-axis--y {
+    background: #C2410C;
   }
 
   .mk-skill-xy-field {

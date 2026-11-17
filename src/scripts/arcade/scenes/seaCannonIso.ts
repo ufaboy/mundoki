@@ -48,10 +48,10 @@ export class SeaCannonIsoScene implements SkillScene {
   }
 
   private isoToScreen(gx: number, gy: number): { x: number; y: number } {
-    const tileW = this.gridSize <= 8 ? 50 : this.gridSize <= 10 ? 42 : 35;
+    const tileW = this.gridSize <= 8 ? 72 : this.gridSize <= 10 ? 58 : 48;
     const tileH = tileW * 0.52;
-    const originX = 445;
-    const originY = 92;
+    const originX = 465;
+    const originY = 58;
     return {
       x: originX + (gx - gy) * (tileW * 0.5),
       y: originY + (gx + gy) * (tileH * 0.5),
@@ -88,7 +88,7 @@ export class SeaCannonIsoScene implements SkillScene {
 
     const clampedX = clamp(submitted, -1, this.gridSize);
     const clampedY = clamp(submittedY, -1, this.gridSize);
-    this.shotStart = { x: 132, y: 318 };
+    this.shotStart = { x: 118, y: 344 };
     this.shotEnd = this.isoToScreen(clampedX + 0.5, clampedY + 0.5);
 
     this.startCannonAngle = this.cannonAngle;
@@ -202,16 +202,16 @@ export class SeaCannonIsoScene implements SkillScene {
     // Horizon sky & deep ocean backdrop
     const bg = ctx.createLinearGradient(0, 0, 0, h);
     bg.addColorStop(0, '#BAE6FD');
-    bg.addColorStop(0.28, '#E0F2FE');
-    bg.addColorStop(0.29, '#0369A1');
+    bg.addColorStop(0.14, '#E0F2FE');
+    bg.addColorStop(0.15, '#0369A1');
     bg.addColorStop(1, '#0C4A6E');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
 
     // Clouds
     const drift = (this.time * 12) % (w + 180);
-    drawCloud(ctx, drift - 90, 48, 0.72, 0.75);
-    drawCloud(ctx, ((drift + 420) % (w + 180)) - 90, 66, 0.55, 0.6);
+    drawCloud(ctx, drift - 90, 32, 0.62, 0.75);
+    drawCloud(ctx, ((drift + 420) % (w + 180)) - 90, 40, 0.48, 0.6);
 
     // Isometric Sea Grid
     const n = this.gridSize;
@@ -263,25 +263,41 @@ export class SeaCannonIsoScene implements SkillScene {
     ctx.closePath();
     ctx.fill();
 
-    // Axis labels (X along top-right, Y along top-left)
-    ctx.font = '800 11px Nunito, sans-serif';
-    ctx.fillStyle = '#FFFFFF';
+    // Axis labels (X along top-right in sky-blue, Y along top-left in coral)
+    ctx.font = '800 13px Nunito, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     for (let i = 0; i < n; i++) {
-      const xp = this.isoToScreen(i + 0.5, -0.45);
-      ctx.fillText(String(i), xp.x, xp.y);
-      const yp = this.isoToScreen(-0.45, i + 0.5);
-      ctx.fillText(String(i), yp.x, yp.y);
+      const xp = this.isoToScreen(i + 0.5, -0.55);
+      ctx.fillStyle = '#075A94';
+      drawRoundedRect(ctx, xp.x - 11, xp.y - 10, 22, 20, 6);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(String(i), xp.x, xp.y + 0.5);
+
+      const yp = this.isoToScreen(-0.55, i + 0.5);
+      ctx.fillStyle = '#C2410C';
+      drawRoundedRect(ctx, yp.x - 11, yp.y - 10, 22, 20, 6);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(String(i), yp.x, yp.y + 0.5);
     }
 
     // Axis titles
-    ctx.font = '900 14px Nunito, sans-serif';
-    ctx.fillStyle = '#FFC933';
-    const xTitlePos = this.isoToScreen(n * 0.5, -1.2);
-    ctx.fillText('X →', xTitlePos.x, xTitlePos.y);
-    const yTitlePos = this.isoToScreen(-1.2, n * 0.5);
-    ctx.fillText('← Y', yTitlePos.x, yTitlePos.y);
+    ctx.font = '900 15px Nunito, sans-serif';
+    const xTitlePos = this.isoToScreen(n * 0.5, -1.45);
+    ctx.fillStyle = '#075A94';
+    drawRoundedRect(ctx, xTitlePos.x - 24, xTitlePos.y - 12, 48, 24, 8);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('X →', xTitlePos.x, xTitlePos.y + 0.5);
+
+    const yTitlePos = this.isoToScreen(-1.45, n * 0.5);
+    ctx.fillStyle = '#C2410C';
+    drawRoundedRect(ctx, yTitlePos.x - 24, yTitlePos.y - 12, 48, 24, 8);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('← Y', yTitlePos.x, yTitlePos.y + 0.5);
 
     // Water splash ripple on miss
     if (this.ripple) {
@@ -298,20 +314,20 @@ export class SeaCannonIsoScene implements SkillScene {
     const shipPos = this.isoToScreen(this.targetX + 0.5, this.targetY + 0.5);
     this.drawShip(ctx, shipPos.x, shipPos.y);
 
-    // Coastal Fort & Cannon on left island
+    // Coastal Fort & Cannon on bottom-left island
     ctx.fillStyle = '#22C55E';
     ctx.beginPath();
-    ctx.ellipse(112, 342, 84, 34, 0, 0, Math.PI * 2);
+    ctx.ellipse(98, 372, 84, 34, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = '#64748B';
-    drawRoundedRect(ctx, 84, 306, 86, 36, 10);
+    drawRoundedRect(ctx, 70, 332, 86, 36, 10);
     ctx.fill();
 
     const mood: HeroMood =
       this.phase === 'won' ? 'happy' : this.phase === 'missed' ? 'oops' : 'idle';
     drawHero(ctx, this.ctxInfo.hero, {
-      x: 74,
-      y: 326,
+      x: 60,
+      y: 352,
       scale: 0.78,
       mood,
       time: this.time,
@@ -321,7 +337,7 @@ export class SeaCannonIsoScene implements SkillScene {
 
     // Swivel Cannon
     ctx.save();
-    ctx.translate(132, 318);
+    ctx.translate(118, 344);
     ctx.rotate(this.cannonAngle);
     ctx.fillStyle = '#1E293B';
     drawRoundedRect(ctx, -10, -10, 44, 20, 7);
