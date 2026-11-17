@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AppLayout from '../../../layouts/AppLayout.astro';
 import { normalizeUrlLocale } from '../../../i18n/routes';
 import { promoText } from '../../../i18n/promos';
 export const prerender = true;
@@ -7,7 +7,7 @@ export function getStaticPaths() { return [{ params: { locale: 'es-ar' } }, { pa
 const locale = normalizeUrlLocale(Astro.params.locale);
 const tr = (key: string) => promoText(locale, key);
 ---
-<BaseLayout title={tr('title')} locale={locale} switchLocaleHref={`/${locale === 'es-AR' ? 'en-us' : 'es-ar'}/admin/promos`}>
+<AppLayout title={tr('title')} locale={locale} switchLocaleHref={`/${locale === 'es-AR' ? 'en-us' : 'es-ar'}/admin/promos`} legacyContent>
   <div id="promo-admin" data-locale={locale} class="article-container stack-lg">
     <header class="card stack-sm"><div class="kicker">Mundoki · Admin</div><h1>{tr('title')}</h1><p>{tr('intro')}</p></header>
     <p id="promo-admin-message" role="status" aria-live="polite"></p>
@@ -33,4 +33,4 @@ const tr = (key: string) => promoText(locale, key);
     </div>
   </div>
   <script>import { initPromoAdmin } from '../../../scripts/promoAdmin'; initPromoAdmin();</script>
-</BaseLayout>
+</AppLayout>

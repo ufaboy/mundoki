@@ -169,7 +169,7 @@
   line-gap-override: 0%;
 }
 
-.mk-root {
+html.mk-root {
   font-size: 100%;
   scrollbar-gutter: stable;
 }

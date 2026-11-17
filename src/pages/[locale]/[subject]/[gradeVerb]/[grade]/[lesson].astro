@@ -3,7 +3,7 @@ import DetectiveLesson from '../../../../../components/learn/DetectiveLesson.ast
 import RaceLesson from '../../../../../components/learn/RaceLesson.astro';
 import MoonLesson from '../../../../../components/learn/MoonLesson.astro';
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+import AppLayout from '../../../../../layouts/AppLayout.astro';
 import GradeOneChecks from '../../../../../components/learn/GradeOneChecks.astro';
 import IslandLesson from '../../../../../components/learn/IslandLesson.astro';
 import HouseLesson from '../../../../../components/learn/HouseLesson.astro';
@@ -44,7 +44,7 @@ const horizontalScene = lesson.scene.layout === 'row' || ['G01-03-L02', 'G01-03-
 const onDayPage = course.gradeNumber === 1;
 const alignedScene = lesson.scene.layout === 'aligned' || lesson.packageId === 'G01-11' || entry.id === 'G01-09-L02';
 ---
-<BaseLayout title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)} system={onDayPage}>
+<AppLayout legacyContent title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)} system={onDayPage}>
   {onDayPage ? <DayLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 2 ? <QuestLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 3 ? <HouseLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 4 ? <IslandLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 5 ? <MoonLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 6 ? <RaceLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 7 ? <DetectiveLesson locale={locale} lessonId={entry.id} /> : <article class="stack-lg grade-one" data-grade-one-lesson>
     <nav class="flex-between" aria-label={es ? 'Navegación de la lección' : 'Lesson navigation'}>
       <a href={`${buildGradeUrl(locale, course.gradeId)}#${pack.id.toLowerCase()}`}>← {pack.title[locale]}</a>
@@ -94,4 +94,4 @@ const alignedScene = lesson.scene.layout === 'aligned' || lesson.packageId === '
   <script>import '../../../../../scripts/gradeSixLabs';</script>
   <script>import '../../../../../scripts/gradeSevenLabs';</script>
   <script>import '../../../../../scripts/replayButton';</script>
-</BaseLayout>
+</AppLayout>

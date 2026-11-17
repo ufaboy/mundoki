@@ -1,7 +1,7 @@
 ---
-// Layout for pages built on the design system (src/styles/design-system.css).
-// Legacy pages still use BaseLayout; both share SiteHeader and SiteFooter, so
-// the header and menu never change between them.
+// Unified site layout shared by all pages.
+import '../styles/global.css';
+import 'katex/dist/katex.min.css';
 import DesignHead from '../components/shared/DesignHead.astro';
 import SiteHeader from '../components/shared/SiteHeader.astro';
 import SiteFooter from '../components/shared/SiteFooter.astro';
@@ -15,6 +15,10 @@ interface Props {
   locale: Locale;
   activeNav?: SiteNavId;
   switchLocaleHref?: string;
+  /** True for pages whose main content still uses legacy global.css containers. */
+  legacyContent?: boolean;
+  /** Overrides legacyContent when a page conditionally uses design-system main. */
+  system?: boolean;
 }
 
 const {
@@ -25,7 +29,11 @@ const {
     : 'Mundoki — matemática visual para primaria y secundaria.',
   activeNav = 'home',
   switchLocaleHref,
+  legacyContent = false,
+  system = false,
 } = Astro.props;
+
+const useSystemMain = system || !legacyContent;
 ---
 
 <!doctype html>
@@ -44,7 +52,7 @@ const {
   <body class="mk-body mk-ui">
     <a href="#main-content" class="mk-skip">{t(locale, 'skipToContent')}</a>
     <SiteHeader locale={locale} activeNav={activeNav} />
-    <main id="main-content" class="mk-page">
+    <main id="main-content" class={useSystemMain ? 'mk-page' : 'main-container'}>
       <slot />
     </main>
     <SiteFooter locale={locale} switchLocaleHref={switchLocaleHref} />
