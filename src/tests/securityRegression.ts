@@ -105,6 +105,27 @@ const spoofed = await memoryAuth.api.signUpEmail({ body: { name: 'Role test', em
 assert.notEqual((spoofed.user as any).role, 'admin');
 console.log('PASS [Roles] registration cannot supply an admin role');
 
+// With D1 bound (every Worker, production included) a public or missing auth secret must stop auth.
+{
+  const { getAuthSecret } = await import('../lib/server/runtimeEnv');
+  const savedSecret = process.env.BETTER_AUTH_SECRET;
+  delete process.env.BETTER_AUTH_SECRET;
+  try {
+    const bound = { DB: {} };
+    for (const value of [undefined, '', 'too-short-secret', 'mundoki-dev-worker-secret-key-32chars!',
+      'replace-with-32-byte-secret-in-production', 'dev-secret-replace-in-production']) {
+      assert.throws(() => getAuthSecret({ ...bound, BETTER_AUTH_SECRET: value }), /BETTER_AUTH_SECRET/);
+    }
+    assert.throws(() => createBetterAuthInstance(bound), /BETTER_AUTH_SECRET/);
+    const strong = 'a-random-looking-production-secret-0123456789';
+    assert.equal(getAuthSecret({ ...bound, BETTER_AUTH_SECRET: strong }), strong);
+    assert.ok(getAuthSecret({}).length >= 32, 'local dev without D1 keeps working');
+  } finally {
+    process.env.BETTER_AUTH_SECRET = savedSecret;
+  }
+}
+console.log('PASS [Auth secret] Workers with D1 refuse a missing, short, or public secret');
+
 // A native email URL must not create a session; POST must revoke the library session before 2FA.
 let magicToken = '';
 createBetterAuthInstance({ BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET }, {
@@ -154,6 +175,20 @@ assert.equal(unknownMagic.magicToken, undefined);
 assert.ok(knownMagic.magicToken);
 assert.equal(unknownMagic.message.replace('nobody-here@example.invalid', ''), knownMagic.message.replace(spoofed.user.email, ''));
 console.log('PASS [Magic link] sent only to registered emails; same answer for unknown emails');
+
+// The native Better Auth route must stay closed, and no link or token may reach the logs.
+const nativeIssue = await call(auth, request('/api/auth/sign-in/magic-link', { email: spoofed.user.email }, { authorization: '' }), 'sign-in/magic-link');
+assert.equal(nativeIssue.status, 403);
+const logged: string[] = [];
+const realLog = { info: console.info, log: console.log, warn: console.warn, error: console.error };
+for (const level of ['info', 'log', 'warn', 'error'] as const) console[level] = (...args: unknown[]) => { logged.push(args.map(String).join(' ')); };
+// No email provider and no dev hook: the situation in production before this fix.
+const silentAuth = createBetterAuthInstance({ BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET });
+(globalThis as Record<string, unknown>).__mundokiMagicLinkHook = undefined;
+try { await silentAuth.api.signInMagicLink({ headers, body: { email: spoofed.user.email } }); }
+finally { Object.assign(console, realLog); }
+assert.ok(logged.every(line => !line.includes('magic-link/verify') && !line.includes('token=')), logged.join('\n'));
+console.log('PASS [Magic link] native issue route blocked; links never written to logs');
 
 let providerCalls = 0;
 let checkoutKey = '';

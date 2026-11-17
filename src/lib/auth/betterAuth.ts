@@ -194,11 +194,8 @@ function buildAuthInstance(params: {
           const hook =
             params.onDevMagicLink ||
             ((globalThis as Record<string, unknown>)[MAGIC_LINK_HOOK_KEY] as DevMagicLinkHook);
-          if (hook) {
-            hook({ email, url, token });
-          } else {
-            console.info(`[Better Auth Magic Link] ${email} -> ${url}`);
-          }
+          // Never log the link or token: whoever can read logs could sign in as this user.
+          if (hook) hook({ email, url, token });
         },
       }),
     ],

@@ -74,11 +74,34 @@ export async function getRuntimeEnv(): Promise<RuntimeEnv> {
   return procEnv as RuntimeEnv;
 }
 
+/** Values that are public in this repository and must never protect real data. */
+const PUBLIC_PLACEHOLDER_SECRETS = new Set([
+  DEFAULT_DEV_SECRET,
+  'replace-with-32-byte-secret-in-production',
+  'dev-secret-replace-in-production',
+]);
+
+export const MIN_AUTH_SECRET_LENGTH = 32;
+
+/**
+ * Returns the key that signs sessions and encrypts 2FA secrets.
+ * With a D1 binding (any Worker, including production) a real secret is required: a missing,
+ * short, or publicly known value throws instead of silently falling back to a key from the repo.
+ * Only local Node dev/tests without D1 may use the built-in development key.
+ */
 export function getAuthSecret(env: RuntimeEnv): string {
-  return (
+  const configured = (
     env.BETTER_AUTH_SECRET ||
     (typeof process !== 'undefined' ? process.env.BETTER_AUTH_SECRET : undefined) ||
-    DEFAULT_DEV_SECRET
+    ''
+  ).trim();
+  if (configured.length >= MIN_AUTH_SECRET_LENGTH && !PUBLIC_PLACEHOLDER_SECRETS.has(configured)) {
+    return configured;
+  }
+  if (!env.DB) return configured || DEFAULT_DEV_SECRET;
+  throw new Error(
+    `BETTER_AUTH_SECRET is missing, shorter than ${MIN_AUTH_SECRET_LENGTH} characters, or a public placeholder. ` +
+      'Set it with `npx wrangler secret put BETTER_AUTH_SECRET` (or in .dev.vars / .env for a local Worker).'
   );
 }
 

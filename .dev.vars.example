@@ -1,4 +1,6 @@
 # Better Auth & Session Secret (Generate with: openssl rand -base64 32)
+# Required whenever D1 is bound: the Worker refuses to start auth with a missing,
+# shorter-than-32-character, or placeholder value (including the one below).
 BETTER_AUTH_SECRET="replace-with-32-byte-secret-in-production"
 BETTER_AUTH_URL="http://localhost:3333"
 APP_URL="http://localhost:3333"

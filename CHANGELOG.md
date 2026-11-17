@@ -3,6 +3,12 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.9] - 2026-11-17
+
+### Changed
+- Hardened sign-in by requiring a private, sufficiently strong authentication secret for D1-backed Workers and blocking direct magic-link issuance without the configured flow.
+- Stopped writing magic-link URLs and tokens to logs.
+
 ## [2.2.8] - 2026-11-17
 
 ### Changed

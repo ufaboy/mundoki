@@ -783,6 +783,12 @@ export const ALL: APIRoute = async ({ request, params }) => {
     return jsonResponse({ error: 'Use the account two-factor settings.' }, 403);
   }
 
+  // Magic links are issued only through POST /api/auth/magic-link/request, which refuses to
+  // run without an email provider outside the dev sandbox. The native route has no such check.
+  if (action === 'sign-in/magic-link') {
+    return jsonResponse({ error: 'Use /api/auth/magic-link/request.' }, 403);
+  }
+
   // 14. Delegate all native Better Auth endpoints (/api/auth/get-session, /api/auth/sign-in/email,
   //     /api/auth/sign-up/email, /api/auth/callback/google, /api/auth/callback/facebook,
   //     /api/auth/callback/apple, /api/auth/magic-link/verify GET, /api/auth/two-factor/*, /api/auth/ok, etc.)
