@@ -3,6 +3,11 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.8] - 2026-11-17
+
+### Changed
+- Updated `AGENTS.md` release and pull-request workflow rules so `CHANGELOG.md` is updated prior to PR creation and direct `main` commits, and existing branch version bumps are preserved.
+
 ## [2.2.5] - 2026-11-17
 
 ### Changed
