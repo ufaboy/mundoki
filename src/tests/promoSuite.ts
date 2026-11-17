@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
-import { addCalendarMonths, maxPromoMonths, promoPrice, PROMO_TERMS_VERSION, validateInvite } from '../lib/promos/policy';
-import { changeInvite, getInvite, issueInvite, revokeInvite } from '../lib/promos/store';
+import { addCalendarMonths, maxPromoMonths, promoPrice, PROMO_DEFAULT_MAX_ACTIVATIONS, PROMO_TERMS_VERSION, validateInvite } from '../lib/promos/policy';
+import { changeInvite, getCampaignByCode, getInvite, issueCampaign, issueInvite, revokeInvite } from '../lib/promos/store';
 import { publicQuote, quotePromo, redeemPromo } from '../lib/promos/service';
 import { synchronizePromo } from '../lib/promos/billing';
 import { hasAdminRole } from '../lib/auth/roles';
@@ -10,7 +10,7 @@ import { getSubscriptionFromStore, saveSubscriptionInStore } from '../lib/db/d1S
 import type { RuntimeEnv } from '../lib/server/runtimeEnv';
 
 const sqlite = new DatabaseSync(':memory:');
-for (const file of ['0000_initial.sql', '0001_better_auth.sql', '0002_personal_promos.sql']) sqlite.exec(readFileSync(`drizzle/${file}`, 'utf8'));
+for (const file of ['0000_initial.sql', '0001_better_auth.sql', '0002_personal_promos.sql', '0003_promo_campaigns.sql']) sqlite.exec(readFileSync(`drizzle/${file}`, 'utf8'));
 class Statement {
   constructor(private query: string, private params: any[] = []) {}
   bind(...params: any[]) { return new Statement(this.query, params); }
@@ -46,7 +46,7 @@ assert.throws(() => sqlite.prepare('UPDATE promo_invites SET duration_months=7 W
 assert.throws(() => sqlite.prepare('UPDATE promo_invites SET discount_percent=101 WHERE id=?').run(invite.id));
 await assert.rejects(quotePromo(env, { ...customer, emailVerified: false }, invite.code), /verify_email/);
 await assert.rejects(quotePromo(env, { ...customer, email: 'other@example.invalid' }, invite.code), /invalid_code/);
-assert.equal((await quotePromo(env, customer, invite.code.toLowerCase())).invite.id, invite.id);
+assert.equal((await quotePromo(env, customer, invite.code.toLowerCase())).invite?.id, invite.id);
 const request = new Request('https://example.invalid/api/promos/redeem');
 const accepted = { code: invite.code, adultConfirmed: true, termsVersion: PROMO_TERMS_VERSION, fullAmountArs: 4500 };
 await assert.rejects(redeemPromo(env, customer, request, { ...accepted, adultConfirmed: false }), /consent_required/);
@@ -117,6 +117,29 @@ assert.equal(publicQuote(trialClaim, env).discountedAmountArs, 0);
 const revoked = await issueInvite(env, admin.id, { ...input, recipientEmail: user('revoked').email });
 await revokeInvite(env, revoked.id, admin.id);
 assert.equal((await getInvite(env, 'id', revoked.id)).state, 'revoked');
+
+// Unassigned temporary promo campaigns with activation limits (default 10)
+const defaultCampaign = await issueCampaign(env, admin.id, {
+  discountPercent: 25,
+  durationMonths: 2,
+  expiresAt: input.expiresAt,
+});
+assert.equal(defaultCampaign.maxActivations, PROMO_DEFAULT_MAX_ACTIVATIONS);
+const limitedCampaign = await issueCampaign(env, admin.id, {
+  code: 'TEAM2',
+  discountPercent: 30,
+  durationMonths: 1,
+  maxActivations: 1,
+  expiresAt: input.expiresAt,
+});
+const campUser1 = user('camp1');
+const campUser2 = user('camp2');
+assert.equal((await quotePromo(env, campUser1, 'team2')).campaign?.id, limitedCampaign.id);
+await redeemPromo(env, campUser1, request, { ...accepted, code: 'TEAM2' });
+assert.equal((await getCampaignByCode(env, 'TEAM2'))?.activationsCount, 1);
+await assert.rejects(quotePromo(env, campUser1, 'TEAM2'), /already_used/);
+await assert.rejects(quotePromo(env, campUser2, 'TEAM2'), /promo_limit_reached/);
+
 sqlite.prepare("UPDATE users SET role='user' WHERE id=?").run(admin.id);
 assert.equal(await hasAdminRole(admin.id, env), false, 'Role revocation is effective immediately');
 globalThis.fetch = realFetch;

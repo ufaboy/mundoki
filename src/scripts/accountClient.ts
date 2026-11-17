@@ -408,6 +408,7 @@ export function initAccountPage(): void {
     const isAdmin = user.role === 'admin';
     const hasInvite = Boolean(sessionStorage.getItem('mundoki_invite'));
     show(byId('account-admin-promos'), isAdmin);
+    show(byId('account-admin-promo'), isAdmin);
     show(byId('account-return-promo'), hasInvite);
     const returnLink = byId<HTMLAnchorElement>('account-return-next');
     if (returnLink && returnPath) returnLink.href = returnPath;

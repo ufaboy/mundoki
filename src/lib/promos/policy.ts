@@ -1,6 +1,7 @@
 import type { RuntimeEnv } from '../server/runtimeEnv';
 
 export const PROMO_HARD_MAX_MONTHS = 6;
+export const PROMO_DEFAULT_MAX_ACTIVATIONS = 10;
 export const PROMO_TERMS_VERSION = 'personal-promo-v1';
 
 export class PromoError extends Error {
@@ -42,6 +43,34 @@ export function validateInvite(input: Record<string, unknown>, env: RuntimeEnv, 
   if (label.length > 120) throw new PromoError('invalid_label');
   return { recipientEmail, discountPercent, durationMonths, expiresAt: expires.toISOString(), label,
     newCustomersOnly: input.newCustomersOnly !== false };
+}
+
+export function validateCampaign(input: Record<string, unknown>, env: RuntimeEnv, now = new Date()): {
+  code: string; discountPercent: number; durationMonths: number; maxActivations: number;
+  expiresAt: string; label: string; newCustomersOnly: boolean;
+} {
+  const rawCode = normalizePromoCode(input.code);
+  if (rawCode && !/^[A-Z0-9_-]{4,32}$/.test(rawCode)) throw new PromoError('invalid_code');
+  const discountPercent = Number(input.discountPercent);
+  const durationMonths = Number(input.durationMonths);
+  const rawMax = input.maxActivations === undefined || input.maxActivations === null || input.maxActivations === ''
+    ? PROMO_DEFAULT_MAX_ACTIVATIONS : Number(input.maxActivations);
+  const expires = new Date(String(input.expiresAt || ''));
+  const label = String(input.label || '').trim();
+  if (!Number.isInteger(discountPercent) || discountPercent < 10 || discountPercent > 100) throw new PromoError('invalid_discount');
+  if (!Number.isInteger(durationMonths) || durationMonths < 1 || durationMonths > maxPromoMonths(env)) throw new PromoError('invalid_duration');
+  if (!Number.isInteger(rawMax) || rawMax < 1 || rawMax > 10000) throw new PromoError('invalid_max_activations');
+  if (!Number.isFinite(expires.getTime()) || expires <= now) throw new PromoError('invalid_expiry');
+  if (label.length > 120) throw new PromoError('invalid_label');
+  return {
+    code: rawCode,
+    discountPercent,
+    durationMonths,
+    maxActivations: rawMax,
+    expiresAt: expires.toISOString(),
+    label,
+    newCustomersOnly: input.newCustomersOnly !== false,
+  };
 }
 
 export function promoPrice(base: number, percent: number): number {

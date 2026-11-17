@@ -1,11 +1,12 @@
 import crypto from 'node:crypto';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { createD1DrizzleClient } from '../db/d1Store';
-import { promoEvents, promoInvites } from '../db/schema';
+import { promoCampaignRedemptions, promoCampaigns, promoEvents, promoInvites } from '../db/schema';
 import type { RuntimeEnv } from '../server/runtimeEnv';
-import { PromoError, validateInvite } from './policy';
+import { PromoError, validateCampaign, validateInvite } from './policy';
 
 export type PromoInvite = typeof promoInvites.$inferSelect;
+export type PromoCampaign = typeof promoCampaigns.$inferSelect;
 export type PromoState = PromoInvite['state'];
 function db(env: RuntimeEnv) {
   if (!env.DB) throw new PromoError('database_required', 503);
@@ -76,4 +77,122 @@ export async function revokeInvite(env: RuntimeEnv, id: string, actorId: string)
   const invite = await getInvite(env, 'id', id);
   if (!invite || invite.state !== 'issued') throw new PromoError('cannot_revoke', 409);
   return changeInvite(env, invite, { state: 'revoked' }, 'revoked', actorId);
+}
+
+export async function issueCampaign(env: RuntimeEnv, actorId: string, input: Record<string, unknown>): Promise<PromoCampaign> {
+  const valid = validateCampaign(input, env);
+  const now = new Date().toISOString();
+  const code = valid.code || `MP-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
+  const row: PromoCampaign = {
+    id: crypto.randomUUID(),
+    code,
+    label: valid.label,
+    discountPercent: valid.discountPercent,
+    durationMonths: valid.durationMonths,
+    maxActivations: valid.maxActivations,
+    activationsCount: 0,
+    newCustomersOnly: valid.newCustomersOnly,
+    expiresAt: valid.expiresAt,
+    active: true,
+    createdBy: actorId,
+    createdAt: now,
+    updatedAt: now,
+  };
+  try {
+    await db(env).insert(promoCampaigns).values(row);
+  } catch {
+    throw new PromoError('code_exists', 409);
+  }
+  return row;
+}
+
+export async function listCampaigns(env: RuntimeEnv) {
+  return db(env).select().from(promoCampaigns).orderBy(desc(promoCampaigns.createdAt)).limit(200);
+}
+
+export async function getCampaignByCode(env: RuntimeEnv, code: string): Promise<PromoCampaign | null> {
+  return (await db(env).select().from(promoCampaigns).where(eq(promoCampaigns.code, code)).limit(1))[0] || null;
+}
+
+export async function toggleCampaignActive(env: RuntimeEnv, id: string, active: boolean): Promise<PromoCampaign> {
+  const now = new Date().toISOString();
+  const rows = await db(env).update(promoCampaigns).set({ active, updatedAt: now }).where(eq(promoCampaigns.id, id)).returning();
+  if (!rows.length) throw new PromoError('not_found', 404);
+  return rows[0];
+}
+
+export async function hasUserRedeemedCampaign(env: RuntimeEnv, campaignId: string, userId: string): Promise<boolean> {
+  const rows = await db(env)
+    .select({ id: promoCampaignRedemptions.id })
+    .from(promoCampaignRedemptions)
+    .where(and(eq(promoCampaignRedemptions.campaignId, campaignId), eq(promoCampaignRedemptions.userId, userId)))
+    .limit(1);
+  return rows.length > 0;
+}
+
+export async function claimCampaignForUser(
+  env: RuntimeEnv,
+  campaign: PromoCampaign,
+  user: { id: string; email: string },
+  terms: { promoEndsAt: string; fullAmountArs: number; discountedAmountArs: number; termsVersion: string }
+): Promise<PromoInvite> {
+  const now = new Date().toISOString();
+  const inviteId = crypto.randomUUID();
+  const invite: PromoInvite = {
+    id: inviteId,
+    code: `${campaign.code}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
+    recipientEmail: user.email.trim().toLowerCase(),
+    label: campaign.label,
+    discountPercent: campaign.discountPercent,
+    durationMonths: campaign.durationMonths,
+    newCustomersOnly: campaign.newCustomersOnly,
+    expiresAt: campaign.expiresAt,
+    state: 'checkout',
+    createdBy: campaign.createdBy,
+    createdAt: now,
+    userId: user.id,
+    acceptedAt: now,
+    promoEndsAt: terms.promoEndsAt,
+    fullAmountArs: terms.fullAmountArs,
+    discountedAmountArs: terms.discountedAmountArs,
+    termsVersion: terms.termsVersion,
+    providerSubscriptionId: null,
+    checkoutUrl: null,
+    leaseUntil: null,
+    transitionAttempts: 0,
+    lastError: null,
+    version: 0,
+    updatedAt: now,
+  };
+  const client = db(env);
+  try {
+    await client.batch([
+      client
+        .update(promoCampaigns)
+        .set({
+          updatedAt: now,
+          activationsCount: sql`CASE WHEN ${promoCampaigns.active} = 1 AND ${promoCampaigns.activationsCount} < ${promoCampaigns.maxActivations} THEN ${promoCampaigns.activationsCount} + 1 ELSE NULL END`,
+        })
+        .where(eq(promoCampaigns.id, campaign.id)),
+      client.insert(promoInvites).values(invite),
+      client.insert(promoEvents).values({
+        id: crypto.randomUUID(),
+        inviteId,
+        actorId: user.id,
+        action: 'terms_accepted',
+        detail: `campaign:${campaign.code}`,
+        createdAt: now,
+      }),
+      client.insert(promoCampaignRedemptions).values({
+        id: crypto.randomUUID(),
+        campaignId: campaign.id,
+        userId: user.id,
+        inviteId,
+        createdAt: now,
+      }),
+    ]);
+  } catch {
+    throw new PromoError('promo_limit_reached', 409);
+  }
+  return invite;
 }

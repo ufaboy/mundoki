@@ -1465,7 +1465,7 @@ input, select, textarea { font-size:var(--font-body); }
 @media(prefers-reduced-motion:reduce){.park-stage *,.park-model *{transition:none!important;animation:none!important}}
 
 /* Personal promo administration */
-#promo-admin [hidden], #account-admin-promos[hidden], #account-return-promo[hidden] { display: none !important; }
+#promo-admin [hidden], #promo-campaign-admin [hidden], #account-admin-promos[hidden], #account-admin-promo[hidden], #account-return-promo[hidden] { display: none !important; }
 .promo-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 #promo-create label { display: flex; flex-direction: column; gap: .4rem; }
 #promo-create label.flex-row { flex-direction: row; align-items: center; }
