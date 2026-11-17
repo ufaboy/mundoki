@@ -105,5 +105,17 @@ export function buildAccountUrl(locale: Locale): string {
   return locale === 'en-US' ? '/en-us/account/' : '/es-ar/cuenta/';
 }
 
+export function buildAboutUrl(locale: Locale): string {
+  return locale === 'en-US' ? '/en-us/about/' : '/es-ar/acerca/';
+}
+
+export function buildPrivacyUrl(locale: Locale): string {
+  return locale === 'en-US' ? '/en-us/privacy/' : '/es-ar/privacidad/';
+}
+
+export function buildTermsUrl(locale: Locale): string {
+  return locale === 'en-US' ? '/en-us/terms/' : '/es-ar/terminos/';
+}
+
 /** Which destination the header marks as current. */
 export type SiteNavId = 'home' | 'learn' | 'play' | 'train' | 'progress' | 'premium' | 'account';

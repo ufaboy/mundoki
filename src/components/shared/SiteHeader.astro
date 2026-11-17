@@ -10,6 +10,7 @@ import {
   buildCatalogUrl,
   buildHomeUrl,
   buildPlayUrl,
+  buildPremiumUrl,
   buildProgressUrl,
   buildTrainHubUrl,
   type SiteNavId,
@@ -57,6 +58,13 @@ const items = [
     label: t(locale, 'navStars'),
     current: activeNav === 'progress',
     icon: 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z',
+    fill: true,
+  },
+  {
+    href: buildPremiumUrl(locale),
+    label: t(locale, 'navPremium'),
+    current: activeNav === 'premium',
+    icon: 'M3 18h18v2H3zm0-2l2-9 4.5 4L12 5l2.5 6L19 7l2 9z',
     fill: true,
   },
 ];

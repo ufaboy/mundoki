@@ -1,0 +1,154 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import {
+  buildAboutUrl,
+  buildHomeUrl,
+  buildPrivacyUrl,
+  buildTermsUrl,
+  normalizeUrlLocale,
+} from '../../i18n/routes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [
+    { params: { locale: 'es-ar', infoSlug: 'acerca' } },
+    { params: { locale: 'en-us', infoSlug: 'about' } },
+    { params: { locale: 'es-ar', infoSlug: 'privacidad' } },
+    { params: { locale: 'en-us', infoSlug: 'privacy' } },
+    { params: { locale: 'es-ar', infoSlug: 'terminos' } },
+    { params: { locale: 'en-us', infoSlug: 'terms' } },
+  ];
+}
+
+const locale = normalizeUrlLocale(Astro.params.locale);
+const es = locale === 'es-AR';
+const otherLocale = es ? 'en-US' : 'es-AR';
+const slug = (Astro.params.infoSlug || '').toLowerCase();
+
+const kind =
+  slug === 'acerca' || slug === 'about'
+    ? 'about'
+    : slug === 'privacidad' || slug === 'privacy'
+      ? 'privacy'
+      : 'terms';
+
+const switchHref =
+  kind === 'about'
+    ? buildAboutUrl(otherLocale)
+    : kind === 'privacy'
+      ? buildPrivacyUrl(otherLocale)
+      : buildTermsUrl(otherLocale);
+
+const pages = {
+  about: {
+    title: es ? 'Acerca de Mundoki' : 'About Mundoki',
+    lead: es
+      ? 'Mundoki es una plataforma bilingüe de matemática visual diseñada para Primaria (1.º a 7.º grado) y Secundaria (1.º a 5.º año) con referencia curricular de la Ciudad Autónoma de Buenos Aires (CABA).'
+      : 'Mundoki is a bilingual visual mathematics platform designed for Primary (Grades 1–7) and Secondary (Years 1–5) following the CABA curriculum structure.',
+    sections: es
+      ? [
+          {
+            heading: 'Aprender viendo cómo funciona',
+            body: 'Cada tema combina modelos visuales interactivos, lecciones paso a paso y minijuegos animados para construir comprensión real antes de memorizar reglas.',
+          },
+          {
+            heading: 'Seguro y sin anuncios',
+            body: 'Mundoki no muestra publicidad ni enlaces externos distractores para los estudiantes. La gestión de cuenta y suscripción está pensada exclusivamente para personas adultas responsables.',
+          },
+        ]
+      : [
+          {
+            heading: 'Learn by seeing how it works',
+            body: 'Every topic pairs interactive visual models, step-by-step lessons, and animated mini-games to build genuine understanding before memorizing rules.',
+          },
+          {
+            heading: 'Safe and ad-free',
+            body: 'Mundoki has zero ads and no distracting external links for learners. Account and subscription management is intended solely for responsible adults.',
+          },
+        ],
+  },
+  privacy: {
+    title: es ? 'Política de Privacidad' : 'Privacy Policy',
+    lead: es
+      ? 'Respetamos la privacidad de estudiantes y familias. Recopilamos únicamente los datos mínimos necesarios para guardar el progreso y gestionar la cuenta.'
+      : 'We respect the privacy of learners and families. We collect only the minimum data needed to save learning progress and manage parent-controlled accounts.',
+    sections: es
+      ? [
+          {
+            heading: 'Sin publicidad ni rastreo comercial',
+            body: 'No vendemos ni compartimos información personal con redes publicitarias. No mostramos anuncios en ninguna sección de la plataforma.',
+          },
+          {
+            heading: 'Datos de cuenta y progreso',
+            body: 'El correo electrónico y las credenciales se utilizan exclusivamente para autenticar a la persona adulta responsable y sincronizar el avance de los ejercicios en la nube.',
+          },
+        ]
+      : [
+          {
+            heading: 'No ads or commercial tracking',
+            body: 'We never sell or share personal information with ad networks, and there are no advertisements anywhere on Mundoki.',
+          },
+          {
+            heading: 'Account and progress data',
+            body: 'Email and authentication credentials are used solely to sign in responsible adults and synchronize exercise progress.',
+          },
+        ],
+  },
+  terms: {
+    title: es ? 'Términos de Uso' : 'Terms of Use',
+    lead: es
+      ? 'El acceso a la base visual y a los juegos de práctica es gratuito. La suscripción Premium es gestionada por una persona adulta mayor de 18 años.'
+      : 'Access to core visual lessons and practice games is free. Premium subscriptions must be managed by an adult aged 18 or older.',
+    sections: es
+      ? [
+          {
+            heading: 'Uso educativo',
+            body: 'Los contenidos y ejercicios están destinados al aprendizaje personal y escolar.',
+          },
+          {
+            heading: 'Suscripciones y cancelación',
+            body: 'Las suscripciones mensuales se procesan a través de Mercado Pago y pueden cancelarse en cualquier momento desde la sección Familia.',
+          },
+        ]
+      : [
+          {
+            heading: 'Educational use',
+            body: 'Lessons, visual tools, and games are provided for personal and classroom learning.',
+          },
+          {
+            heading: 'Subscriptions and cancellation',
+            body: 'Monthly subscriptions are processed through Mercado Pago and can be canceled at any time from the Family account page.',
+          },
+        ],
+  },
+} as const;
+
+const content = pages[kind];
+---
+
+<AppLayout
+  title={content.title}
+  description={content.lead}
+  locale={locale}
+  activeNav="home"
+  switchLocaleHref={switchHref}
+>
+  <article class="mk-card mk-stack">
+    <h1 class="mk-display" style="margin: 0;">{content.title}</h1>
+    <p class="mk-text" style="font-size: 1.1rem; font-weight: 700;">{content.lead}</p>
+
+    {content.sections.map((sec) => (
+      <section class="mk-stack mk-stack--tight">
+        <h2 class="mk-title" style="margin: 0;">{sec.heading}</h2>
+        <p class="mk-text" style="margin: 0;">{sec.body}</p>
+      </section>
+    ))}
+
+    <div style="padding-top: 8px;">
+      <a href={buildHomeUrl(locale)} class="mk-btn mk-btn--primary">
+        ← {es ? 'Volver al inicio' : 'Back to home'}
+      </a>
+    </div>
+  </article>
+</AppLayout>
