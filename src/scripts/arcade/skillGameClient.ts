@@ -125,10 +125,10 @@ export function initSkillGame(): void {
   const renderChallengeUI = () => {
     if (promptEl) promptEl.textContent = challenge.prompt[locale];
     if (isXY) {
-      if (eqXEl) eqXEl.textContent = `${challenge.xExpr ?? ''} = ?`;
-      if (eqYEl) eqYEl.textContent = `${challenge.yExpr ?? ''} = ?`;
+      if (eqXEl) eqXEl.textContent = `${challenge.xExpr ?? ''} =`;
+      if (eqYEl) eqYEl.textContent = `${challenge.yExpr ?? ''} =`;
     } else if (eqEl) {
-      eqEl.textContent = challenge.equationText;
+      eqEl.textContent = challenge.equationText.replace(/\s*\?$/, '');
     }
     if (input) input.value = '';
     if (inputX) inputX.value = '';
@@ -244,10 +244,10 @@ export function initSkillGame(): void {
         if (scoreEl) scoreEl.textContent = String(score);
         if (streakEl) streakEl.textContent = String(streak);
         if (isXY) {
-          if (eqXEl) eqXEl.textContent = `${challenge.xExpr ?? ''} = ${challenge.targetX ?? ''}`;
-          if (eqYEl) eqYEl.textContent = `${challenge.yExpr ?? ''} = ${challenge.targetY ?? ''}`;
+          if (eqXEl) eqXEl.textContent = `${challenge.xExpr ?? ''} =`;
+          if (eqYEl) eqYEl.textContent = `${challenge.yExpr ?? ''} =`;
         } else if (eqEl) {
-          eqEl.textContent = challenge.equationText.replace('?', String(challenge.answer));
+          eqEl.textContent = challenge.equationText.replace(/\s*\?$/, '');
         }
         setFeedback(
           es

@@ -94,70 +94,57 @@ const isXY = meta.inputMode === 'xy';
         </div>
       </div>
 
-      {isXY ? (
-        <div id="skill-equation" class="mk-skill-eq mk-skill-eq--xy" aria-live="polite">
-          <div class="mk-skill-eq-row">
-            <span class="mk-skill-axis mk-skill-axis--x">X</span>
-            <span id="skill-eq-x" class="mk-skill-eq-expr"></span>
-          </div>
-          <div class="mk-skill-eq-row">
-            <span class="mk-skill-axis mk-skill-axis--y">Y</span>
-            <span id="skill-eq-y" class="mk-skill-eq-expr"></span>
-          </div>
-        </div>
-      ) : (
-        <div id="skill-equation" class="mk-skill-eq" aria-live="polite"></div>
-      )}
-
       <form id="skill-answer-form" class="mk-stack mk-stack--tight">
-        <label for={isXY ? 'skill-answer-x' : 'skill-answer-input'} class="mk-text" style="font-weight: 700;">
-          {meta.howToPlay[locale]}
-        </label>
         {isXY ? (
-          <div class="mk-stack mk-stack--tight">
-            <div class="mk-row" style="gap: 8px;">
-              <label class="mk-skill-xy-field">
-                <span class="mk-skill-axis mk-skill-axis--x">X</span>
-                <input
-                  id="skill-answer-x"
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  placeholder="?"
-                  class="mk-skill-input mk-skill-input--xy"
-                />
-              </label>
-              <label class="mk-skill-xy-field">
-                <span class="mk-skill-axis mk-skill-axis--y">Y</span>
-                <input
-                  id="skill-answer-y"
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  placeholder="?"
-                  class="mk-skill-input mk-skill-input--xy"
-                />
-              </label>
-            </div>
-            <button type="submit" id="skill-submit-btn" class="mk-btn mk-btn--primary mk-skill-go">
-              {meta.actionLabel[locale]}
-            </button>
+          <div id="skill-equation" class="mk-skill-eq mk-skill-eq--xy" aria-live="polite">
+            <label class="mk-skill-eq-row" for="skill-answer-x">
+              <span class="mk-skill-axis mk-skill-axis--x">X</span>
+              <span id="skill-eq-x" class="mk-skill-eq-expr"></span>
+              <input
+                id="skill-answer-x"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="?"
+                class="mk-skill-input mk-skill-input--inline"
+                aria-label="X"
+              />
+            </label>
+            <label class="mk-skill-eq-row" for="skill-answer-y">
+              <span class="mk-skill-axis mk-skill-axis--y">Y</span>
+              <span id="skill-eq-y" class="mk-skill-eq-expr"></span>
+              <input
+                id="skill-answer-y"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="?"
+                class="mk-skill-input mk-skill-input--inline"
+                aria-label="Y"
+              />
+            </label>
           </div>
         ) : (
-          <div class="mk-row" style="gap: 8px;">
+          <label class="mk-skill-eq mk-skill-eq--inline" for="skill-answer-input" aria-live="polite">
+            <span id="skill-equation" class="mk-skill-eq-expr"></span>
             <input
               id="skill-answer-input"
               type="text"
               inputmode="numeric"
               autocomplete="off"
               placeholder="?"
-              class="mk-skill-input"
+              class="mk-skill-input mk-skill-input--inline"
             />
-            <button type="submit" id="skill-submit-btn" class="mk-btn mk-btn--primary mk-skill-go">
-              {meta.actionLabel[locale]}
-            </button>
-          </div>
+          </label>
         )}
+
+        <p class="mk-text" style="margin: 0; font-weight: 700;">
+          {meta.howToPlay[locale]}
+        </p>
+
+        <button type="submit" id="skill-submit-btn" class="mk-btn mk-btn--primary mk-skill-go">
+          {meta.actionLabel[locale]}
+        </button>
       </form>
 
       <div id="skill-feedback" class="mk-skill-feedback" aria-live="polite" data-tone="neutral"></div>
@@ -274,20 +261,37 @@ const isXY = meta.inputMode === 'xy';
     padding: var(--mk-s3);
   }
 
+  .mk-skill-eq--inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
   .mk-skill-eq-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: var(--mk-surface);
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-radius: 10px;
     border: 1.5px solid var(--mk-line);
+    cursor: text;
   }
 
   .mk-skill-eq-expr {
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-size: clamp(1.1rem, 1.9vw, 1.45rem);
     font-weight: 900;
     white-space: nowrap;
+  }
+
+  .mk-skill-input--inline {
+    width: 68px;
+    min-height: 44px;
+    font-size: 1.35rem;
+    margin-left: auto;
+    flex-shrink: 0;
   }
 
   .mk-skill-axis {
