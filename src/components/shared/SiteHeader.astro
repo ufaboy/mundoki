@@ -68,7 +68,7 @@ const items = [
     fill: true,
   },
 ];
-const familyCurrent = activeNav === 'account' || activeNav === 'premium';
+const familyCurrent = activeNav === 'account';
 ---
 
 <header class="mk-ui mk-topbar mk-topbar--site">
@@ -158,35 +158,6 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
     gap: 8px;
   }
 
-  .mk-topbar__crumbs {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 6px;
-    list-style: none;
-    margin: 0;
-    padding: 0 0 0 14px;
-    border-left: 2px solid var(--mk-line);
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--mk-ink-soft);
-    white-space: nowrap;
-  }
-
-  .mk-topbar__crumbs a {
-    color: var(--mk-sky);
-    text-decoration: none;
-  }
-
-  .mk-topbar__crumbs a:hover {
-    text-decoration: underline;
-  }
-
-  .mk-topbar__crumbs [aria-current='page'] {
-    color: var(--mk-ink);
-    font-weight: 800;
-  }
-
   @media (min-width: 64rem) {
     .mk-topbar--site {
       gap: 12px;
@@ -269,26 +240,6 @@ const familyCurrent = activeNav === 'account' || activeNav === 'premium';
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .mk-drawer__crumbs {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    list-style: none;
-    margin: 0;
-    padding: 8px 12px;
-    border-radius: 12px;
-    background: var(--mk-sunk);
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--mk-ink-soft);
-  }
-
-  .mk-drawer__crumbs a {
-    color: var(--mk-sky);
-    text-decoration: none;
   }
 
   .mk-drawer__list {

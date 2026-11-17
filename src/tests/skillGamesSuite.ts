@@ -27,6 +27,7 @@ for (const skill of skills) {
       assert.equal(c.skill, skill);
       assert.equal(c.difficulty, diff);
       assert.ok(Number.isSafeInteger(c.answer), `Expected integer answer for ${c.id}`);
+      assert.ok(c.answer >= 1, `Expected positive answer for ${c.id}, got ${c.answer}`);
 
       if (skill === 'addition') {
         assert.equal(c.answer, c.a + c.b);
@@ -77,5 +78,5 @@ assert.equal(buildTrainSkillUrl('es-AR', 'addition'), '/es-ar/entrenar/suma/');
 assert.equal(buildTrainSkillUrl('en-US', 'multiplication'), '/en-us/train/multiplication/');
 
 console.log(
-  'PASS [Skill Games] 4 operations × 3 difficulties × 200 seeds (2,400 challenges), exact evaluation, and bilingual routes'
+  'PASS [Skill Games] 6 games × 3 difficulties × 200 seeds (3,600 challenges), exact evaluation, and bilingual routes'
 );

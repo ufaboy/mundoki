@@ -118,4 +118,4 @@ export function buildTermsUrl(locale: Locale): string {
 }
 
 /** Which destination the header marks as current. */
-export type SiteNavId = 'home' | 'learn' | 'play' | 'train' | 'progress' | 'premium' | 'account';
+export type SiteNavId = 'home' | 'learn' | 'play' | 'train' | 'progress' | 'premium' | 'account' | 'none';

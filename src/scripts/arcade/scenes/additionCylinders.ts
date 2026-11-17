@@ -8,7 +8,6 @@ import {
   easeOutCubic,
   lerp,
   spawnBurst,
-  updateAndDrawParticles,
   type HeroMood,
   type Particle,
 } from '../canvasUtils';
@@ -179,13 +178,7 @@ export class AdditionCylindersScene implements SkillScene {
       }
     }
 
-    updateAndDrawParticles(
-      // updated during render if needed; keep physics here
-      null as unknown as CanvasRenderingContext2D,
-      [],
-      0
-    );
-    // Step particles manually without drawing
+    // Step particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const pt = this.particles[i];
       pt.life += dt;

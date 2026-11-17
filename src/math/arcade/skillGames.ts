@@ -413,7 +413,8 @@ export function generateSkillChallenge(
       const a = randInt(rng, 3, 15);
       const b = randInt(rng, 2, 8);
       const c = randInt(rng, 2, 7);
-      const d = randInt(rng, 1, 9);
+      const rawD = randInt(rng, 1, 9);
+      const d = Math.min(rawD, a + b * c - 1);
       answer = a + b * c - d;
       expr = `${a} + ${b} × ${c} − ${d}`;
     } else {
@@ -422,7 +423,8 @@ export function generateSkillChallenge(
         const a = randInt(rng, 3, 9);
         const b = randInt(rng, 2, 8);
         const c = randInt(rng, 2, 6);
-        const d = randInt(rng, 2, 12);
+        const rawD = randInt(rng, 2, 12);
+        const d = Math.min(rawD, (a + b) * c - 1);
         answer = (a + b) * c - d;
         expr = `(${a} + ${b}) × ${c} − ${d}`;
       } else {
