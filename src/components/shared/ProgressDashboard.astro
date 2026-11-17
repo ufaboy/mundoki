@@ -5,7 +5,7 @@
 // the page is static and progressClient.ts fills it in.
 import HeroCharacter from './HeroCharacter.astro';
 import { SCHOOL_COURSES } from '../../content/schoolCourses';
-import { buildAccountUrl, buildGradeUrl, buildHomeUrl } from '../../i18n/routes';
+import { buildGradeUrl, buildHomeUrl, buildLoginUrl } from '../../i18n/routes';
 import type { Locale } from '../../math/core/types';
 
 interface Props {
@@ -88,7 +88,7 @@ const worldData = JSON.stringify(worlds.map(({ gradeId, missions }) => ({ gradeI
       </div>
     </div>
     <p class="mk-text" id="prog-save-status"></p>
-    <a class="mk-btn" id="prog-account-link" href={buildAccountUrl(locale)} hidden>{L('Ir a la cuenta', 'Go to account')}</a>
+    <a class="mk-btn" id="prog-account-link" href={buildLoginUrl(locale)} hidden>{L('Ir a la cuenta', 'Go to account')}</a>
   </section>
 </div>
 

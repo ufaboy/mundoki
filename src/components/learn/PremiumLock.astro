@@ -3,7 +3,7 @@
 // of the mission itself: only its title, the offer and the way back.
 import HeroCharacter from '../shared/HeroCharacter.astro';
 import { countMissions } from '../../content/premiumAccess';
-import { buildAccountUrl, buildPremiumUrl } from '../../i18n/routes';
+import { buildLoginUrl, buildPremiumUrl } from '../../i18n/routes';
 import type { Locale } from '../../math/core/types';
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 const { locale, missionTitle, mapHref, signedIn, returnPath } = Astro.props;
 const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
 const { total } = countMissions();
-const accountHref = `${buildAccountUrl(locale)}?next=${encodeURIComponent(returnPath)}`;
+const accountHref = `${buildLoginUrl(locale)}?next=${encodeURIComponent(returnPath)}`;
 ---
 
 <section class="mk-card mk-card--grape mk-hello mk-lock" aria-labelledby="lock-title">

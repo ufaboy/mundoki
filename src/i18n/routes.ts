@@ -117,6 +117,10 @@ export function buildAccountUrl(locale: Locale): string {
   return locale === 'en-US' ? '/en-us/account/' : '/es-ar/cuenta/';
 }
 
+export function buildLoginUrl(locale: Locale): string {
+  return `/${localeToUrlPrefix(locale)}/login/`;
+}
+
 export function buildAboutUrl(locale: Locale): string {
   return locale === 'en-US' ? '/en-us/about/' : '/es-ar/acerca/';
 }

@@ -1,0 +1,170 @@
+---
+import { buildAccountUrl } from '../../i18n/routes';
+import type { Locale } from '../../math/core/types';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
+const mailIcon = 'M3 6.5h18v11H3zM3 7l9 6.5L21 7';
+---
+
+<div
+  id="login-page-root"
+  data-locale={locale}
+  data-account-url={buildAccountUrl(locale)}
+  class="mk-account"
+>
+  <!-- Messages for sign-in, sign-up, magic link, and 2FA errors -->
+  <div id="account-status-banner" class="mk-feedback" role="status" aria-live="polite" hidden>
+    <span class="mk-feedback__text"></span>
+  </div>
+
+  <!-- 1. Sign in or create an account -->
+  <section id="account-guest-view" class="mk-card mk-stack mk-account__auth" aria-labelledby="account-auth-title">
+    <div class="mk-stack mk-stack--tight">
+      <h1 class="mk-title" id="account-auth-title">{L('Cuenta de la familia', 'Family account')}</h1>
+      <p class="mk-text">
+        {L(
+          'Entrá para guardar el avance de tus hijos y verlo en cualquier dispositivo. Para jugar no hace falta cuenta.',
+          'Sign in to save your children’s progress and see it on any device. Playing does not need an account.'
+        )}
+      </p>
+    </div>
+
+    <div class="mk-tabs mk-account__mode" role="group" aria-label={L('Qué querés hacer', 'What do you want to do')}>
+      <button type="button" data-auth-tab="signin" aria-pressed="true">{L('Entrar', 'Sign in')}</button>
+      <button type="button" data-auth-tab="signup" aria-pressed="false">{L('Crear cuenta', 'Create account')}</button>
+    </div>
+
+    <form id="form-password-auth" class="mk-stack" novalidate>
+      <div id="auth-name-group" class="mk-field" hidden>
+        <label for="input-auth-name">{L('Tu nombre', 'Your name')}</label>
+        <input id="input-auth-name" name="name" class="mk-input" type="text" autocomplete="name" maxlength="60" />
+      </div>
+
+      <div class="mk-field">
+        <label for="input-auth-email">{L('Correo electrónico', 'Email')}</label>
+        <input
+          id="input-auth-email"
+          name="email"
+          class="mk-input"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="off"
+          spellcheck="false"
+          required
+          aria-describedby="auth-email-error"
+          placeholder={L('nombre@correo.com', 'name@email.com')}
+        />
+        <p class="mk-field__error" id="auth-email-error" hidden></p>
+      </div>
+
+      <div class="mk-field">
+        <label id="label-auth-password" for="input-auth-password">{L('Contraseña', 'Password')}</label>
+        <div class="mk-account__secret">
+          <input
+            id="input-auth-password"
+            name="password"
+            class="mk-input"
+            type="password"
+            autocomplete="current-password"
+            minlength="6"
+            required
+            aria-describedby="auth-password-hint auth-password-error"
+          />
+          <input
+            id="input-auth-signup-password"
+            name="password"
+            class="mk-input"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+            hidden
+            disabled
+            aria-describedby="auth-password-hint auth-password-error"
+          />
+          <button type="button" class="mk-btn mk-btn--quiet" id="btn-toggle-password" aria-pressed="false">
+            {L('Mostrar', 'Show')}
+          </button>
+        </div>
+        <p class="mk-label" id="auth-password-hint" hidden>{L('6 letras o números como mínimo.', 'At least 6 letters or numbers.')}</p>
+        <p class="mk-field__error" id="auth-password-error" hidden></p>
+      </div>
+
+      <button type="submit" class="mk-btn mk-btn--primary mk-btn--wide" id="btn-submit-password-auth">
+        {L('Entrar', 'Sign in')}
+      </button>
+    </form>
+
+    <!-- Passwordless shortcut for existing accounts: uses the email typed above -->
+    <div id="auth-magic-block" class="mk-stack mk-stack--tight">
+      <p class="mk-account__or"><span>{L('o', 'or')}</span></p>
+      <button type="button" class="mk-btn mk-btn--wide" id="btn-send-magic-link">
+        <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={mailIcon} /></svg>
+        {L('Pedir un enlace', 'Email me a link')}
+      </button>
+      <p class="mk-label mk-account__center">{L('Sin contraseña: te mandamos un enlace para entrar.', 'No password needed: we send you a link to sign in.')}</p>
+    </div>
+
+    <!-- Local development only: the server returns the link because no email provider is set up -->
+    <div id="magic-dev-outbox" class="mk-card mk-card--sunk mk-stack mk-stack--tight" hidden>
+      <p class="mk-label">{L('Modo desarrollo: no hay servicio de correo. Abrí el enlace acá.', 'Development mode: no email service. Open the link here.')}</p>
+      <button type="button" class="mk-btn mk-btn--go" id="btn-verify-magic-now">{L('Abrir el enlace', 'Open the link')}</button>
+    </div>
+
+    <!-- OAuth providers stay hidden until their credentials are configured -->
+    <div id="oauth-section" class="mk-stack mk-stack--tight" hidden>
+      <button type="button" class="mk-btn mk-btn--wide" data-oauth-provider="google">Google</button>
+      <button type="button" class="mk-btn mk-btn--wide" data-oauth-provider="facebook">Facebook</button>
+      <button type="button" class="mk-btn mk-btn--wide" data-oauth-provider="apple">Apple</button>
+      <div id="oauth-dev-sandbox" class="mk-card mk-card--sunk mk-stack mk-stack--tight" hidden>
+        <p class="mk-label" id="oauth-sandbox-provider-label">Google</p>
+        <div class="mk-field">
+          <label for="input-dev-oauth-email">{L('Correo de prueba', 'Test email')}</label>
+          <input id="input-dev-oauth-email" class="mk-input" type="email" value="explorador.oauth@mundoki.edu.ar" />
+        </div>
+        <button type="button" class="mk-btn" id="btn-confirm-dev-oauth">{L('Simular acceso', 'Simulate sign-in')}</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Second step for accounts with two-step verification -->
+  <section id="account-2fa-challenge-view" class="mk-card mk-stack mk-account__auth" aria-labelledby="account-2fa-title" hidden>
+    <div class="mk-stack mk-stack--tight">
+      <h1 class="mk-title" id="account-2fa-title">{L('Un paso más', 'One more step')}</h1>
+      <p class="mk-text">
+        {L('Escribí el código de 6 números de tu app de verificación para', 'Enter the 6-digit code from your authenticator app for')}
+        {' '}<strong id="challenge-2fa-email"></strong>.
+      </p>
+    </div>
+    <p id="challenge-2fa-dev-totp" class="mk-label" hidden></p>
+    <form id="form-2fa-challenge" class="mk-stack">
+      <div class="mk-field">
+        <label for="input-2fa-challenge-code">{L('Código', 'Code')}</label>
+        <input
+          id="input-2fa-challenge-code"
+          class="mk-input mk-account__code"
+          type="text"
+          inputmode="text"
+          autocomplete="one-time-code"
+          autocapitalize="characters"
+          spellcheck="false"
+          required
+        />
+        <p class="mk-label">{L('¿Perdiste el teléfono? Usá uno de tus códigos de respaldo.', 'Lost your phone? Use one of your backup codes.')}</p>
+      </div>
+      <button type="submit" class="mk-btn mk-btn--primary mk-btn--wide">{L('Entrar', 'Sign in')}</button>
+      <button type="button" class="mk-btn mk-btn--quiet" id="btn-cancel-2fa-challenge">{L('Volver', 'Back')}</button>
+    </form>
+  </section>
+</div>
+
+<script>
+  import { initLoginPage } from '../../scripts/accountClient';
+  initLoginPage();
+</script>

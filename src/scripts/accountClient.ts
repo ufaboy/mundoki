@@ -9,42 +9,35 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 6;
 const MAGIC_RESEND_SECONDS = 30;
 
-export function initAccountPage(): void {
-  const root = document.getElementById('account-page-root');
-  if (!root) return;
+const byId = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T | null;
 
-  const locale = (root.dataset.locale || 'es-AR') as Locale;
+const show = (el: HTMLElement | null, visible: boolean) => {
+  if (el) el.hidden = !visible;
+};
+
+const sessionToken = () => window.localStorage.getItem('mundoki_token') || '';
+
+function sanitizeNextPath(nextParam: string | null): string {
+  const raw = nextParam || '';
+  return /^\/(?!\/)[\w\-/.%]*$/.test(raw) ? raw : '';
+}
+
+function updateHeaderName(label: string) {
+  const headerLink = byId('header-account-link');
+  if (headerLink && label) headerLink.textContent = label;
+}
+
+async function postJson(url: string, body: unknown, token?: string): Promise<{ ok: boolean; status: number; data: Json }> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, { method: 'POST', credentials: 'same-origin', headers, body: JSON.stringify(body ?? {}) });
+  const data = (await res.json().catch(() => ({}))) as Json;
+  return { ok: res.ok, status: res.status, data };
+}
+
+function createHelpers(locale: Locale) {
   const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
-  const byId = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T | null;
-  const show = (el: HTMLElement | null, visible: boolean) => {
-    if (el) el.hidden = !visible;
-  };
-
-  const guestView = byId('account-guest-view');
-  const challengeView = byId('account-2fa-challenge-view');
-  const loggedInView = byId('account-loggedin-view');
   const banner = byId('account-status-banner');
-  const emailInput = byId<HTMLInputElement>('input-auth-email');
-  const passwordInput = byId<HTMLInputElement>('input-auth-password');
-  const signupPasswordInput = byId<HTMLInputElement>('input-auth-signup-password');
-  const passwordLabel = byId<HTMLLabelElement>('label-auth-password');
-  const nameInput = byId<HTMLInputElement>('input-auth-name');
-  const emailError = byId('auth-email-error');
-  const passwordError = byId('auth-password-error');
-  const submitBtn = byId<HTMLButtonElement>('btn-submit-password-auth');
-  const magicBtn = byId<HTMLButtonElement>('btn-send-magic-link');
-  const magicDevBox = byId('magic-dev-outbox');
-
-  // Set by the Premium lock screen (?next=/es-ar/...): offer the way back after signing in.
-  // Only paths on this site are accepted, never another site.
-  const nextParam = new URLSearchParams(window.location.search).get('next') || '';
-  const returnPath = /^\/(?!\/)[\w\-/.%]*$/.test(nextParam) ? nextParam : '';
-
-  let authMode: AuthMode = 'signin';
-  let pending2faToken = '';
-  let devMagicToken = '';
-
-  // ---------- Small helpers ----------
 
   function showBanner(message: string, kind: BannerKind = 'info') {
     if (!banner) return;
@@ -58,6 +51,53 @@ export function initAccountPage(): void {
   function hideBanner() {
     if (banner) banner.hidden = true;
   }
+
+  /** Runs a request with the button locked, and turns network failures into one message. */
+  async function withBusy(btn: HTMLButtonElement | null, work: () => Promise<void>) {
+    if (btn?.disabled) return;
+    if (btn) btn.disabled = true;
+    try {
+      await work();
+    } catch {
+      showBanner(L('No hay conexión. Probá de nuevo en un momento.', 'No connection. Try again in a moment.'), 'error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  return { L, showBanner, hideBanner, withBusy };
+}
+
+// ============================================================================
+// Login page (/es-ar/login/, /en-us/login/)
+// ============================================================================
+
+export function initLoginPage(): void {
+  const root = byId('login-page-root');
+  if (!root) return;
+
+  const locale = (root.dataset.locale || 'es-AR') as Locale;
+  const accountUrl = root.dataset.accountUrl || (locale === 'en-US' ? '/en-us/account/' : '/es-ar/cuenta/');
+  const { L, showBanner, hideBanner, withBusy } = createHelpers(locale);
+
+  const guestView = byId('account-guest-view');
+  const challengeView = byId('account-2fa-challenge-view');
+  const emailInput = byId<HTMLInputElement>('input-auth-email');
+  const passwordInput = byId<HTMLInputElement>('input-auth-password');
+  const signupPasswordInput = byId<HTMLInputElement>('input-auth-signup-password');
+  const passwordLabel = byId<HTMLLabelElement>('label-auth-password');
+  const nameInput = byId<HTMLInputElement>('input-auth-name');
+  const emailError = byId('auth-email-error');
+  const passwordError = byId('auth-password-error');
+  const submitBtn = byId<HTMLButtonElement>('btn-submit-password-auth');
+  const magicBtn = byId<HTMLButtonElement>('btn-send-magic-link');
+  const magicDevBox = byId('magic-dev-outbox');
+
+  const returnPath = sanitizeNextPath(new URLSearchParams(window.location.search).get('next'));
+
+  let authMode: AuthMode = 'signin';
+  let pending2faToken = '';
+  let devMagicToken = '';
 
   function setFieldError(input: HTMLInputElement | null, errorEl: HTMLElement | null, message: string) {
     if (input) input.setAttribute('aria-invalid', message ? 'true' : 'false');
@@ -90,36 +130,9 @@ export function initAccountPage(): void {
     return email;
   }
 
-  async function postJson(url: string, body: unknown, token?: string): Promise<{ ok: boolean; status: number; data: Json }> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers.Authorization = `Bearer ${token}`;
-    const res = await fetch(url, { method: 'POST', credentials: 'same-origin', headers, body: JSON.stringify(body ?? {}) });
-    const data = (await res.json().catch(() => ({}))) as Json;
-    return { ok: res.ok, status: res.status, data };
-  }
-
-  /** Runs a request with the button locked, and turns network failures into one message. */
-  async function withBusy(btn: HTMLButtonElement | null, work: () => Promise<void>) {
-    if (btn?.disabled) return;
-    if (btn) btn.disabled = true;
-    try {
-      await work();
-    } catch {
-      showBanner(L('No hay conexión. Probá de nuevo en un momento.', 'No connection. Try again in a moment.'), 'error');
-    } finally {
-      if (btn) btn.disabled = false;
-    }
-  }
-
-  const sessionToken = () => window.localStorage.getItem('mundoki_token') || '';
-
-  // ---------- Views ----------
-
-  function showView(view: 'guest' | 'challenge' | 'signedIn') {
+  function showLoginView(view: 'guest' | 'challenge') {
     show(guestView, view === 'guest');
     show(challengeView, view === 'challenge');
-    show(loggedInView, view === 'signedIn');
-    root!.classList.toggle('is-signed-in', view === 'signedIn');
   }
 
   function setMode(mode: AuthMode) {
@@ -147,57 +160,10 @@ export function initAccountPage(): void {
     hideBanner();
   }
 
-  function renderLoggedInState(user: Json, isPremium: boolean) {
-    showView('signedIn');
-    const isAdmin = user.role === 'admin';
-    const hasInvite = Boolean(sessionStorage.getItem('mundoki_invite'));
-    show(byId('account-admin-promos'), isAdmin);
-    show(byId('account-return-promo'), hasInvite);
-    const returnLink = byId<HTMLAnchorElement>('account-return-next');
-    if (returnLink && returnPath) returnLink.href = returnPath;
-    show(returnLink, Boolean(returnPath));
-    show(byId('account-extra-links'), isAdmin || hasInvite || Boolean(returnPath));
-
-    const name = String(user.name || '').trim();
-    const nameEl = byId('user-profile-name');
-    if (nameEl) nameEl.textContent = name ? L(`¡Hola, ${name}!`, `Hi, ${name}!`) : L('¡Hola!', 'Hi!');
-    const emailEl = byId('user-profile-email');
-    if (emailEl) emailEl.textContent = String(user.email || '');
-
-    const tierChip = byId('user-profile-tier');
-    if (tierChip) {
-      tierChip.textContent = isPremium ? 'Premium' : L('Gratis', 'Free');
-      tierChip.className = isPremium ? 'mk-chip mk-chip--grape' : 'mk-chip';
-    }
-    const tierText = byId('user-profile-tier-text');
-    if (tierText) {
-      tierText.textContent = isPremium
-        ? L('Tienen todos los mundos y lecciones abiertos.', 'All worlds and lessons are open for your family.')
-        : L('Con Premium se abren todos los mundos y lecciones.', 'Premium opens every world and lesson.');
-    }
-    const tierLink = byId('user-profile-tier-link');
-    if (tierLink) tierLink.textContent = isPremium ? L('Ver mi plan', 'See my plan') : L('Conocer Premium', 'See Premium');
-
-    const tfEnabled = Boolean(user.twoFactorEnabled);
-    const tfBadge = byId('user-2fa-status-badge');
-    if (tfBadge) {
-      tfBadge.textContent = tfEnabled ? L('activada', 'on') : L('desactivada', 'off');
-      tfBadge.className = tfEnabled ? 'mk-chip mk-chip--leaf' : 'mk-chip';
-    }
-    show(byId('btn-start-2fa-setup'), !tfEnabled);
-    show(byId('form-disable-2fa'), tfEnabled);
-    if (tfEnabled) show(byId('panel-2fa-setup'), false);
-  }
-
-  function updateHeaderName(label: string) {
-    const headerLink = byId('header-account-link');
-    if (headerLink && label) headerLink.textContent = label;
-  }
-
   function applyAuthResponse(data: Json) {
     if (data.requiresTwoFactor && data.pending2faToken) {
       pending2faToken = String(data.pending2faToken);
-      showView('challenge');
+      showLoginView('challenge');
       hideBanner();
       const emailEl = byId('challenge-2fa-email');
       if (emailEl) emailEl.textContent = String(data.email || '');
@@ -218,30 +184,9 @@ export function initAccountPage(): void {
       window.localStorage.setItem('mundoki_premium', data.isPremiumEntitled ? 'true' : 'false');
       if (data.gameState) saveLocalGameState(data.gameState);
       updateHeaderName(String(data.user.name || ''));
-      if (passwordInput) passwordInput.value = '';
-      if (signupPasswordInput) signupPasswordInput.value = '';
-      devMagicToken = '';
-      show(magicDevBox, false);
-      renderLoggedInState(data.user, Boolean(data.isPremiumEntitled));
-      showBanner(L('Listo, ya entraste.', 'Done, you are signed in.'), 'ok');
+      window.location.assign(returnPath || accountUrl);
     }
   }
-
-  // ---------- Restore an existing session ----------
-
-  fetch('/api/auth/me', {
-    credentials: 'same-origin',
-    headers: sessionToken() ? { Authorization: `Bearer ${sessionToken()}` } : {},
-  })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((data) => {
-      if (data && data.authenticated && data.user) {
-        window.localStorage.setItem('mundoki_user', JSON.stringify(data.user));
-        window.localStorage.setItem('mundoki_premium', data.isPremiumEntitled ? 'true' : 'false');
-        renderLoggedInState(data.user, Boolean(data.isPremiumEntitled));
-      }
-    })
-    .catch(() => {});
 
   // ---------- Magic link: opened from the email (?magic_token=) ----------
 
@@ -427,7 +372,7 @@ export function initAccountPage(): void {
         pending2faToken = '';
         const codeInput = byId<HTMLInputElement>('input-2fa-challenge-code');
         if (codeInput) codeInput.value = '';
-        showView('guest');
+        showLoginView('guest');
         showBanner(
           L('El código no sirvió. Volvé a entrar y escribí el código que muestra la app en ese momento.', 'That code did not work. Sign in again and enter the code the app shows at that moment.'),
           'error'
@@ -441,8 +386,98 @@ export function initAccountPage(): void {
   byId('btn-cancel-2fa-challenge')?.addEventListener('click', () => {
     pending2faToken = '';
     hideBanner();
-    showView('guest');
+    showLoginView('guest');
   });
+}
+
+// ============================================================================
+// Account page (/es-ar/cuenta/, /en-us/account/) — authenticated users only
+// ============================================================================
+
+export function initAccountPage(): void {
+  const root = byId('account-page-root');
+  if (!root) return;
+
+  const locale = (root.dataset.locale || 'es-AR') as Locale;
+  const loginUrl = root.dataset.loginUrl || (locale === 'en-US' ? '/en-us/login/' : '/es-ar/login/');
+  const { L, showBanner, hideBanner, withBusy } = createHelpers(locale);
+
+  const returnPath = sanitizeNextPath(new URLSearchParams(window.location.search).get('next'));
+
+  function renderLoggedInState(user: Json, isPremium: boolean) {
+    const isAdmin = user.role === 'admin';
+    const hasInvite = Boolean(sessionStorage.getItem('mundoki_invite'));
+    show(byId('account-admin-promos'), isAdmin);
+    show(byId('account-return-promo'), hasInvite);
+    const returnLink = byId<HTMLAnchorElement>('account-return-next');
+    if (returnLink && returnPath) returnLink.href = returnPath;
+    show(returnLink, Boolean(returnPath));
+    show(byId('account-extra-links'), isAdmin || hasInvite || Boolean(returnPath));
+
+    const roleLabelEl = byId('user-profile-role-label');
+    if (roleLabelEl) {
+      roleLabelEl.textContent = isAdmin ? L('Cuenta de administrador', 'Admin account') : L('Cuenta de la familia', 'Family account');
+    }
+    const name = String(user.name || '').trim();
+    const nameEl = byId('user-profile-name');
+    if (nameEl) nameEl.textContent = name ? L(`¡Hola, ${name}!`, `Hi, ${name}!`) : L('¡Hola!', 'Hi!');
+    const emailEl = byId('user-profile-email');
+    if (emailEl) emailEl.textContent = String(user.email || '');
+
+    const tierChip = byId('user-profile-tier');
+    if (tierChip) {
+      tierChip.textContent = isPremium ? 'Premium' : L('Gratis', 'Free');
+      tierChip.className = isPremium ? 'mk-chip mk-chip--grape' : 'mk-chip';
+    }
+    const tierText = byId('user-profile-tier-text');
+    if (tierText) {
+      tierText.textContent = isPremium
+        ? L('Tienen todos los mundos y lecciones abiertos.', 'All worlds and lessons are open for your family.')
+        : L('Con Premium se abren todos los mundos y lecciones.', 'Premium opens every world and lesson.');
+    }
+    const tierLink = byId('user-profile-tier-link');
+    if (tierLink) tierLink.textContent = isPremium ? L('Ver mi plan', 'See my plan') : L('Conocer Premium', 'See Premium');
+
+    const tfEnabled = Boolean(user.twoFactorEnabled);
+    const tfBadge = byId('user-2fa-status-badge');
+    if (tfBadge) {
+      tfBadge.textContent = tfEnabled ? L('activada', 'on') : L('desactivada', 'off');
+      tfBadge.className = tfEnabled ? 'mk-chip mk-chip--leaf' : 'mk-chip';
+    }
+    show(byId('btn-start-2fa-setup'), !tfEnabled);
+    show(byId('form-disable-2fa'), tfEnabled);
+    if (tfEnabled) show(byId('panel-2fa-setup'), false);
+  }
+
+  // Hydrate client-side invite / ?next= links immediately, then keep session state in sync.
+  const hasInvite = Boolean(sessionStorage.getItem('mundoki_invite'));
+  if (hasInvite || returnPath) {
+    show(byId('account-return-promo'), hasInvite);
+    const returnLink = byId<HTMLAnchorElement>('account-return-next');
+    if (returnLink && returnPath) returnLink.href = returnPath;
+    show(returnLink, Boolean(returnPath));
+    show(byId('account-extra-links'), true);
+  }
+
+  fetch('/api/auth/me', {
+    credentials: 'same-origin',
+    headers: sessionToken() ? { Authorization: `Bearer ${sessionToken()}` } : {},
+  })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (data && data.authenticated && data.user) {
+        window.localStorage.setItem('mundoki_user', JSON.stringify(data.user));
+        window.localStorage.setItem('mundoki_premium', data.isPremiumEntitled ? 'true' : 'false');
+        updateHeaderName(String(data.user.name || ''));
+        renderLoggedInState(data.user, Boolean(data.isPremiumEntitled));
+      } else if (data && !data.authenticated) {
+        window.localStorage.removeItem('mundoki_token');
+        window.localStorage.removeItem('mundoki_user');
+        window.localStorage.removeItem('mundoki_premium');
+        window.location.replace(loginUrl);
+      }
+    })
+    .catch(() => {});
 
   // ---------- Two-step verification: turn on / off ----------
 
@@ -537,9 +572,7 @@ export function initAccountPage(): void {
       window.localStorage.removeItem('mundoki_user');
       window.localStorage.removeItem('mundoki_premium');
       updateHeaderName(L('Familia', 'Parents'));
-      setMode('signin');
-      showView('guest');
-      showBanner(L('Saliste de la cuenta.', 'You signed out.'), 'info');
+      window.location.assign(loginUrl);
     });
   });
 }
