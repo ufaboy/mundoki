@@ -1,7 +1,7 @@
 {
   "name": "mundoki",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.2.1",
   "type": "module",
   "scripts": {
     "dev": "node scripts/astro-cli.mjs dev --port 3333 --host 0.0.0.0",
