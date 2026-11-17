@@ -1,5 +1,5 @@
 ---
-import { buildTrainHubUrl, buildTrainSkillUrl } from '../../i18n/routes';
+import { buildHomeUrl, buildTrainHubUrl, buildTrainSkillUrl } from '../../i18n/routes';
 import {
   getSkillGameMeta,
   SKILL_GAMES_META,
@@ -25,28 +25,46 @@ const isXY = meta.inputMode === 'xy';
   data-input-mode={meta.inputMode ?? 'single'}
   class="mk-stack"
 >
-  <!-- Top Bar: Back + Skill Switcher + Stats -->
+  <!-- Header Breadcrumbs & Compact Skill Switcher -->
+  <div class="mk-skill-nav">
+    <nav class="mk-skill-crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href={buildHomeUrl(locale)}>{es ? 'Inicio' : 'Home'}</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href={buildTrainHubUrl(locale)}>{es ? 'Juegos de Cálculo' : 'Skill Games'}</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page">
+          {skill === 'addition' && (es ? 'Suma' : 'Addition')}
+          {skill === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
+          {skill === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
+          {skill === 'division' && (es ? 'División' : 'Division')}
+          {skill === 'sea-cannon' && (es ? 'Batalla Naval' : 'Sea Cannon')}
+          {skill === 'chain-ops' && (es ? 'Combinadas' : 'Combined')}
+        </li>
+      </ol>
+    </nav>
+
+    <nav class="mk-skill-tabs" aria-label={es ? 'Cambiar juego' : 'Switch game'}>
+      {SKILL_GAMES_META.map((item) => (
+        <a
+          href={buildTrainSkillUrl(locale, item.id)}
+          class:list={['mk-skill-tab', { 'is-active': item.id === skill }]}
+          aria-current={item.id === skill ? 'page' : undefined}
+        >
+          {item.id === 'addition' && (es ? 'Suma' : 'Addition')}
+          {item.id === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
+          {item.id === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
+          {item.id === 'division' && (es ? 'División' : 'Division')}
+          {item.id === 'sea-cannon' && (es ? 'Batalla Naval' : 'Sea Cannon')}
+          {item.id === 'chain-ops' && (es ? 'Combinadas' : 'Combined')}
+        </a>
+      ))}
+    </nav>
+  </div>
+
+  <!-- Top Bar: Title + Stats -->
   <div class="mk-card mk-row mk-row--between mk-skill-top">
     <div class="mk-stack mk-stack--tight">
-      <div class="mk-row" style="gap: 8px; flex-wrap: wrap;">
-        <a href={buildTrainHubUrl(locale)} class="mk-btn">
-          ← {es ? 'Todos los juegos' : 'All games'}
-        </a>
-        {SKILL_GAMES_META.map((item) => (
-          <a
-            href={buildTrainSkillUrl(locale, item.id)}
-            class:list={['mk-btn', { 'mk-btn--primary': item.id === skill }]}
-            aria-current={item.id === skill ? 'page' : undefined}
-          >
-            {item.id === 'addition' && (es ? 'Suma' : 'Addition')}
-            {item.id === 'subtraction' && (es ? 'Resta' : 'Subtraction')}
-            {item.id === 'multiplication' && (es ? 'Multiplicación' : 'Multiplication')}
-            {item.id === 'division' && (es ? 'División' : 'Division')}
-            {item.id === 'sea-cannon' && (es ? 'Batalla Naval' : 'Sea Cannon')}
-            {item.id === 'chain-ops' && (es ? 'Combinadas' : 'Combined')}
-          </a>
-        ))}
-      </div>
       <h1 class="mk-title" style="margin: 0;">{meta.title[locale]}</h1>
       <p class="mk-text" style="margin: 0;">{meta.subtitle[locale]}</p>
     </div>
@@ -169,6 +187,76 @@ const isXY = meta.inputMode === 'xy';
 </script>
 
 <style>
+  .mk-skill-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mk-s2) var(--mk-s4);
+  }
+
+  .mk-skill-crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--mk-ink-soft);
+  }
+
+  .mk-skill-crumbs a {
+    color: var(--mk-sky);
+    text-decoration: none;
+  }
+
+  .mk-skill-crumbs a:hover {
+    text-decoration: underline;
+  }
+
+  .mk-skill-crumbs [aria-current='page'] {
+    color: var(--mk-ink);
+    font-weight: 800;
+  }
+
+  .mk-skill-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 2px;
+  }
+
+  .mk-skill-tab {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: var(--mk-radius-pill);
+    font-size: 0.9rem;
+    font-weight: 800;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--mk-ink-soft);
+    background: var(--mk-surface);
+    border: 1.5px solid var(--mk-line);
+    transition: background var(--mk-fast) var(--mk-ease), color var(--mk-fast) var(--mk-ease);
+  }
+
+  .mk-skill-tab:hover {
+    color: var(--mk-ink);
+    border-color: var(--mk-sky);
+  }
+
+  .mk-skill-tab.is-active {
+    background: var(--mk-sky);
+    color: #FFFFFF;
+    border-color: var(--mk-sky-deep);
+  }
+
   .mk-skill-top {
     gap: var(--mk-s4);
     flex-wrap: wrap;
