@@ -151,6 +151,10 @@ function init(lesson: HTMLElement, data: ClientData) {
     if (kind === 'lines') lines(box, T);
     if (kind === 'numberline') numberLine(box, T);
     if (kind === 'triangle') triangle(box, T);
+    if (kind === 'parallels') parallels(box, T);
+    if (kind === 'locus') locus(box, T);
+    if (kind === 'frequency') frequency(box, T);
+    if (kind === 'trials') trials(box, T);
   });
 }
 
@@ -531,6 +535,321 @@ function triangle(box: HTMLElement, T: Record<string, string>) {
 
   legA.addEventListener('input', draw);
   legB.addEventListener('input', draw);
+  draw();
+}
+
+// ---------- Parallel lines cut by a transversal ----------
+
+// Sectors at each crossing, in degrees counter-clockwise from the right-hand ray:
+// 0 upper right [0, a], 1 upper left [a, 180], 2 lower left [180, 180 + a], 3 lower right [180 + a, 360].
+// Each pair is [sector at the top crossing, sector at the bottom crossing].
+const PARALLEL_PAIRS: Record<string, [number, number]> = { corresponding: [0, 0], alternate: [2, 0], cointerior: [3, 0] };
+const PARALLEL_LABEL: Record<string, string> = { corresponding: 'parCorresponding', alternate: 'parAlternate', cointerior: 'parCointerior' };
+
+function parallels(box: HTMLElement, T: Record<string, string>) {
+  const view = box.querySelector<HTMLElement>('[data-par-view]')!;
+  const angle = box.querySelector<HTMLInputElement>('[data-par-angle]')!;
+  const out = box.querySelector<HTMLOutputElement>('[data-par-a]')!;
+  const status = box.querySelector<HTMLElement>('[data-par-status]')!;
+  const buttons = [...box.querySelectorAll<HTMLButtonElement>('[data-par-pair]')];
+  let pair = PARALLEL_PAIRS[box.dataset.pair ?? ''] ? box.dataset.pair! : 'corresponding';
+  angle.value = box.dataset.start || '60';
+
+  const W = 340;
+  const H = 240;
+  const gap = 110;
+  const top = H / 2 - gap / 2;
+  const bottom = H / 2 + gap / 2;
+
+  const draw = () => {
+    const a = Number(angle.value);
+    out.textContent = String(a);
+    const rad = (a * Math.PI) / 180;
+    const cot = Math.cos(rad) / Math.sin(rad);
+    const crossings = [{ x: W / 2 + (gap / 2) * cot, y: top }, { x: W / 2 - (gap / 2) * cot, y: bottom }];
+    const values = [a, 180 - a, a, 180 - a];
+    const sector = (s: number): [number, number] => [s === 0 ? 0 : s === 1 ? a : s === 2 ? 180 : 180 + a, s === 0 ? a : s === 1 ? 180 : s === 2 ? 180 + a : 360];
+    const at = (p: { x: number; y: number }, deg: number, r: number) => {
+      const t = (deg * Math.PI) / 180;
+      return { x: p.x + r * Math.cos(t), y: p.y - r * Math.sin(t) };
+    };
+    const [s1, s2] = PARALLEL_PAIRS[pair];
+    const supplementary = pair === 'cointerior';
+    status.textContent = `${T[PARALLEL_LABEL[pair]]}: ${values[s1]}° ${T.and} ${values[s2]}° — ${supplementary ? T.parSupplementary : T.parEqual}.`;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.parPair === pair)));
+
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': status.textContent });
+    for (const y of [top, bottom]) {
+      svg.append(
+        svgEl('line', { x1: 8, y1: y, x2: W - 8, y2: y, stroke: '#0B79C4', 'stroke-width': 3, 'stroke-linecap': 'round' }),
+        // Arrow marks: the usual sign that the two lines are parallel.
+        svgEl('path', { d: `M${W - 40} ${y - 6} l8 6 l-8 6`, fill: 'none', stroke: '#0B79C4', 'stroke-width': 2.5 }),
+      );
+    }
+    const reach = H / 2 / Math.sin(rad);
+    const ends = [at({ x: W / 2, y: H / 2 }, a, reach), at({ x: W / 2, y: H / 2 }, a + 180, reach)];
+    svg.append(svgEl('line', { x1: ends[0].x, y1: ends[0].y, x2: ends[1].x, y2: ends[1].y, stroke: '#1C2443', 'stroke-width': 2.5 }));
+
+    crossings.forEach((p, i) => {
+      for (let s = 0; s < 4; s += 1) {
+        const [d1, d2] = sector(s);
+        const on = (i === 0 && s === s1) || (i === 1 && s === s2);
+        if (on) {
+          const p1 = at(p, d1, 26);
+          const p2 = at(p, d2, 26);
+          svg.append(svgEl('path', { d: `M${p.x} ${p.y} L${p1.x} ${p1.y} A26 26 0 0 0 ${p2.x} ${p2.y} Z`, fill: '#FDE7C8', stroke: '#C2410C', 'stroke-width': 2 }));
+        }
+        const label = at(p, (d1 + d2) / 2, 42);
+        svg.append(svgEl('text', {
+          x: label.x, y: label.y + 4, 'text-anchor': 'middle', 'font-size': on ? 14 : 11, 'font-weight': on ? 800 : 400, fill: on ? '#C2410C' : '#878DA6',
+        }, `${values[s]}°`));
+      }
+      svg.append(svgEl('circle', { cx: p.x, cy: p.y, r: 3.5, fill: '#1C2443' }));
+    });
+    view.replaceChildren(svg);
+  };
+
+  buttons.forEach((button) => button.addEventListener('click', () => {
+    pair = button.dataset.parPair ?? pair;
+    draw();
+  }));
+  angle.addEventListener('input', draw);
+  draw();
+}
+
+// ---------- Locus: points at a given distance, or equidistant ----------
+
+function locus(box: HTMLElement, T: Record<string, string>) {
+  const mode = box.dataset.mode || 'circle';
+  const [x0, y0] = JSON.parse(box.dataset.start || '[1,1]') as [number, number];
+  const view = box.querySelector<HTMLElement>('[data-locus-view]')!;
+  const px = box.querySelector<HTMLInputElement>('[data-locus-px]')!;
+  const py = box.querySelector<HTMLInputElement>('[data-locus-py]')!;
+  const xOut = box.querySelector<HTMLOutputElement>('[data-locus-x]')!;
+  const yOut = box.querySelector<HTMLOutputElement>('[data-locus-y]')!;
+  const eq = box.querySelector<HTMLElement>('[data-locus-eq]')!;
+  const status = box.querySelector<HTMLElement>('[data-locus-status]')!;
+  const comma = T.decimal;
+  px.value = String(x0);
+  py.value = String(y0);
+
+  const R = 6;
+  const S = 26;
+  const X = (x: number) => 170 + x * S;
+  const Y = (y: number) => 170 - y * S;
+  const A: [number, number] = [-2, -1];
+  const B: [number, number] = [2, 3];
+  /** A distance from its square: exact when whole, otherwise √n ≈ value. */
+  const dist = (d2: number) => {
+    const d = Math.sqrt(d2);
+    return Number.isInteger(d) ? String(d) : `√${d2} ≈ ${decimal(Math.round(d * 10) / 10, comma)}`;
+  };
+  const sq = (p: [number, number], q: [number, number]) => (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2;
+
+  const draw = () => {
+    const P: [number, number] = [Number(px.value), Number(py.value)];
+    xOut.textContent = decimal(P[0], comma);
+    yOut.textContent = decimal(P[1], comma);
+
+    const svg = svgEl('svg', { viewBox: '0 0 340 340', role: 'img' });
+    const defs = svgEl('defs', {});
+    const clip = svgEl('clipPath', { id: 'sec-locus-clip' });
+    clip.append(svgEl('rect', { x: X(-R), y: Y(R), width: 2 * R * S, height: 2 * R * S }));
+    defs.append(clip);
+    svg.append(defs, svgEl('rect', { x: X(-R), y: Y(R), width: 2 * R * S, height: 2 * R * S, fill: '#fff', stroke: '#EADFCB' }));
+    for (let i = -R; i <= R; i += 1) {
+      svg.append(
+        svgEl('line', { x1: X(i), y1: Y(-R), x2: X(i), y2: Y(R), stroke: '#F1E8D8', 'stroke-width': 1 }),
+        svgEl('line', { x1: X(-R), y1: Y(i), x2: X(R), y2: Y(i), stroke: '#F1E8D8', 'stroke-width': 1 }),
+      );
+    }
+    const plotted = svgEl('g', { 'clip-path': 'url(#sec-locus-clip)' });
+    const dashed = (x1: number, y1: number, x2: number, y2: number, color = '#878DA6') =>
+      svgEl('line', { x1: X(x1), y1: Y(y1), x2: X(x2), y2: Y(y2), stroke: color, 'stroke-width': 2, 'stroke-dasharray': '6 5' });
+    const dot = (p: [number, number], name: string, color: string) => [
+      svgEl('circle', { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: color, stroke: '#fff', 'stroke-width': 2 }),
+      svgEl('text', { x: X(p[0]) + 9, y: Y(p[1]) - 8, 'font-size': 14, 'font-weight': 800, fill: color }, name),
+    ];
+
+    if (mode === 'circle') {
+      const d2 = P[0] ** 2 + P[1] ** 2;
+      eq.textContent = `OP = ${dist(d2)}`;
+      status.textContent = d2 === 25 ? T.locusOnCircle : d2 < 25 ? T.locusInside : T.locusOutside;
+      plotted.append(
+        svgEl('circle', { cx: X(0), cy: Y(0), r: 5 * S, fill: 'none', stroke: '#15803D', 'stroke-width': 2.5, 'stroke-dasharray': '8 6' }),
+        dashed(0, 0, P[0], P[1], '#6D43D0'),
+        ...dot([0, 0], 'O', '#1C2443'),
+      );
+    } else if (mode === 'bisector') {
+      const dA = sq(P, A);
+      const dB = sq(P, B);
+      eq.textContent = `PA = ${dist(dA)}   ·   PB = ${dist(dB)}`;
+      status.textContent = dA === dB ? T.locusEqualAB : dA < dB ? T.locusCloserA : T.locusCloserB;
+      // Perpendicular bisector of A(−2, −1) and B(2, 3): x + y = 1.
+      plotted.append(
+        svgEl('line', { x1: X(-R), y1: Y(1 + R), x2: X(R), y2: Y(1 - R), stroke: '#15803D', 'stroke-width': 2.5, 'stroke-dasharray': '8 6' }),
+        svgEl('line', { x1: X(A[0]), y1: Y(A[1]), x2: X(B[0]), y2: Y(B[1]), stroke: '#0B79C4', 'stroke-width': 3 }),
+        dashed(P[0], P[1], A[0], A[1]),
+        dashed(P[0], P[1], B[0], B[1]),
+        ...dot(A, 'A', '#0B79C4'),
+        ...dot(B, 'B', '#0B79C4'),
+      );
+    } else {
+      // Right angle at O with sides along the positive axes; its bisector is y = x.
+      eq.textContent = `${T.toHorizontal}: ${P[1]}   ·   ${T.toVertical}: ${P[0]}`;
+      status.textContent = P[0] === P[1] ? T.locusEqualSides : P[1] < P[0] ? T.locusCloserH : T.locusCloserV;
+      plotted.append(
+        svgEl('line', { x1: X(0), y1: Y(0), x2: X(R), y2: Y(R), stroke: '#15803D', 'stroke-width': 2.5, 'stroke-dasharray': '8 6' }),
+        svgEl('path', { d: `M${X(0)} ${Y(R)} V${Y(0)} H${X(R)}`, fill: 'none', stroke: '#0B79C4', 'stroke-width': 3 }),
+        dashed(P[0], P[1], P[0], 0),
+        dashed(P[0], P[1], 0, P[1]),
+        ...dot([0, 0], 'O', '#1C2443'),
+      );
+    }
+    plotted.append(...dot(P, 'P', '#6D43D0'));
+    svg.append(plotted);
+    svg.setAttribute('aria-label', `${eq.textContent}. ${status.textContent}`);
+    view.replaceChildren(svg);
+  };
+
+  px.addEventListener('input', draw);
+  py.addEventListener('input', draw);
+  draw();
+}
+
+// ---------- Frequency table and bar chart ----------
+
+function frequency(box: HTMLElement, T: Record<string, string>) {
+  const counts = JSON.parse(box.dataset.counts || '[]') as number[];
+  const names = JSON.parse(box.dataset.names || '[]') as string[];
+  const view = box.querySelector<HTMLElement>('[data-freq-view]')!;
+  const status = box.querySelector<HTMLElement>('[data-freq-status]')!;
+  const comma = T.decimal;
+  const MAX = 30;
+  const colors = ['#0B79C4', '#C2410C', '#15803D', '#6D43D0', '#B45309', '#0F766E'];
+
+  const draw = () => {
+    const total = counts.reduce((s, c) => s + c, 0);
+    counts.forEach((c, i) => {
+      box.querySelector(`[data-freq-count="${i}"]`)!.textContent = String(c);
+      const rel = box.querySelector(`[data-freq-rel="${i}"]`)!;
+      rel.textContent = total ? `${c}/${total} ≈ ${decimal(Math.round((c / total) * 1000) / 10, comma)} %` : '—';
+    });
+    status.textContent = `${T.total}: ${total}`;
+
+    const W = 340;
+    const H = 200;
+    const base = 160;
+    const top = Math.max(5, Math.ceil(Math.max(...counts, 1) / 5) * 5);
+    const slot = (W - 40) / counts.length;
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${T.total}: ${total}` });
+    for (let v = 0; v <= top; v += 5) {
+      const y = base - (v / top) * 140;
+      svg.append(
+        svgEl('line', { x1: 32, y1: y, x2: W - 6, y2: y, stroke: v === 0 ? '#4B5475' : '#F1E8D8', 'stroke-width': v === 0 ? 1.5 : 1 }),
+        svgEl('text', { x: 26, y: y + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#4B5475' }, String(v)),
+      );
+    }
+    counts.forEach((c, i) => {
+      const h = (c / top) * 140;
+      const x = 36 + i * slot + slot * 0.18;
+      const w = slot * 0.64;
+      svg.append(
+        svgEl('rect', { x, y: base - h, width: w, height: h, rx: 3, fill: colors[i % colors.length] }),
+        svgEl('text', { x: x + w / 2, y: base - h - 5, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 800, fill: '#1C2443' }, String(c)),
+        svgEl('text', { x: x + w / 2, y: base + 18, 'text-anchor': 'middle', 'font-size': 11, fill: '#1C2443' }, (names[i] ?? '').slice(0, 12)),
+      );
+    });
+    view.replaceChildren(svg);
+  };
+
+  box.querySelectorAll<HTMLButtonElement>('[data-freq-step]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const i = Number(button.dataset.freqStep);
+      counts[i] = Math.min(MAX, Math.max(0, counts[i] + Number(button.dataset.delta)));
+      draw();
+    });
+  });
+  draw();
+}
+
+// ---------- Repeated trials: relative frequency against the number of trials ----------
+
+function trials(box: HTMLElement, T: Record<string, string>) {
+  const coin = box.dataset.experiment === 'coin';
+  const target = Number(box.dataset.target || '6');
+  const p = coin ? 1 / 2 : 1 / 6;
+  const pText = coin ? '1/2' : '1/6';
+  const event = coin ? T.eventHeads : `${T.eventFace} ${target}`;
+  const view = box.querySelector<HTMLElement>('[data-trials-view]')!;
+  const last = box.querySelector<HTMLElement>('[data-trials-last]')!;
+  const status = box.querySelector<HTMLElement>('[data-trials-status]')!;
+  const runs = [...box.querySelectorAll<HTMLButtonElement>('[data-trials-run]')];
+  const comma = T.decimal;
+  const MAX = 5000;
+  let n = 0;
+  let hits = 0;
+  let history: number[] = [];
+
+  const draw = () => {
+    const rel = n ? hits / n : 0;
+    status.textContent = n
+      ? `${T.trialsCount}: ${n} · ${event}: ${hits} · ${T.relFreq}: ${hits}/${n} ≈ ${decimal(Math.round(rel * 1000) / 1000, comma)}`
+      : `${T.trialsCount}: 0`;
+    if (n >= MAX) status.textContent += ` ${T.trialsMax}`;
+    runs.forEach((b) => { b.disabled = n >= MAX; });
+
+    const W = 340;
+    const H = 200;
+    const left = 34;
+    const right = W - 10;
+    const topY = 14;
+    const bottomY = 176;
+    const X = (i: number) => left + (i / Math.max(n, 10)) * (right - left);
+    const Y = (v: number) => bottomY - v * (bottomY - topY);
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': status.textContent });
+    for (const v of [0, 0.5, 1]) {
+      svg.append(
+        svgEl('line', { x1: left, y1: Y(v), x2: right, y2: Y(v), stroke: v === 0 ? '#4B5475' : '#F1E8D8', 'stroke-width': v === 0 ? 1.5 : 1 }),
+        svgEl('text', { x: left - 6, y: Y(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#4B5475' }, decimal(v, comma)),
+      );
+    }
+    svg.append(
+      svgEl('line', { x1: left, y1: Y(p), x2: right, y2: Y(p), stroke: '#15803D', 'stroke-width': 2, 'stroke-dasharray': '6 5' }),
+      svgEl('text', { x: right, y: Y(p) - 6, 'text-anchor': 'end', 'font-size': 12, 'font-weight': 800, fill: '#15803D' }, pText),
+      svgEl('text', { x: right, y: H - 4, 'text-anchor': 'end', 'font-size': 11, fill: '#4B5475' }, `${T.trialsCount}: ${n}`),
+    );
+    if (history.length) {
+      const step = Math.max(1, Math.floor(history.length / 400));
+      const pts: string[] = [];
+      for (let i = 0; i < history.length; i += step) pts.push(`${X(i + 1).toFixed(1)},${Y(history[i]).toFixed(1)}`);
+      pts.push(`${X(history.length).toFixed(1)},${Y(history[history.length - 1]).toFixed(1)}`);
+      svg.append(svgEl('polyline', { points: pts.join(' '), fill: 'none', stroke: '#C2410C', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }));
+    }
+    view.replaceChildren(svg);
+  };
+
+  runs.forEach((button) => {
+    button.addEventListener('click', () => {
+      const times = Math.min(Number(button.dataset.trialsRun), MAX - n);
+      let face = 0;
+      for (let i = 0; i < times; i += 1) {
+        face = coin ? (Math.random() < 0.5 ? 1 : 0) : 1 + Math.floor(Math.random() * 6);
+        if (coin ? face === 1 : face === target) hits += 1;
+        n += 1;
+        history.push(hits / n);
+      }
+      if (times > 0) last.textContent = coin ? (face === 1 ? T.lastHeads : T.lastTails) : `${T.lastDie} ${face}`;
+      draw();
+    });
+  });
+  box.querySelector<HTMLButtonElement>('[data-trials-reset]')!.addEventListener('click', () => {
+    n = 0;
+    hits = 0;
+    history = [];
+    last.textContent = '—';
+    draw();
+  });
   draw();
 }
 

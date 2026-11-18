@@ -67,6 +67,32 @@ const client = {
     lineIntercept: es ? 'Corta el eje y en y =' : 'It crosses the y-axis at y =',
     lineSlope: es ? 'Por cada 1 que avanza x, y cambia' : 'For each 1 that x moves right, y changes by',
     hypotenuse: es ? 'Hipotenusa' : 'Hypotenuse',
+    and: es ? 'y' : 'and',
+    parCorresponding: es ? 'Correspondientes' : 'Corresponding',
+    parAlternate: es ? 'Alternos internos' : 'Alternate interior',
+    parCointerior: es ? 'Conjugados internos' : 'Co-interior',
+    parEqual: es ? 'son iguales' : 'they are equal',
+    parSupplementary: es ? 'suman 180°' : 'they add up to 180°',
+    locusOnCircle: es ? 'P está a 5 de O: está sobre la circunferencia.' : 'P is 5 away from O: it is on the circle.',
+    locusInside: es ? 'P está a menos de 5 de O: queda adentro del círculo.' : 'P is less than 5 away from O: it is inside the circle.',
+    locusOutside: es ? 'P está a más de 5 de O: queda afuera del círculo.' : 'P is more than 5 away from O: it is outside the circle.',
+    locusEqualAB: es ? 'PA = PB: P está sobre la mediatriz de AB.' : 'PA = PB: P is on the perpendicular bisector of AB.',
+    locusCloserA: es ? 'P está más cerca de A que de B.' : 'P is closer to A than to B.',
+    locusCloserB: es ? 'P está más cerca de B que de A.' : 'P is closer to B than to A.',
+    locusEqualSides: es ? 'Misma distancia a los dos lados: P está sobre la bisectriz.' : 'Same distance to both sides: P is on the angle bisector.',
+    locusCloserH: es ? 'P está más cerca del lado horizontal.' : 'P is closer to the horizontal side.',
+    locusCloserV: es ? 'P está más cerca del lado vertical.' : 'P is closer to the vertical side.',
+    toHorizontal: es ? 'distancia al lado horizontal' : 'distance to the horizontal side',
+    toVertical: es ? 'distancia al lado vertical' : 'distance to the vertical side',
+    total: es ? 'Total' : 'Total',
+    trialsCount: es ? 'Tiradas' : 'Throws',
+    relFreq: es ? 'frecuencia relativa' : 'relative frequency',
+    eventHeads: es ? 'cara' : 'heads',
+    eventFace: es ? 'sale' : 'a',
+    lastHeads: es ? 'Salió cara' : 'Heads',
+    lastTails: es ? 'Salió ceca' : 'Tails',
+    lastDie: es ? 'Salió' : 'Rolled',
+    trialsMax: es ? 'Llegaste al máximo de 5000 tiradas.' : 'You reached the maximum of 5000 throws.',
   },
 };
 
@@ -183,6 +209,61 @@ const chainBack = explorer?.kind === 'chain' ? explorer : null;
           <p class="sec-explorer__status" data-tri-status role="status"></p>
         </div>
       )}
+      {explorer.kind === 'parallels' && (
+        <div class="sec-explorer" data-explorer="parallels" data-start={String(explorer.start)} data-pair={explorer.pair}>
+          <div class="sec-lines sec-parallels" data-par-view></div>
+          <div class="sec-lines__controls">
+            <label class="mk-field"><span>{es ? 'Ángulo de la secante' : 'Angle of the transversal'}: <output data-par-a></output>°</span><input type="range" min="35" max="145" step="5" data-par-angle /></label>
+          </div>
+          <div class="mk-row sec-explorer__tools" role="group" aria-label={es ? 'Par de ángulos' : 'Pair of angles'}>
+            <button type="button" class="mk-btn" data-par-pair="corresponding" aria-pressed="false">{client.text.parCorresponding}</button>
+            <button type="button" class="mk-btn" data-par-pair="alternate" aria-pressed="false">{client.text.parAlternate}</button>
+            <button type="button" class="mk-btn" data-par-pair="cointerior" aria-pressed="false">{client.text.parCointerior}</button>
+          </div>
+          <p class="sec-explorer__status" data-par-status role="status" aria-live="polite"></p>
+        </div>
+      )}
+      {explorer.kind === 'locus' && (
+        <div class="sec-explorer" data-explorer="locus" data-mode={explorer.mode} data-start={JSON.stringify(explorer.start)}>
+          <div class="sec-lines sec-locus" data-locus-view></div>
+          <div class="sec-lines__controls">
+            <label class="mk-field"><span>{es ? 'x de P' : 'x of P'}: <output data-locus-x></output></span><input type="range" min={explorer.mode === 'angle' ? 0 : -5} max="5" step="1" data-locus-px /></label>
+            <label class="mk-field"><span>{es ? 'y de P' : 'y of P'}: <output data-locus-y></output></span><input type="range" min={explorer.mode === 'angle' ? 0 : -5} max="5" step="1" data-locus-py /></label>
+          </div>
+          <p class="sec-explorer__eq" data-locus-eq></p>
+          <p class="sec-explorer__status" data-locus-status role="status" aria-live="polite"></p>
+        </div>
+      )}
+      {explorer.kind === 'frequency' && (
+        <div class="sec-explorer" data-explorer="frequency" data-counts={JSON.stringify(explorer.counts)} data-names={JSON.stringify(explorer.categories.map((c) => c[locale]))}>
+          <div class="sec-lines" data-freq-view></div>
+          <ul class="sec-freq">
+            {explorer.categories.map((category, i) => (
+              <li class="sec-freq__row">
+                <span class="sec-freq__name">{category[locale]}</span>
+                <button type="button" class="mk-btn sec-freq__step" data-freq-step={i} data-delta="-1" aria-label={`${es ? 'Uno menos:' : 'One less:'} ${category[locale]}`}>−</button>
+                <output class="sec-freq__count" data-freq-count={i}></output>
+                <button type="button" class="mk-btn sec-freq__step" data-freq-step={i} data-delta="1" aria-label={`${es ? 'Uno más:' : 'One more:'} ${category[locale]}`}>+</button>
+                <span class="sec-freq__rel" data-freq-rel={i}></span>
+              </li>
+            ))}
+          </ul>
+          <p class="sec-explorer__status" data-freq-status role="status" aria-live="polite"></p>
+        </div>
+      )}
+      {explorer.kind === 'trials' && (
+        <div class="sec-explorer" data-explorer="trials" data-experiment={explorer.experiment} data-target={String(explorer.target ?? 6)}>
+          <p class="sec-explorer__eq" data-trials-last aria-live="polite">—</p>
+          <div class="sec-lines" data-trials-view></div>
+          <div class="mk-row sec-explorer__tools">
+            <button type="button" class="mk-btn" data-trials-run="1">{es ? 'Tirar 1 vez' : 'Throw once'}</button>
+            <button type="button" class="mk-btn" data-trials-run="10">{es ? 'Tirar 10 veces' : 'Throw 10 times'}</button>
+            <button type="button" class="mk-btn" data-trials-run="100">{es ? 'Tirar 100 veces' : 'Throw 100 times'}</button>
+            <button type="button" class="mk-btn mk-btn--quiet" data-trials-reset>{es ? 'Empezar de nuevo' : 'Start again'}</button>
+          </div>
+          <p class="sec-explorer__status" data-trials-status role="status" aria-live="polite"></p>
+        </div>
+      )}
       <noscript><p class="mk-text">{es ? 'Activá JavaScript para usar el modelo interactivo.' : 'Enable JavaScript to use the interactive model.'}</p></noscript>
     </section>
   )}
@@ -262,7 +343,18 @@ const chainBack = explorer?.kind === 'chain' ? explorer : null;
   .sec-explorer__field { max-width: 14rem; margin-inline: auto; }
   .sec-balance :global(svg), .sec-lines :global(svg) { display: block; width: 100%; height: auto; }
   .sec-lines__controls { display: grid; gap: var(--mk-s3); }
-  .sec-triangle { max-width: 26rem; margin-inline: auto; width: 100%; }
+  .sec-triangle, .sec-locus { max-width: 26rem; margin-inline: auto; width: 100%; }
+  .sec-freq { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--mk-s2); }
+  .sec-freq__row { display: grid; grid-template-columns: 1fr auto 2.5rem auto minmax(6.5rem, auto); align-items: center; gap: var(--mk-s2); }
+  .sec-freq__name { font-weight: var(--mk-weight-strong); min-width: 0; overflow-wrap: anywhere; }
+  .sec-freq__step { min-width: 2.75rem; padding-inline: var(--mk-s2); }
+  .sec-freq__count { text-align: center; font-weight: var(--mk-weight-display); font-variant-numeric: tabular-nums; }
+  .sec-freq__rel { color: var(--mk-ink-soft); font-variant-numeric: tabular-nums; text-align: right; }
+  @media (max-width: 30rem) {
+    .sec-freq__row { grid-template-columns: 1fr auto 2.5rem auto; row-gap: 0; }
+    .sec-freq__rel { grid-column: 1 / -1; text-align: left; font-size: var(--mk-text-label); }
+  }
+  .sec-explorer__tools :global([aria-pressed='true']) { background: var(--mk-sky-tint); border-color: var(--mk-sky); }
   .sec-lines__controls input[type='range'] { width: 100%; min-height: 44px; accent-color: var(--mk-sky); }
   @media (min-width: 48rem) { .sec-lines__controls { grid-template-columns: 1fr 1fr; } }
 

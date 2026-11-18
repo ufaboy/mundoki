@@ -1,0 +1,142 @@
+// G08-10 · Frequencies (1.º año secundaria CABA).
+// Plan: collecting observations → absolute and relative frequency → charts.
+// Percentages are typed as plain numbers ("25"); relative frequencies as a fraction or decimal.
+import { num, pick, tx, worked, type SecondaryLesson, type SecondaryPackage } from './model';
+
+const travel = [tx('Colectivo|Bus'), tx('Caminando|Walking'), tx('Subte|Underground'), tx('Auto|Car')];
+
+const collecting: SecondaryLesson = {
+  id: 'G08-10-L01', packageId: 'G08-10', order: 1,
+  title: tx('Recolectar y contar datos|Collecting and counting data'),
+  objective: tx('Organizar observaciones en una tabla de frecuencias y comprobar que la suma coincide con el total.|Organise observations in a frequency table and check that the sum matches the total.'),
+  ready: num('B', 'Contá: ¿cuántas veces aparece la letra «a» en la palabra «banana»?|Count: how many times does the letter “a” appear in the word “banana”?', undefined, '3',
+    'Recorré la palabra letra por letra.|Go through the word letter by letter.',
+    [['2', 'Revisá el final de la palabra.|Check the end of the word.']]),
+  situation: tx('Los 25 estudiantes de un curso respondieron cómo llegan a la escuela: en colectivo, caminando, en subte o en auto. Cada respuesta es una observación. Para ver los datos de un vistazo se cuentan en una tabla: la frecuencia absoluta de cada opción es cuántas veces aparece, y todas juntas suman 25.|The 25 students in a class answered how they get to school: by bus, walking, by underground, or by car. Each answer is an observation. To see the data at a glance, count them in a table: the absolute frequency of each option is how many times it appears, and together they add up to 25.'),
+  explorer: { kind: 'frequency', categories: travel, counts: [10, 7, 5, 3] },
+  explorerNote: tx('Cambiá las cantidades con − y +. Fijate cómo cambian el total y las barras.|Change the counts with − and +. Watch how the total and the bars change.'),
+  worked: worked('La tabla del curso|The class table', [
+    'Contamos cada opción con palitos y pasamos el número a la tabla.|Tally each option and copy the number into the table.',
+    ['Colectivo 10, caminando 7, subte 5, auto 3. Comprobamos la suma.|Bus 10, walking 7, underground 5, car 3. Check the sum.', '10 + 7 + 5 + 3 = 25'],
+    'La suma da 25, igual que la cantidad de estudiantes: no falta ni sobra ninguna respuesta.|The sum is 25, the same as the number of students: no answer is missing or extra.',
+  ]),
+  mistake: {
+    wrong: tx('En la tabla puse 26 respuestas porque Mía marcó dos opciones.|I put 26 answers in the table because Mía ticked two options.'),
+    right: tx('Si cada estudiante elige una sola opción, la suma tiene que dar 25. Una respuesta con dos opciones hay que resolverla antes: preguntar o fijar una regla.|If each student picks only one option, the sum must be 25. An answer with two options has to be resolved first: ask, or set a rule.'),
+  },
+  practice: [
+    pick('A', '¿Qué es la frecuencia absoluta de una opción?|What is the absolute frequency of an option?', undefined,
+      ['Cuántas veces aparece|How many times it appears', 'Qué parte del total representa|What share of the total it is', 'La opción que más aparece|The option that appears most', 'El total de observaciones|The total number of observations'],
+      'Es un conteo.|It is a count.'),
+    num('B', 'Datos: 3, 5, 3, 4, 3, 5, 2, 3. ¿Cuál es la frecuencia absoluta del 3?|Data: 3, 5, 3, 4, 3, 5, 2, 3. What is the absolute frequency of 3?', undefined, '4',
+      'Contá cuántas veces aparece el 3.|Count how many times 3 appears.',
+      [['3', 'Revisá: el 3 aparece también al final.|Check again: 3 also appears at the end.'],
+       ['12', 'Sumaste los tres; se pide cuántas veces aparece.|You added the threes; the question is how many times it appears.']]),
+    num('B', 'Una tabla tiene frecuencias 8, 12, 5 y ☐. En total hay 30 observaciones. ¿Qué número falta?|A table has frequencies 8, 12, 5, and ☐. There are 30 observations in all. What number is missing?', undefined, '5',
+      'Todas las frecuencias juntas dan el total.|All the frequencies together give the total.',
+      [['25', 'Esa es la suma de las tres conocidas; falta restarla del total.|That is the sum of the three known ones; you still need to subtract it from the total.']]),
+    num('C', 'En un kiosco anotan qué alfajores se venden: chocolate 18, dulce de leche 14, blanco 9 y fruta ☐. Ese día vendieron 50 alfajores. ¿Cuántos de fruta se vendieron?|At a kiosk they record which alfajores sell: chocolate 18, dulce de leche 14, white 9, and fruit ☐. That day they sold 50 alfajores. How many fruit ones were sold?', undefined, '9',
+      'Sumá los gustos conocidos.|Add up the known flavours.',
+      [['41', 'Esa es la suma de los otros tres; falta compararla con 50.|That is the sum of the other three; you still need to compare it with 50.']]),
+    pick('D', 'Una encuesta tiene 40 respuestas, pero la tabla suma 38. ¿Qué es lo más probable?|A survey has 40 answers, but the table adds up to 38. What is most likely?', undefined,
+      ['Se contó mal o faltan 2 respuestas en la tabla|Something was miscounted or 2 answers are missing from the table', 'Está bien: la tabla no tiene que sumar el total|It is fine: the table does not need to add up to the total', 'Hay 2 respuestas repetidas|There are 2 repeated answers', 'Hay que borrar 2 respuestas|2 answers must be deleted'],
+      '¿Cuánto debería sumar la tabla?|What should the table add up to?'),
+  ],
+  exit: num('B', 'Control final: goles por partido: 0, 2, 1, 2, 3, 2, 0, 1, 2. ¿Cuál es la frecuencia absoluta del 2?|Exit check: goals per match: 0, 2, 1, 2, 3, 2, 0, 1, 2. What is the absolute frequency of 2?', undefined, '4',
+    'Marcá cada 2 a medida que lo contás.|Mark each 2 as you count it.',
+    [['8', 'Sumaste los goles; se pide en cuántos partidos hubo 2.|You added the goals; the question is how many matches had 2.'],
+     ['3', 'Revisá: hay un 2 al final.|Check again: there is a 2 at the end.']]),
+};
+
+const relative: SecondaryLesson = {
+  id: 'G08-10-L02', packageId: 'G08-10', order: 2,
+  title: tx('Frecuencia absoluta y relativa|Absolute and relative frequency'),
+  objective: tx('Calcular frecuencias relativas como fracción, decimal y porcentaje, y comparar grupos de distinto tamaño.|Compute relative frequencies as fractions, decimals, and percentages, and compare groups of different sizes.'),
+  ready: num('B', 'Escribí 1/4 como porcentaje (solo el número).|Write 1/4 as a percentage (just the number).', undefined, '25',
+    'Un porcentaje es una fracción con denominador 100.|A percentage is a fraction with denominator 100.',
+    [['0.25', 'Ese es el decimal; el porcentaje es «de cada 100».|That is the decimal; a percentage is “out of 100”.']]),
+  situation: tx('En el curso A, 10 de 25 estudiantes van en colectivo; en el curso B, 12 de 40. En B hay más estudiantes en colectivo, pero ¿en cuál es más común? Para comparar grupos de distinto tamaño se usa la frecuencia relativa, la frecuencia dividida el total. A: 10/25 = 0,4 = 40 %. B: 12/40 = 0,3 = 30 %.|In class A, 10 of 25 students take the bus; in class B, 12 of 40. B has more students on the bus, but where is it more common? To compare groups of different sizes, use the relative frequency: the frequency divided by the total. A: 10/25 = 0.4 = 40%. B: 12/40 = 0.3 = 30%.'),
+  explorer: { kind: 'frequency', categories: travel, counts: [10, 7, 5, 3] },
+  explorerNote: tx('Mirá la frecuencia relativa de cada opción. Si cambiás una cantidad, cambian todas las relativas, porque cambia el total.|Look at each option’s relative frequency. If you change one count, all the relative frequencies change, because the total changes.'),
+  worked: worked('Curso A o curso B|Class A or class B', [
+    ['Curso A: 10 de 25.|Class A: 10 out of 25.', '\\frac{10}{25} = \\frac{40}{100}'],
+    ['Curso B: 12 de 40.|Class B: 12 out of 40.', '\\frac{12}{40} = \\frac{30}{100}'],
+    'En A va en colectivo el 40 %; en B, el 30 %. Es más común en A, aunque en B haya más estudiantes en colectivo.|In A, 40% take the bus; in B, 30%. It is more common in A, even though B has more students on the bus.',
+  ]),
+  mistake: {
+    wrong: tx('En B van más en colectivo (12 contra 10), así que en B es más común.|More students take the bus in B (12 against 10), so it is more common in B.'),
+    right: tx('Con totales distintos hay que comparar frecuencias relativas: 40 % en A contra 30 % en B.|With different totals you must compare relative frequencies: 40% in A against 30% in B.'),
+  },
+  practice: [
+    pick('A', '¿Cuánto suman las frecuencias relativas de todas las opciones de una tabla?|What do the relative frequencies of all the options in a table add up to?', undefined,
+      ['1, o sea, el 100 %|1, that is, 100%', 'El total de observaciones|The total number of observations', 'Depende de la tabla|It depends on the table', '0|0'],
+      'Cada relativa es una parte del total.|Each relative frequency is a share of the total.'),
+    num('B', 'En una encuesta a 50 personas, 20 eligieron fútbol. ¿Cuál es la frecuencia relativa de fútbol? Escribila como fracción o decimal.|In a survey of 50 people, 20 chose football. What is the relative frequency of football? Write it as a fraction or decimal.', undefined, '2/5',
+      'Dividí la frecuencia por el total.|Divide the frequency by the total.',
+      [['20', 'Esa es la frecuencia absoluta; falta dividir por el total.|That is the absolute frequency; you still need to divide by the total.'],
+       ['5/2', 'Dividiste al revés.|You divided the wrong way round.']]),
+    num('B', 'De 80 lanzamientos al aro, 28 entraron. ¿Qué porcentaje entró? Escribí solo el número.|Of 80 shots at the hoop, 28 went in. What percentage went in? Write just the number.', undefined, '35',
+      'Pasá la fracción a centésimos.|Turn the fraction into hundredths.',
+      [['28', 'Esa es la cantidad de aciertos, no el porcentaje.|That is the number of hits, not the percentage.'],
+       ['7/20', 'Esa es la fracción; se pide el porcentaje.|That is the fraction; the percentage is asked for.']]),
+    num('C', 'En el curso A, 9 de 30 estudiantes tienen mascota; en el curso B, 12 de 48. ¿Cuántos puntos porcentuales más tiene el curso con mayor porcentaje?|In class A, 9 of 30 students have a pet; in class B, 12 of 48. How many percentage points higher is the class with the higher percentage?', undefined, '5',
+      'Calculá el porcentaje de cada curso.|Work out each class’s percentage.',
+      [['3', 'Comparaste cantidades; hay que comparar porcentajes.|You compared counts; you need to compare percentages.']]),
+    pick('D', 'Un diario titula: «En el barrio Norte hay más accidentes de bicicleta que en el Sur: 30 contra 20». En el Norte circulan 3000 bicicletas y en el Sur, 1000. ¿Qué le respondés?|A newspaper headline says: “There are more bike accidents in the North district than in the South: 30 against 20.” 3000 bikes ride in the North and 1000 in the South. What do you answer?', undefined,
+      ['En proporción hay más en el Sur: 2 % contra 1 %|In proportion there are more in the South: 2% against 1%', 'Tiene razón: 30 es más que 20|It is right: 30 is more than 20', 'Son iguales|They are equal', 'No se pueden comparar|They cannot be compared'],
+      'Compará cada cantidad con su total.|Compare each count with its total.'),
+  ],
+  exit: num('B', 'Control final: en una encuesta a 60 personas, 15 prefieren básquet. ¿Qué porcentaje prefiere básquet? Escribí solo el número.|Exit check: in a survey of 60 people, 15 prefer basketball. What percentage prefers basketball? Write just the number.', undefined, '25',
+    'Simplificá la fracción antes de pasarla a porcentaje.|Simplify the fraction before turning it into a percentage.',
+    [['15', 'Esa es la frecuencia absoluta.|That is the absolute frequency.'],
+     ['1/4', 'Esa es la fracción; se pide el porcentaje.|That is the fraction; the percentage is asked for.']]),
+};
+
+const charts: SecondaryLesson = {
+  id: 'G08-10-L03', packageId: 'G08-10', order: 3,
+  title: tx('Gráficos de frecuencias|Frequency charts'),
+  objective: tx('Leer y construir gráficos de barras y circulares, y detectar gráficos engañosos.|Read and build bar charts and pie charts, and spot misleading charts.'),
+  ready: pick('A', 'En un gráfico de barras, ¿qué indica la altura de cada barra?|In a bar chart, what does the height of each bar show?', undefined,
+    ['La frecuencia de esa opción|The frequency of that option', 'El orden de las opciones|The order of the options', 'El total de datos|The total number of data', 'El nombre de la opción|The name of the option'],
+    'Mirá el eje vertical.|Look at the vertical axis.'),
+  situation: tx('Los mismos datos se pueden mostrar de varias formas. En un gráfico de barras, la altura muestra la frecuencia. En un gráfico circular, cada opción ocupa una porción proporcional a su frecuencia relativa: el 25 % es un cuarto del círculo, 90°. Un gráfico puede engañar si su eje no empieza en 0.|The same data can be shown in several ways. In a bar chart, height shows frequency. In a pie chart, each option takes a slice proportional to its relative frequency: 25% is a quarter of the circle, 90°. A chart can mislead if its axis does not start at 0.'),
+  explorer: { kind: 'frequency', categories: [tx('Rock|Rock'), tx('Pop|Pop'), tx('Cumbia|Cumbia'), tx('Trap|Trap')], counts: [6, 9, 12, 3] },
+  explorerNote: tx('Las barras arrancan en 0, así que su altura es proporcional a la frecuencia. Probá cambiar los datos.|The bars start at 0, so their height is proportional to the frequency. Try changing the data.'),
+  worked: worked('Del porcentaje al ángulo|From percentage to angle', [
+    'Encuesta a 30 personas: 12 eligieron cumbia.|Survey of 30 people: 12 chose cumbia.',
+    ['Frecuencia relativa.|Relative frequency.', '\\frac{12}{30} = \\frac{2}{5}'],
+    ['En el gráfico circular, la porción es esa parte de 360°.|In the pie chart, the slice is that share of 360°.', '\\frac{2}{5} \\cdot 360° = 144°'],
+  ]),
+  mistake: {
+    wrong: tx('En el gráfico, la barra de 52 es el doble de alta que la de 51, así que hay el doble de datos.|In the chart, the 52 bar is twice as tall as the 51 bar, so there is twice as much data.'),
+    right: tx('Si el eje empieza en 50, las diferencias se ven enormes. Hay que leer los números: 52 y 51 son casi iguales.|If the axis starts at 50, differences look huge. Read the numbers: 52 and 51 are almost equal.'),
+  },
+  practice: [
+    pick('A', '¿Qué gráfico muestra mejor cómo se reparte un total en partes?|Which chart best shows how a total is split into parts?', undefined,
+      ['El circular|A pie chart', 'Uno de barras con el eje lejos del 0|A bar chart with its axis far from 0', 'Una lista de datos|A list of data', 'Ninguno|None'],
+      'Pensá en «partes de un todo».|Think about “parts of a whole”.'),
+    num('B', 'En un gráfico circular, una opción tiene el 25 % de los datos. ¿Cuántos grados mide su porción?|In a pie chart, an option has 25% of the data. How many degrees is its slice?', undefined, '90',
+      'El círculo completo mide 360°.|The whole circle is 360°.',
+      [['25', 'El porcentaje no es el ángulo: hay que tomar esa parte de 360°.|The percentage is not the angle: take that share of 360°.']]),
+    num('B', 'En una encuesta a 36 personas, 10 eligieron teatro. En el gráfico circular, ¿cuántos grados mide la porción de teatro?|In a survey of 36 people, 10 chose theatre. In the pie chart, how many degrees is the theatre slice?', undefined, '100',
+      'Calculá primero la frecuencia relativa.|Work out the relative frequency first.',
+      [['10', 'Esa es la frecuencia; falta pasarla a grados.|That is the frequency; you still need to turn it into degrees.']]),
+    num('C', 'Un gráfico circular de 60 respuestas tiene una porción de 72°. ¿Cuántas respuestas representa?|A pie chart of 60 answers has a 72° slice. How many answers does it represent?', undefined, '12',
+      '¿Qué parte de 360° es la porción?|What share of 360° is the slice?',
+      [['72', 'Ese es el ángulo, no la cantidad de respuestas.|That is the angle, not the number of answers.']]),
+    pick('D', 'En un gráfico de barras, el eje vertical empieza en 1000. La barra A llega a 1200 y la B a 1100, y A se ve el doble de alta. ¿Qué podés decir?|In a bar chart, the vertical axis starts at 1000. Bar A reaches 1200 and bar B 1100, and A looks twice as tall. What can you say?', undefined,
+      ['A no es el doble de B: es apenas un 9 % más|A is not double B: it is only about 9% more', 'A es el doble de B|A is double B', 'B es el doble de A|B is double A', 'Son iguales|They are equal'],
+      'Leé los números, no las alturas.|Read the numbers, not the heights.'),
+  ],
+  exit: num('B', 'Control final: en una encuesta a 20 personas, 5 eligieron natación. ¿Cuántos grados mide su porción en el gráfico circular?|Exit check: in a survey of 20 people, 5 chose swimming. How many degrees is its slice in the pie chart?', undefined, '90',
+    'Calculá qué parte del total es y aplicala a 360°.|Work out what share of the total it is and apply it to 360°.',
+    [['5', 'Esa es la frecuencia; falta pasarla a grados.|That is the frequency; you still need to turn it into degrees.'],
+     ['25', 'Ese es el porcentaje; el ángulo es esa parte de 360°.|That is the percentage; the angle is that share of 360°.']]),
+};
+
+export const G08_FREQUENCIES: SecondaryPackage = {
+  id: 'G08-10',
+  title: tx('Frecuencias|Frequencies'),
+  goal: tx('Organizar datos en tablas, calcular frecuencias absolutas y relativas, y leer gráficos sin dejarse engañar.|Organise data in tables, compute absolute and relative frequencies, and read charts without being misled.'),
+  lessons: [collecting, relative, charts],
+};

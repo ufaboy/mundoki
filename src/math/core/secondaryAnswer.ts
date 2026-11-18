@@ -20,6 +20,7 @@ export function readRational(raw: string): Rational | null {
     .trim()
     .replace(/[−‒–—]/g, '-')
     .replace(/^[a-zA-Z]\s*=\s*/, '')
+    .replace(/°/g, '') // angles may be typed as "50°"
     .replace(/\s+/g, '');
   if (!cleaned || cleaned.length > MAX_SECONDARY_ANSWER || !/^-?[0-9.,]+(\/-?[0-9.,]+)?$/.test(cleaned)) return null;
   const parsed = parseRationalInput(cleaned);

@@ -19,6 +19,7 @@ assert.equal(checkSecondaryAnswer(n('-4'), 'x = -4'), 'correct', '"x =" prefix')
 assert.equal(checkSecondaryAnswer(n('5/2'), '2,5'), 'correct', 'decimal comma equals fraction');
 assert.equal(checkSecondaryAnswer(n('5/2'), '10/4'), 'correct', 'equivalent fraction');
 assert.equal(checkSecondaryAnswer(n('7'), '8'), 'incorrect');
+assert.equal(checkSecondaryAnswer(n('50'), '50°'), 'correct', 'a degree sign is allowed');
 assert.equal(checkSecondaryAnswer(n('7'), 'siete'), 'invalid');
 assert.equal(checkSecondaryAnswer(n('7'), '3+4'), 'invalid', 'expressions are not evaluated');
 assert.equal(checkSecondaryAnswer(n('7'), '1/0'), 'invalid');
@@ -103,7 +104,7 @@ for (const course of SECONDARY_COURSES) {
     }
   }
 }
-assert.equal(isFreeLesson('G08-03-L01'), false, 'unknown secundaria ids are locked');
+assert.equal(isFreeLesson('G09-01-L01'), false, 'unknown secundaria ids are locked');
 assert.equal(findSecondaryLesson('g08-07-l01')?.lesson.id, 'G08-07-L01', 'URL ids are case-insensitive');
 assert.ok(!TOPICS_CATALOG.some((topic) => topic.id === 'linear-equations'), 'the old linear-equations topic page is gone');
 
@@ -133,13 +134,13 @@ const answer = (attemptId: string, lessonId: string, checkIndex: number, userAns
   attemptId, source: 'mission', lessonId, checkIndex, userAnswer, isCorrect: true,
 });
 
-// Free package G08-02: L01 item 2 is "−8 + 13" (typed 5); item 3 is "−3 − (−10)" (7).
-assert.ok(isFreeSecondaryLesson('G08-02-L01') && !isFreeSecondaryLesson('G08-07-L01'), 'pilot order: G08-02 is the free package');
-let result = await post([answer('s-wrong', 'G08-02-L01', 2, '-21')]);
+// Free package G08-01: L01 item 2 is the diver at −12 m; item 3 counts floors from −4 to 6 (10).
+assert.ok(isFreeSecondaryLesson('G08-01-L01') && !isFreeSecondaryLesson('G08-02-L01') && !isFreeSecondaryLesson('G08-07-L01'), 'plan order: G08-01 is the free package');
+let result = await post([answer('s-wrong', 'G08-01-L01', 2, '12')]);
 assert.equal(result.gameState.totalSolved, 0, 'a wrong typed answer with a forged flag does not count');
-result = await post([answer('s-right', 'G08-02-L01', 2, '5'), answer('s-second', 'G08-02-L01', 3, '7')]);
+result = await post([answer('s-right', 'G08-01-L01', 2, '-12'), answer('s-second', 'G08-01-L01', 3, '10')]);
 assert.equal(result.gameState.totalSolved, 2, 'free secundaria lesson counts without Premium');
-result = await post([answer('s-repeat', 'g08-02-l01', 2, '5,0')]);
+result = await post([answer('s-repeat', 'g08-01-l01', 2, '−12,0')]);
 assert.equal(result.gameState.totalSolved, 2, 'the same item counts once, whatever the spelling');
 
 // A Premium package does not count without Premium. G08-07-L01 item 2 is "x + 9 = 23" (14).
@@ -169,7 +170,7 @@ assert.equal(result.gameState.totalSolved, 5);
 // Malformed: text answer, unknown lesson, index past the end.
 result = await post([
   answer('s-text', 'G08-07-L01', 3, 'siete'),
-  answer('s-unknown', 'G08-03-L01', 0, '1'),
+  answer('s-unknown', 'G09-01-L01', 0, '1'),
   answer('s-past', 'G08-07-L01', 99, '1'),
 ]);
 assert.equal(result.gameState.totalSolved, 5);

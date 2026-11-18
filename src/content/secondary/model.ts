@@ -58,7 +58,22 @@ export type Explorer =
   /** a + b as a jump on the number line; `start` is [a, b]. */
   | { kind: 'numberline'; start: [number, number] }
   /** Right triangle with squares on its sides; `start` is the two legs. */
-  | { kind: 'triangle'; start: [number, number] };
+  | { kind: 'triangle'; start: [number, number] }
+  /** Two parallel lines cut by a transversal at `start` degrees; `pair` is highlighted first. */
+  | { kind: 'parallels'; start: number; pair: 'corresponding' | 'alternate' | 'cointerior' }
+  /**
+   * A movable point P on a grid and the points it is compared with: a circle of radius 5
+   * around O, the segment A(−2, −1)–B(2, 3) and its perpendicular bisector, or a right angle
+   * at O whose bisector is y = x. `start` is P.
+   */
+  | { kind: 'locus'; mode: 'circle' | 'bisector' | 'angle'; start: [number, number] }
+  /** A frequency table the learner can change with − / +, drawn as a bar chart with relative frequencies. */
+  | { kind: 'frequency'; categories: LocalizedText[]; counts: number[] }
+  /**
+   * Simulated coin tosses or die rolls (not graded): the relative frequency of the event
+   * (heads, or the `target` face) is plotted against the number of trials, with the probability dashed.
+   */
+  | { kind: 'trials'; experiment: 'coin' | 'die'; target?: number };
 
 export interface SecondaryLesson {
   id: string;

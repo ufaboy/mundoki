@@ -1,11 +1,19 @@
 // Secundaria courses (Grades 8–12) in exam-prep mode. Design: docs/secundaria-exam-prep-design.md.
-// Pilot (2026-11-18): Grades 8 and 9, four packages each, listed in plan order;
+// Grade 8: all twelve packages (2026-11-18); Grade 9: the four pilot packages. Listed in plan order;
 // `packages[0]` is the free one.
 import type { GradeId } from '../../math/core/types';
+import { G08_INTEGERS_ORDER } from './g08IntegersOrder';
 import { G08_INTEGERS } from './g08Integers';
+import { G08_RATIONALS } from './g08Rationals';
 import { G08_EXPRESSIONS } from './g08Expressions';
 import { G08_RELATIONS } from './g08Relations';
+import { G08_PROPORTION } from './g08Proportion';
 import { G08_EQUATIONS } from './g08Equations';
+import { G08_PARALLELS } from './g08Parallels';
+import { G08_LOCI } from './g08Loci';
+import { G08_FREQUENCIES } from './g08Frequencies';
+import { G08_PROBABILITY } from './g08Probability';
+import { G08_MODELLING } from './g08Modelling';
 import { G09_LINEAR } from './g09Linear';
 import { G09_EQUATIONS } from './g09Equations';
 import { G09_SYSTEMS } from './g09Systems';
@@ -20,7 +28,7 @@ export const SECONDARY_COURSES: SecondaryCourse[] = [
     label: tx('1.º año de secundaria · CABA|Secondary Year 1 · CABA'),
     title: tx('Enteros, expresiones y primeras ecuaciones|Integers, expressions, and first equations'),
     intro: tx('Cada tema: una explicación visual, un ejemplo resuelto, práctica con pistas y un control final. Escribís tus respuestas y, si aparece un error típico, te mostramos dónde está.|Each topic: a visual explanation, a worked example, practice with hints, and an exit check. You type your answers and, if a typical mistake shows up, we show you where it is.'),
-    packages: [G08_INTEGERS, G08_EXPRESSIONS, G08_RELATIONS, G08_EQUATIONS],
+    packages: [G08_INTEGERS_ORDER, G08_INTEGERS, G08_RATIONALS, G08_EXPRESSIONS, G08_RELATIONS, G08_PROPORTION, G08_EQUATIONS, G08_PARALLELS, G08_LOCI, G08_FREQUENCIES, G08_PROBABILITY, G08_MODELLING],
     plan: plan([
       ['G08-01', 'Números enteros: representar y comparar|Integers: represent and compare'],
       ['G08-02', 'Operaciones con enteros|Operations with integers'],
