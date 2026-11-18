@@ -10,7 +10,7 @@ import { Locale, TopicId } from '../../../math/core/types';
 
 export const prerender = false;
 
-const SERVER_PROTECTED_MASTERCLASS: Record<
+const SERVER_PROTECTED_MASTERCLASS: Partial<Record<
   TopicId,
   {
     title: { 'es-AR': string; 'en-US': string };
@@ -18,7 +18,7 @@ const SERVER_PROTECTED_MASTERCLASS: Record<
     challengeLatex: string;
     workedProof: { 'es-AR': string; 'en-US': string };
   }
-> = {
+>> = {
   'addition-subtraction': {
     title: {
       'es-AR': 'Laboratorio Premium: Compensación Mental Instantánea',
@@ -104,23 +104,6 @@ const SERVER_PROTECTED_MASTERCLASS: Record<
       'en-US': 'Because (16 × 25) / 100 = (25 × 16) / 100 by commutativity of multiplication.',
     },
   },
-  'linear-equations': {
-    title: {
-      'es-AR': 'Lección Completa Protegida: Ecuaciones con Incógnitas en Ambos Lados',
-      'en-US': 'Protected Masterclass: Equations with Unknowns on Both Sides',
-    },
-    secretStrategy: {
-      'es-AR':
-        'En 5x + 2 = 3x + 10, primero quitamos 3 cajas "x" de ambos platillos (queda 2x + 2 = 10), luego restamos 2 (2x = 8) y dividimos por 2 (x = 4).',
-      'en-US':
-        'In 5x + 2 = 3x + 10, first remove 3 "x" boxes from both pans (leaving 2x + 2 = 10), then subtract 2 (2x = 8) and divide by 2 (x = 4).',
-    },
-    challengeLatex: '5x + 2 = 3x + 10 \\implies 2x + 2 = 10 \\implies 2x = 8 \\implies x = 4',
-    workedProof: {
-      'es-AR': 'Verificación: 5(4) + 2 = 22 en la izquierda, y 3(4) + 10 = 22 en la derecha.',
-      'en-US': 'Verification: 5(4) + 2 = 22 on the left pan, and 3(4) + 10 = 22 on the right pan.',
-    },
-  },
 };
 
 export const GET: APIRoute = async ({ request }) => {
@@ -148,10 +131,13 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const url = new URL(request.url);
-  const topicId = (url.searchParams.get('topicId') as TopicId) || 'linear-equations';
+  const requested = url.searchParams.get('topicId') ?? '';
   const locale: Locale = url.searchParams.get('locale') === 'en-US' ? 'en-US' : 'es-AR';
-  const masterclass =
-    SERVER_PROTECTED_MASTERCLASS[topicId] || SERVER_PROTECTED_MASTERCLASS['linear-equations'];
+  // Own keys only: "constructor" or "__proto__" must fall back, not reach Object.prototype.
+  const topicId: TopicId = Object.hasOwn(SERVER_PROTECTED_MASTERCLASS, requested)
+    ? (requested as TopicId)
+    : 'percentages-proportions';
+  const masterclass = SERVER_PROTECTED_MASTERCLASS[topicId]!;
 
   return jsonResponse({
     entitled: true,

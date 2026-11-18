@@ -1,0 +1,36 @@
+---
+// One typed answer box of a secundaria item. It asks for the phone's number keypad
+// (inputmode="decimal": digits and the decimal separator). That keypad has no minus sign
+// and, on iPhone, no "/", so touch screens get a small ± key, and a / key only where the
+// answer is a fraction. With a mouse and keyboard both keys are hidden (see SecondaryLesson).
+// The keys act on this box only: src/scripts/secondaryLesson.ts.
+import type { Locale } from '../../math/core/types';
+
+interface Props {
+  locale: Locale;
+  /** Accessible name when no visible label sits next to the box. */
+  label?: string;
+  /** Show the / key: the expected answer is written as a fraction. */
+  slash?: boolean;
+  maxlength?: number;
+}
+
+const { locale, label, slash = false, maxlength = 20 } = Astro.props;
+const es = locale === 'es-AR';
+---
+
+<span class="sec-box">
+  <input
+    class="mk-input sec-eq__input"
+    type="text"
+    inputmode="decimal"
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+    maxlength={maxlength}
+    aria-label={label}
+    data-sec-input
+  />
+  <button type="button" class="sec-box__key" data-sec-sign aria-label={es ? 'Cambiar el signo' : 'Change the sign'}>±</button>
+  {slash && <button type="button" class="sec-box__key" data-sec-key="/" aria-label={es ? 'Fracción' : 'Fraction'}>/</button>}
+</span>

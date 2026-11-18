@@ -14,3 +14,6 @@ coverage/
 .astro/
 .claude/
 artifacts/
+
+# Security audit reports stay private (public repository).
+SECURITY_AUDIT.md

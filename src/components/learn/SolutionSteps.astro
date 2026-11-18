@@ -1,0 +1,22 @@
+---
+// Numbered steps: a sentence, then (optionally) the line of mathematics rendered with KaTeX.
+import type { Locale } from '../../math/core/types';
+import type { SolutionStep } from '../../content/secondary/model';
+import { renderLatexToHtml } from '../../lib/katexRender';
+
+interface Props {
+  locale: Locale;
+  steps: SolutionStep[];
+}
+
+const { locale, steps } = Astro.props;
+---
+
+<ol class="sec-steps">
+  {steps.map((step) => (
+    <li>
+      <span>{step.text[locale]}</span>
+      {step.latex && <div class="sec-math" set:html={renderLatexToHtml(step.latex, true)} />}
+    </li>
+  ))}
+</ol>

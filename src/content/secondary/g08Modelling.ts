@@ -1,0 +1,137 @@
+// G08-12 · Modelling a situation (1.º año secundaria CABA).
+// Plan: comparing plans → tables, graphs, formulas → the limits of a conclusion.
+// Builds on G08-05 (formulas) and G08-07 (equations): a fixed charge plus a rate is not
+// direct proportion, and a model holds only under its assumptions.
+import { ask, num, pair, pick, tx, worked, type SecondaryLesson, type SecondaryPackage } from './model';
+
+const plans: SecondaryLesson = {
+  id: 'G08-12-L01', packageId: 'G08-12', order: 1,
+  title: tx('Comparar planes|Comparing plans'),
+  objective: tx('Escribir el costo de dos planes con fórmulas y decidir cuál conviene según el uso.|Write the cost of two plans as formulas and decide which is better depending on use.'),
+  ready: num('B', 'Un plan cobra $2000 fijos más $500 por GB. ¿Cuánto cuesta con 6 GB?|A plan charges a fixed $2000 plus $500 per GB. How much does it cost with 6 GB?', undefined, '5000',
+    'Al monto fijo se le suma lo que depende de los GB.|Add what depends on the GB to the fixed charge.',
+    [['15000', 'El fijo se paga una sola vez: no se multiplica por 6.|The fixed charge is paid only once: it is not multiplied by 6.']]),
+  situation: tx('Plan A: $5000 fijos más $300 por GB. Plan B: sin fijo, $800 por GB. Con pocos GB conviene B; con muchos, A. ¿Dónde cambia la decisión? Donde los dos cuestan lo mismo: 5000 + 300g = 800g.|Plan A: a fixed $5000 plus $300 per GB. Plan B: no fixed charge, $800 per GB. With few GB, B is cheaper; with many, A is. Where does the decision switch? Where both cost the same: 5000 + 300g = 800g.'),
+  explorer: null,
+  worked: worked('Dónde cambia|Where it switches', [
+    ['Igualamos los costos.|Set the costs equal.', '5000 + 300g = 800g'],
+    ['Restamos 300g de los dos lados.|Subtract 300g from both sides.', '5000 = 500g'],
+    ['Dividimos por 500.|Divide by 500.', 'g = 10'],
+    'Con 10 GB los dos cuestan $8000. Con menos de 10 GB conviene B; con más, A.|At 10 GB both cost $8000. Below 10 GB, B is cheaper; above, A is.',
+  ]),
+  mistake: {
+    wrong: tx('El plan A siempre es más caro porque tiene un fijo de $5000.|Plan A is always more expensive because it has a fixed $5000 charge.'),
+    right: tx('El fijo pesa con pocos GB, pero cada GB de A es más barato. Con más de 10 GB, A cuesta menos.|The fixed charge matters with few GB, but each GB on A is cheaper. Above 10 GB, A costs less.'),
+  },
+  practice: [
+    pick('A', '¿Qué fórmula da el costo del plan B ($800 por GB, sin fijo) con g GB?|Which formula gives the cost of plan B ($800 per GB, no fixed charge) for g GB?', undefined,
+      ['C = 800g|C = 800g', 'C = 800 + g|C = 800 + g', 'C = 800/g|C = 800/g', 'C = 5000 + 800g|C = 5000 + 800g'],
+      '¿Cuánto se paga por cada GB?|How much do you pay per GB?'),
+    ask('C', num('B', 'Con el plan A, C = 5000 + 300g. ¿Cuánto pagás con 4 GB?|With plan A, C = 5000 + 300g. How much do you pay with 4 GB?', 'C = 5000 + 300g', '6200',
+      'Reemplazá g por 4.|Replace g with 4.',
+      [['21200', 'El fijo no se multiplica: solo lo que depende de los GB.|The fixed charge is not multiplied: only what depends on the GB.']])),
+    ask('g', num('B', 'Dos planes cuestan C = 3000 + 400g y C = 700g. ¿Con cuántos GB cuestan lo mismo?|Two plans cost C = 3000 + 400g and C = 700g. At how many GB do they cost the same?', '3000 + 400g = 700g', '10',
+      'Dejá los términos con g de un mismo lado.|Get the g terms on one side.',
+      [['30/11', 'Al pasar 400g al otro lado, se resta.|Moving 400g to the other side means subtracting it.']])),
+    num('C', 'Sofi usa 6 GB por mes. Plan A: C = 5000 + 300g. Plan B: C = 800g. ¿Cuántos pesos por mes se ahorran eligiendo el plan más barato?|Sofi uses 6 GB a month. Plan A: C = 5000 + 300g. Plan B: C = 800g. How many pesos a month are saved by choosing the cheaper plan?', undefined, '2000',
+      'Calculá el costo de cada plan con 6 GB.|Work out each plan’s cost with 6 GB.',
+      [['4800', 'Ese es el costo del plan B; falta la diferencia con A.|That is plan B’s cost; you still need the difference from A.'],
+       ['6800', 'Ese es el costo del plan A; falta la diferencia con B.|That is plan A’s cost; you still need the difference from B.']]),
+    pick('D', 'Martín dice: «Como con 2 GB conviene B, con cualquier cantidad conviene B». ¿Qué le respondés?|Martín says: “Since B is cheaper at 2 GB, B is cheaper for any amount.” What do you answer?', undefined,
+      ['No: con más de 10 GB conviene A, porque cada GB es más barato|No: above 10 GB A is cheaper, because each GB costs less', 'Tiene razón|That is right', 'No: siempre conviene A|No: A is always cheaper', 'No se puede saber sin más datos|It cannot be known without more data'],
+      'Probá con 20 GB en los dos planes.|Try 20 GB on both plans.'),
+  ],
+  exit: ask('g', num('B', 'Control final: plan A, C = 4000 + 200g; plan B, C = 700g. ¿Con cuántos GB cuestan lo mismo?|Exit check: plan A, C = 4000 + 200g; plan B, C = 700g. At how many GB do they cost the same?', '4000 + 200g = 700g', '8',
+    'Igualá los costos y dejá los términos con g de un mismo lado.|Set the costs equal and get the g terms on one side.',
+    [['40/9', 'Al pasar 200g al otro lado, se resta.|Moving 200g to the other side means subtracting it.']])),
+};
+
+const views: SecondaryLesson = {
+  id: 'G08-12-L02', packageId: 'G08-12', order: 2,
+  title: tx('Tabla, gráfico y fórmula de un modelo|A model’s table, graph, and formula'),
+  objective: tx('Representar un mismo modelo con tabla, gráfico y fórmula, y leer en el gráfico dónde cambia la decisión.|Represent the same model with a table, a graph, and a formula, and read on the graph where the decision changes.'),
+  ready: pick('A', '¿Qué punto está en el gráfico de C = 800g?|Which point is on the graph of C = 800g?', undefined,
+    ['(3; 2400)|(3, 2400)', '(2400; 3)|(2400, 3)', '(3; 800)|(3, 800)', '(0; 800)|(0, 800)'],
+    'Reemplazá g y compará con C.|Substitute g and compare with C.'),
+  situation: tx('Dos gimnasios: el primero cobra $3000 de inscripción y $1000 por clase; el segundo, $2000 por clase sin inscripción. En miles de pesos, y = x + 3 e y = 2x. En el gráfico, cada gimnasio es una recta: donde se cruzan cuestan lo mismo, y a cada lado del cruce conviene uno distinto.|Two gyms: the first charges a $3000 sign-up fee and $1000 per class; the second, $2000 per class with no sign-up fee. In thousands of pesos, y = x + 3 and y = 2x. On the graph each gym is a line: where they cross they cost the same, and on each side of the crossing a different one is cheaper.'),
+  explorer: { kind: 'lines', fixed: [1, 3], start: [2, 0], xLabel: tx('clases|classes'), yLabel: tx('miles de $|thousands of $') },
+  explorerNote: tx('La recta fija es el primer gimnasio. Mové la otra: el cruce marca la cantidad de clases donde la decisión cambia.|The fixed line is the first gym. Move the other one: the crossing marks the number of classes where the decision changes.'),
+  worked: worked('Leer el cruce|Reading the crossing', [
+    ['Igualamos.|Set them equal.', 'x + 3 = 2x'],
+    ['Despejamos x.|Solve for x.', 'x = 3'],
+    ['Costo en el cruce.|Cost at the crossing.', 'y = 2 \\cdot 3 = 6'],
+    'Con 3 clases los dos cuestan $6000. Con menos clases conviene el segundo; con más, el primero.|At 3 classes both cost $6000. With fewer classes the second is cheaper; with more, the first.',
+  ]),
+  mistake: {
+    wrong: tx('La recta más empinada siempre es el plan más caro.|The steeper line is always the more expensive plan.'),
+    right: tx('La más empinada sube más rápido, pero puede empezar más abajo. Antes del cruce está por debajo: ahí es la más barata.|The steeper line rises faster, but it may start lower. Before the crossing it is below: there it is the cheaper one.'),
+  },
+  practice: [
+    pick('A', 'En el gráfico de un plan, ¿qué representa el punto donde la recta corta el eje y?|On a plan’s graph, what does the point where the line crosses the y-axis represent?', undefined,
+      ['El costo fijo, con 0 unidades|The fixed cost, with 0 units', 'El costo por unidad|The cost per unit', 'Dónde conviene el otro plan|Where the other plan is cheaper', 'El costo máximo|The maximum cost'],
+      'Sobre el eje y, ¿cuánto vale x?|On the y-axis, what is x?'),
+    pair('B', '¿En qué punto se cruzan estas rectas?|At which point do these lines cross?', 'y = x + 4,\\quad y = 3x', '2', '6',
+      'En el cruce, las dos rectas dan la misma y.|At the crossing both lines give the same y.',
+      [['6;2', 'Invertiste el orden: primero va x.|You swapped the order: x comes first.']]),
+    num('B', 'Tabla del plan C = 1500 + 250g: g: 0, 2, 4, 6 → C: 1500, 2000, 2500, ☐. ¿Qué número falta?|Table of the plan C = 1500 + 250g: g: 0, 2, 4, 6 → C: 1500, 2000, 2500, ☐. What number is missing?', undefined, '3000',
+      '¿Cuánto aumenta C de una columna a la siguiente?|How much does C go up from one column to the next?',
+      [['2750', 'g aumenta de a 2, así que C aumenta 2 · 250.|g goes up by 2, so C goes up by 2 · 250.']]),
+    num('C', 'Un club cobra $4000 de cuota mensual y $500 por clase; otro, $1300 por clase sin cuota. ¿Con cuántas clases por mes cuestan lo mismo?|One club charges a $4000 monthly fee and $500 per class; another, $1300 per class with no fee. At how many classes a month do they cost the same?', undefined, '5',
+      'Escribí el costo de cada club e igualalos.|Write each club’s cost and set them equal.',
+      [['20/9', 'Al pasar 500x al otro lado, se resta.|Moving 500x to the other side means subtracting it.']]),
+    pick('D', 'En el gráfico de dos planes, las rectas no se cruzan para x ≥ 0 y la del plan A está siempre arriba. Lara concluye que conviene A. ¿Qué le respondés?|On a graph of two plans, the lines do not cross for x ≥ 0 and plan A’s line is always above. Lara concludes that A is better. What do you answer?', undefined,
+      ['Al revés: arriba significa más caro, así que siempre conviene B|The other way round: above means more expensive, so B is always better', 'Tiene razón|That is right', 'Conviene A solo al principio|A is better only at the start', 'Sin un cruce no se pueden comparar|Without a crossing they cannot be compared'],
+      '¿Qué mide el eje y?|What does the y-axis measure?'),
+  ],
+  exit: pair('B', 'Control final: ¿en qué punto se cruzan estas rectas?|Exit check: at which point do these lines cross?', 'y = 2x + 1,\\quad y = 4x - 3', '2', '5',
+    'Igualá las dos expresiones de y.|Set the two expressions for y equal.',
+    [['5;2', 'Invertiste el orden: primero va x.|You swapped the order: x comes first.']]),
+};
+
+const limits: SecondaryLesson = {
+  id: 'G08-12-L03', packageId: 'G08-12', order: 3,
+  title: tx('Los límites de un modelo|The limits of a model'),
+  objective: tx('Reconocer qué supone un modelo y hasta dónde vale su conclusión.|Recognise what a model assumes and how far its conclusion holds.'),
+  ready: ask('C', num('B', 'Un plan cuesta C = 600g. ¿Cuánto cuesta con 0 GB?|A plan costs C = 600g. How much does it cost with 0 GB?', 'C = 600g', '0',
+    'Reemplazá g por 0.|Replace g with 0.',
+    [['600', '600 es el precio por GB; con 0 GB no se paga nada.|600 is the price per GB; with 0 GB you pay nothing.']])),
+  situation: tx('Un modelo simplifica la realidad. La fórmula C = 5000 + 300g supone que el precio por GB no cambia, que no hay impuestos ni promociones y que g no es negativo. Fuera de esas condiciones, una conclusión como «con más de 10 GB conviene A» puede dejar de valer.|A model simplifies reality. The formula C = 5000 + 300g assumes that the price per GB does not change, that there are no taxes or promotions, and that g is not negative. Outside those conditions, a conclusion like “above 10 GB, A is cheaper” may no longer hold.'),
+  explorer: null,
+  worked: worked('Cuando cambia un dato|When one fact changes', [
+    'El plan B lanza una promo: los primeros 5 GB cuestan $400 cada uno y los siguientes, $800.|Plan B launches a promotion: the first 5 GB cost $400 each and the rest, $800.',
+    ['Con 5 GB, B cuesta|With 5 GB, B costs', '5 \\cdot 400 = 2000'],
+    ['Con más GB se suman $800 por cada uno.|For more GB, add $800 for each one.', 'C = 2000 + 800(g - 5)'],
+    'La fórmula C = 800g ya no sirve: el modelo depende de sus condiciones.|The formula C = 800g no longer works: the model depends on its conditions.',
+  ]),
+  mistake: {
+    wrong: tx('Si la fórmula da un número, la respuesta siempre tiene sentido.|If the formula gives a number, the answer always makes sense.'),
+    right: tx('Hay que mirar el contexto: con C = 5000 + 300g, g = −3 da $4100, pero no se pueden usar −3 GB. Ese resultado no tiene sentido.|You have to check the context: with C = 5000 + 300g, g = −3 gives $4100, but you cannot use −3 GB. That result makes no sense.'),
+  },
+  practice: [
+    pick('A', '¿Qué supone el modelo C = 800g?|What does the model C = 800g assume?', undefined,
+      ['Que cada GB cuesta siempre $800|That every GB always costs $800', 'Que el plan tiene un costo fijo|That the plan has a fixed cost', 'Que el precio baja con más GB|That the price goes down with more GB', 'Que se pueden usar GB negativos|That negative GB can be used'],
+      '¿Qué número multiplica a g?|Which number multiplies g?'),
+    ask('k', num('B', 'Un remís cobra C = 1500 + 400k, con k en kilómetros. ¿Cuántos kilómetros podés hacer con $5500?|A car service charges C = 1500 + 400k, with k in kilometres. How many kilometres can you travel with $5500?', 'C = 1500 + 400k', '10',
+      'Reemplazá C por 5500 y despejá k.|Replace C with 5500 and solve for k.',
+      [['55/4', 'Te olvidaste de restar el monto fijo.|You forgot to subtract the fixed charge.']])),
+    pick('B', 'Con C = 5000 + 300g, alguien calcula el costo para g = −4 y obtiene $3800. ¿Qué pasa?|Using C = 5000 + 300g, someone works out the cost for g = −4 and gets $3800. What is going on?', undefined,
+      ['La cuenta está bien, pero g = −4 no tiene sentido: no se usan GB negativos|The arithmetic is right, but g = −4 makes no sense: you cannot use negative GB', 'Es un descuento de $1200|It is a $1200 discount', 'La cuenta está mal: da $6200|The arithmetic is wrong: it gives $6200', 'Con −4 GB te devuelven plata|With −4 GB you get money back'],
+      '¿Qué significa g en la situación?|What does g mean in the situation?'),
+    num('C', 'Un estacionamiento cobra $1200 por hora o fracción, con un máximo de $6000 por día. La fórmula C = 1200h no tiene en cuenta el máximo. ¿Cuánto pagás en realidad por 7 horas?|A car park charges $1200 per hour or part of an hour, up to $6000 per day. The formula C = 1200h ignores the daily maximum. How much do you really pay for 7 hours?', undefined, '6000',
+      'Compará lo que da la fórmula con el máximo del día.|Compare what the formula gives with the daily maximum.',
+      [['8400', 'Eso da la fórmula, pero el máximo del día es menor.|That is what the formula gives, but the daily maximum is lower.']]),
+    pick('D', 'Con datos de enero a marzo, una heladería ve que vende 200 helados menos cada mes y concluye: «En diciembre vamos a vender −1600 helados». ¿Qué falla?|Using data from January to March, an ice-cream shop sees it sells 200 fewer ice creams each month and concludes: “In December we will sell −1600 ice creams.” What is wrong?', undefined,
+      ['El modelo lineal no vale fuera de los meses observados: las ventas dependen de la estación|The linear model does not hold outside the observed months: sales depend on the season', 'La cuenta está mal hecha|The arithmetic is wrong', 'Nada: van a vender −1600 helados|Nothing: they will sell −1600 ice creams', 'Faltan los impuestos|The taxes are missing'],
+      '¿Qué pasa con la venta de helados en verano?|What happens to ice-cream sales in summer?'),
+  ],
+  exit: ask('t', num('B', 'Control final: un tanque de 300 L pierde 20 L por hora, así que V = 300 − 20t. ¿Después de cuántas horas deja de valer la fórmula porque el tanque está vacío?|Exit check: a 300 L tank loses 20 L per hour, so V = 300 − 20t. After how many hours does the formula stop working because the tank is empty?', 'V = 300 - 20t', '15',
+    'Vacío significa V = 0.|Empty means V = 0.',
+    [['6000', 'Multiplicaste; hay que dividir.|You multiplied; you need to divide.']])),
+};
+
+export const G08_MODELLING: SecondaryPackage = {
+  id: 'G08-12',
+  title: tx('Modelizar una situación|Modelling a situation'),
+  goal: tx('Comparar opciones con fórmulas, tablas y gráficos, y reconocer hasta dónde vale la conclusión de un modelo.|Compare options with formulas, tables, and graphs, and recognise how far a model’s conclusion holds.'),
+  lessons: [plans, views, limits],
+};

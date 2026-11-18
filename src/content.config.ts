@@ -39,7 +39,6 @@ const lessonsCollection = defineCollection({
       'fractions',
       'negative-numbers',
       'percentages-proportions',
-      'linear-equations',
     ]),
     locale: z.enum(['es-AR', 'en-US']),
     slug: z.string(),

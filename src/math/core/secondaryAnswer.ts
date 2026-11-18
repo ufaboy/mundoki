@@ -1,0 +1,97 @@
+// Checks a typed or chosen answer to a secundaria lesson item (Grades 8–12).
+// Runs in the browser for instant feedback and on the server in POST /api/progress/sync,
+// so both always agree. Only exact rational arithmetic is used.
+
+import { parseRationalInput, type Rational } from './fraction';
+
+export type SecondaryAnswerSpec =
+  | { kind: 'number'; value: string }
+  | { kind: 'pair'; x: string; y: string }
+  | { kind: 'choice'; answer: number; count: number };
+
+export type SecondaryVerdict = 'correct' | 'incorrect' | 'invalid';
+
+/** Longest answer text accepted anywhere (input, sync payload). */
+export const MAX_SECONDARY_ANSWER = 40;
+
+function clean(raw: string): string {
+  return raw
+    .trim()
+    .replace(/[−‒–—]/g, '-')
+    .replace(/^[a-zA-Z]\s*=\s*/, '')
+    .replace(/°/g, '') // angles may be typed as "50°"
+    .replace(/\s+/g, '');
+}
+
+/** Reads "−3", "x = 5/2", "2,5" as an exact rational; null when it is not a number. */
+export function readRational(raw: string): Rational | null {
+  const cleaned = clean(raw);
+  if (!cleaned || cleaned.length > MAX_SECONDARY_ANSWER || !/^-?[0-9.,]+(\/-?[0-9.,]+)?$/.test(cleaned)) return null;
+  const parsed = parseRationalInput(cleaned);
+  return parsed.valid && parsed.rational ? parsed.rational : null;
+}
+
+/** A whole number written with a thousands separator: "6,200" (en-US) or "13.500" (es-AR). */
+const GROUPED = /^-?[1-9]\d{0,2}([.,])\d{3}(?:\1\d{3})*$/;
+
+/**
+ * Every reasonable reading of a typed number. "1,500" is 3/2 with a decimal comma, but
+ * also 1500 with a thousands separator, as prices are written in the prompts ("$11,000",
+ * "$1.500"); the answer is right when either reading matches.
+ */
+function readings(raw: string): Rational[] {
+  const cleaned = clean(raw);
+  // "1.500.000" has no decimal reading at all, so the grouped one may be the only one.
+  const whole = GROUPED.test(cleaned) ? readRational(cleaned.replace(/[.,]/g, '')) : null;
+  return [readRational(raw), whole].filter((r): r is Rational => r !== null);
+}
+
+/** True when the text reads as a number under the same rules as the check (grouped ones too). */
+export function readsAsNumber(raw: string): boolean {
+  return readings(raw).length > 0;
+}
+
+const same = (a: Rational, b: Rational) => a.numerator === b.numerator && a.denominator === b.denominator;
+const matches = (given: Rational[], expected: Rational) => given.some((g) => same(g, expected));
+
+/** Pair answers travel as "x;y". */
+export function joinPair(x: string, y: string): string {
+  return `${x.trim()};${y.trim()}`;
+}
+
+export function checkSecondaryAnswer(spec: SecondaryAnswerSpec, raw: string): SecondaryVerdict {
+  const text = String(raw ?? '');
+  if (!text.trim() || text.length > MAX_SECONDARY_ANSWER) return 'invalid';
+
+  if (spec.kind === 'choice') {
+    if (!/^\d$/.test(text)) return 'invalid';
+    const index = Number(text);
+    if (index >= spec.count) return 'invalid';
+    return index === spec.answer ? 'correct' : 'incorrect';
+  }
+
+  if (spec.kind === 'number') {
+    const given = readings(text);
+    const expected = readRational(spec.value);
+    if (!given.length || !expected) return 'invalid';
+    return matches(given, expected) ? 'correct' : 'incorrect';
+  }
+
+  const parts = text.split(';');
+  if (parts.length !== 2) return 'invalid';
+  const gx = readings(parts[0]);
+  const gy = readings(parts[1]);
+  const ex = readRational(spec.x);
+  const ey = readRational(spec.y);
+  if (!gx.length || !gy.length || !ex || !ey) return 'invalid';
+  return matches(gx, ex) && matches(gy, ey) ? 'correct' : 'incorrect';
+}
+
+/** True when the typed answer equals a listed typical wrong value (same rules as the check). */
+export function matchesValue(kind: 'number' | 'pair', raw: string, value: string): boolean {
+  if (kind === 'number') {
+    return checkSecondaryAnswer({ kind: 'number', value }, raw) === 'correct';
+  }
+  const [x, y] = value.split(';');
+  return checkSecondaryAnswer({ kind: 'pair', x: x ?? '', y: y ?? '' }, raw) === 'correct';
+}

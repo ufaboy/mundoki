@@ -344,65 +344,19 @@ export const GRADES_CATALOG: GradeMetadata[] = [
     slugEn: 'grade-8',
     labelShort: { 'es-AR': '1.° año de secundaria', 'en-US': 'Secondary Year 1' },
     title: {
-      'es-AR': '1.° año de secundaria · Álgebra Visual y Ecuaciones Lineales en Equilibrio',
-      'en-US': 'Secondary Year 1 · Visual Algebra & Linear Equations in Balance',
+      'es-AR': '1.° año de secundaria · Enteros, expresiones y primeras ecuaciones',
+      'en-US': 'Secondary Year 1 · Integers, expressions, and first equations',
     },
     ageRange: { 'es-AR': '13–14 años', 'en-US': 'Ages 13–14' },
     summary: {
-      'es-AR':
-        'Modelado de incógnitas en balanza, ecuaciones de uno y dos pasos ax + b = c y verificación por sustitución.',
-      'en-US':
-        'Modeling unknowns on a balance scale, one- and two-step equations ax + b = c, and verification by substitution.',
+      'es-AR': 'Números enteros, expresiones, primeras ecuaciones lineales, geometría y datos. Explicación visual, práctica con pistas y control final.',
+      'en-US': 'Integers, expressions, first linear equations, geometry, and data. Visual explanations, practice with hints, and an exit check.',
     },
-    planetSector: { 'es-AR': 'Equilibria Prime', 'en-US': 'Equilibria Prime' },
-    guardianTitle: { 'es-AR': 'Arquitecta Balanza', 'en-US': 'Architect Balance' },
+    // Exam-prep mode: lessons live in src/content/secondary (no world, no units here).
+    planetSector: { 'es-AR': '', 'en-US': '' },
+    guardianTitle: { 'es-AR': '', 'en-US': '' },
     primaryTopicId: 'linear-equations',
-    lessons: [
-      {
-        id: 'g8-u1-linear-equations-balance',
-        unitCode: 'G8 · U1',
-        order: 1,
-        title: {
-          'es-AR': 'Ecuaciones Lineales en Equilibrio (ax + b = c)',
-          'en-US': 'Linear Equations in Balance (ax + b = c)',
-        },
-        summary: {
-          'es-AR': 'Despejá la incógnita realizando la misma operación en ambos platillos de la balanza.',
-          'en-US': 'Isolate the unknown by performing identical inverse operations on both sides of the balance scale.',
-        },
-        estimatedMinutes: 10,
-        accessLevel: 'premium',
-        linkedTopicId: 'linear-equations',
-        trainerTitle: {
-          'es-AR': 'Entrenador: Balanza Gravitatoria en Equilibria Prime',
-          'en-US': 'Trainer: Gravity Balance at Equilibria Prime',
-        },
-        planetSector: { 'es-AR': 'Equilibria Prime', 'en-US': 'Equilibria Prime' },
-        hasInteractiveDiagram: true,
-      },
-      {
-        id: 'g8-u2-equations-negative-solutions',
-        unitCode: 'G8 · U2',
-        order: 2,
-        title: {
-          'es-AR': 'Ecuaciones con Coeficientes y Soluciones Enteras',
-          'en-US': 'Equations with Coefficients & Integer Solutions',
-        },
-        summary: {
-          'es-AR': 'Combiná la balanza algebraica con números negativos para resolver ecuaciones de nivel avanzado.',
-          'en-US': 'Combine the algebraic balance scale with negative numbers to solve advanced linear equations.',
-        },
-        estimatedMinutes: 10,
-        accessLevel: 'premium',
-        linkedTopicId: 'linear-equations',
-        trainerTitle: {
-          'es-AR': 'Entrenador: Núcleo Algebraico (Nivel 3)',
-          'en-US': 'Trainer: Algebraic Core (Level 3)',
-        },
-        planetSector: { 'es-AR': 'Equilibria Prime', 'en-US': 'Equilibria Prime' },
-        hasInteractiveDiagram: true,
-      },
-    ],
+    lessons: [],
   },
 
   // =========================================================================
@@ -416,65 +370,19 @@ export const GRADES_CATALOG: GradeMetadata[] = [
     slugEn: 'grade-9',
     labelShort: { 'es-AR': '2.° año de secundaria', 'en-US': 'Secondary Year 2' },
     title: {
-      'es-AR': '2.° año de secundaria · Funciones Lineales, Pendiente y Sistemas 2×2',
-      'en-US': 'Secondary Year 2 · Linear Functions, Slope & 2×2 Systems',
+      'es-AR': '2.° año de secundaria · Funciones lineales, sistemas, Pitágoras y datos',
+      'en-US': 'Secondary Year 2 · Linear functions, systems, Pythagoras, and data',
     },
     ageRange: { 'es-AR': '14–15 años', 'en-US': 'Ages 14–15' },
     summary: {
-      'es-AR':
-        'Transición de ecuaciones lineales al plano cartesiano, razón de cambio (pendiente) e intersección de rectas.',
-      'en-US':
-        'Transitioning from linear equations to the coordinate plane, rate of change (slope), and line intersections.',
+      'es-AR': 'Función lineal, ecuaciones y sistemas, semejanza, Pitágoras, estadística y probabilidad. Explicación visual, práctica con pistas y control final.',
+      'en-US': 'Linear functions, equations and systems, similarity, Pythagoras, statistics, and probability. Visual explanations, practice with hints, and an exit check.',
     },
-    planetSector: { 'es-AR': 'Sector Cartesiano · Horizonte IX', 'en-US': 'Cartesian Sector · Horizon IX' },
-    guardianTitle: { 'es-AR': 'Comodoro Vector', 'en-US': 'Commodore Vector' },
+    // Exam-prep mode: lessons live in src/content/secondary (no world, no units here).
+    planetSector: { 'es-AR': '', 'en-US': '' },
+    guardianTitle: { 'es-AR': '', 'en-US': '' },
     primaryTopicId: 'linear-equations',
-    lessons: [
-      {
-        id: 'g9-u1-linear-models',
-        unitCode: 'G9 · U1',
-        order: 1,
-        title: {
-          'es-AR': 'De la Ecuación Lineal a la Recta en el Plano',
-          'en-US': 'From Linear Equations to Lines on the Plane',
-        },
-        summary: {
-          'es-AR': 'Conectá el equilibrio algebraico ax + b = c con la pendiente y la ordenada al origen.',
-          'en-US': 'Connect algebraic balance ax + b = c with slope and y-intercept.',
-        },
-        estimatedMinutes: 10,
-        accessLevel: 'premium',
-        linkedTopicId: 'linear-equations',
-        trainerTitle: {
-          'es-AR': 'Entrenador Base: Despeje Algebraico Lineal',
-          'en-US': 'Base Trainer: Linear Algebraic Solving',
-        },
-        planetSector: { 'es-AR': 'Sector Cartesiano', 'en-US': 'Cartesian Sector' },
-        hasInteractiveDiagram: true,
-      },
-      {
-        id: 'g9-u2-systems-intersection',
-        unitCode: 'G9 · U2',
-        order: 2,
-        title: {
-          'es-AR': 'Sistemas de Dos Ecuaciones e Intersección de Trayectorias',
-          'en-US': 'Two-Equation Systems & Trajectory Intersections',
-        },
-        summary: {
-          'es-AR': 'Encontrá el punto exacto donde dos naves con velocidades distintas se cruzan.',
-          'en-US': 'Find the exact coordinates where two spacecraft with different velocities intersect.',
-        },
-        estimatedMinutes: 11,
-        accessLevel: 'premium',
-        linkedTopicId: 'linear-equations',
-        trainerTitle: {
-          'es-AR': 'Entrenador: Encuentro Orbital',
-          'en-US': 'Trainer: Orbital Rendezvous',
-        },
-        planetSector: { 'es-AR': 'Sector Cartesiano', 'en-US': 'Cartesian Sector' },
-        hasInteractiveDiagram: true,
-      },
-    ],
+    lessons: [],
   },
   {
     id: 'grade-10',

@@ -1,22 +1,11 @@
 ---
-import DetectiveLesson from '../../../../../components/learn/DetectiveLesson.astro';
-import RaceLesson from '../../../../../components/learn/RaceLesson.astro';
-import MoonLesson from '../../../../../components/learn/MoonLesson.astro';
-import { getCollection } from 'astro:content';
 import AppLayout from '../../../../../layouts/AppLayout.astro';
-import GradeOneChecks from '../../../../../components/learn/GradeOneChecks.astro';
-import IslandLesson from '../../../../../components/learn/IslandLesson.astro';
-import HouseLesson from '../../../../../components/learn/HouseLesson.astro';
-import QuestLesson from '../../../../../components/learn/QuestLesson.astro';
-import DayLesson from '../../../../../components/learn/DayLesson.astro';
-import GradeSixLab from '../../../../../components/learn/GradeSixLab.astro';
-import GradeSevenLab from '../../../../../components/learn/GradeSevenLab.astro';
-import GradeFiveLab from '../../../../../components/learn/GradeFiveLab.astro';
-import UpperPrimaryLab from '../../../../../components/learn/UpperPrimaryLab.astro';
-import GradeTwoLab from '../../../../../components/learn/GradeTwoLab.astro';
 import PremiumLock from '../../../../../components/learn/PremiumLock.astro';
+import SchoolLessonPage from '../../../../../components/learn/SchoolLessonPage.astro';
+import SecondaryLesson from '../../../../../components/learn/SecondaryLesson.astro';
 import { isFreeLesson } from '../../../../../content/premiumAccess';
-import { SCHOOL_COURSES, getCourseForPackage, getSchoolPackage } from '../../../../../content/schoolCourses';
+import { loadSchoolLesson } from '../../../../../content/schoolLesson';
+import { SECONDARY_COURSES, findSecondaryLesson } from '../../../../../content/secondary';
 import { buildGradeUrl, buildSchoolLessonUrl, getGradeSlug, getGradeVerbSlug, getSubjectSlug, normalizeUrlLocale } from '../../../../../i18n/routes';
 import { getPremiumEntitlement } from '../../../../../lib/server/premiumEntitlement';
 import { getRuntimeEnv } from '../../../../../lib/server/runtimeEnv';
@@ -26,86 +15,36 @@ import { getRuntimeEnv } from '../../../../../lib/server/runtimeEnv';
 export const prerender = false;
 
 const locale = normalizeUrlLocale(Astro.params.locale);
-const urlCourse = SCHOOL_COURSES.find((item) => getGradeSlug(item.gradeId, locale) === Astro.params.grade);
-const validPath =
+const es = locale === 'es-AR';
+const notFound = () => new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+const pathOk =
   Astro.params.locale === (locale === 'es-AR' ? 'es-ar' : 'en-us') &&
   Astro.params.subject === getSubjectSlug(locale) &&
-  Astro.params.gradeVerb === getGradeVerbSlug(locale) &&
-  urlCourse !== undefined;
-const entry = validPath
-  ? (await getCollection(urlCourse!.collection)).find((item) => item.id.toLowerCase() === String(Astro.params.lesson || '').toLowerCase())
-  : undefined;
-if (!entry) {
-  return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
-}
+  Astro.params.gradeVerb === getGradeVerbSlug(locale);
+const lessonParam = String(Astro.params.lesson || '');
 
-const lesson = entry.data;
-const es = locale === 'es-AR';
-const locked = !isFreeLesson(entry.id);
+// Secundaria (Grades 8–12): exam-prep lessons from content/secondary, no story.
+const secondaryCourse = SECONDARY_COURSES.find((item) => getGradeSlug(item.gradeId, locale) === Astro.params.grade);
+const secondary = secondaryCourse && pathOk ? findSecondaryLesson(lessonParam) : null;
+if (secondaryCourse && (!secondary || secondary.course !== secondaryCourse)) return notFound();
+
+// Grades 1–7: story missions (components/learn/SchoolLessonPage.astro).
+const school = secondary || !pathOk ? null : await loadSchoolLesson(locale, Astro.params.grade, lessonParam);
+const lessonId = secondary?.lesson.id ?? school?.entry.id;
+if (!lessonId) return notFound();
+
+const locked = !isFreeLesson(lessonId);
 const access = locked ? await getPremiumEntitlement(Astro.request, await getRuntimeEnv()) : { signedIn: false, isPremium: true };
 const showLock = locked && !access.isPremium;
 // Locked missions depend on who asks: never cache them in shared caches.
 Astro.response.headers.set('Cache-Control', locked ? 'private, no-store' : 'public, max-age=300');
-const course = getCourseForPackage(lesson.packageId);
-const pack = getSchoolPackage(lesson.packageId);
-const all = (await getCollection(course.collection)).sort((a,b) => a.data.order - b.data.order);
-const position = all.findIndex(item => item.id === entry.id);
-const previous = all[position - 1];
-const next = all[position + 1];
-const isLastInPackage = !next || next.data.packageId !== lesson.packageId;
-const horizontalScene = lesson.scene.layout === 'row' || ['G01-03-L02', 'G01-03-L03', 'G01-04-L01', 'G01-04-L02', 'G01-05-L03', 'G01-06-L03', 'G01-08-L01', 'G01-09-L01', 'G01-10-L01', 'G01-10-L02'].includes(entry.id);
-// Grade 1 ("A day with {name}") runs on the design system: content/grade1/day.ts.
-const onDayPage = course.gradeNumber === 1;
-const alignedScene = lesson.scene.layout === 'aligned' || lesson.packageId === 'G01-11' || entry.id === 'G01-09-L02';
 ---
-<AppLayout legacyContent title={lesson.title[locale]} description={lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', course.gradeId, entry.id)} system={onDayPage || showLock}>
-  {showLock ? <PremiumLock locale={locale} missionTitle={lesson.title[locale]} mapHref={buildGradeUrl(locale, course.gradeId)} signedIn={access.signedIn} returnPath={Astro.url.pathname} /> : onDayPage ? <DayLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 2 ? <QuestLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 3 ? <HouseLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 4 ? <IslandLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 5 ? <MoonLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 6 ? <RaceLesson locale={locale} lessonId={entry.id} /> : course.gradeNumber === 7 ? <DetectiveLesson locale={locale} lessonId={entry.id} /> : <article class="stack-lg grade-one" data-grade-one-lesson>
-    <nav class="flex-between" aria-label={es ? 'Navegación de la lección' : 'Lesson navigation'}>
-      <a href={`${buildGradeUrl(locale, course.gradeId)}#${pack.id.toLowerCase()}`}>← {pack.title[locale]}</a>
-      <span>{position + 1} / {all.length} · {course.gradeNumber >= 4 ? '12–18' : '8–12'} min</span>
-    </nav>
-    <header class="card stack-md"><p class="kicker">{course.label[locale]}</p><h1>{lesson.title[locale]}</h1><p class="subtitle">{lesson.objective[locale]}</p></header>
-    <section class="card stack-sm"><h2>{es ? 'Antes de empezar' : 'Before you start'}</h2><p>{lesson.warmup[locale]}</p>
-      {pack.prerequisites.length > 0 && <p class="text-sm">{es ? 'Si necesitás ayuda, podés repasar ' : 'If you need help, you can review '}{pack.prerequisites.map((id, i) => <>{i > 0 && ', '}<a href={`${buildGradeUrl(locale, getCourseForPackage(id).gradeId)}#${id.toLowerCase()}`}>{getSchoolPackage(id).title[locale]}</a></>)}.</p>}
-    </section>
-    <section class="card stack-md"><h2>{es ? 'Vamos a descubrir' : 'Let’s discover'}</h2><p>{lesson.story[locale]}</p>
-      <figure class="g1-scene" data-scene>
-        <div class:list={['g1-scene-items', { 'g1-token-items': lesson.scene.kind === 'tokens', 'g1-horizontal-scene': horizontalScene, 'g1-aligned-scene': alignedScene }]} data-scene-items>
-          {lesson.scene.items.map((item, index) => <button type="button" class="g1-scene-card" aria-pressed="false" data-scene-item aria-label={`${es ? 'Tarjeta' : 'Card'} ${index + 1}: ${item}`}>{item}<span class="g1-mark" aria-hidden="true">✓</span></button>)}
-        </div>
-        <figcaption>{lesson.scene.caption[locale]}</figcaption>
-        <p class="text-sm">{es ? 'Tocá las tarjetas o usá Tab y la barra espaciadora para marcarlas mientras explicás lo que ves.' : 'Tap cards or use Tab and the space bar to mark them as you explain what you see.'}</p>
-        <div class="flex-row"><button type="button" class="btn btn-outline btn-sm" data-scene-reset>{es ? 'Borrar marcas' : 'Clear marks'}</button>{lesson.scene.kind === 'tokens' && <button type="button" class="btn btn-outline btn-sm" data-scene-arrange>{es ? 'Cambiar disposición' : 'Change arrangement'}</button>}</div>
-      </figure>
-      <ol class="g1-steps">{lesson.steps.map(step => <li>{step[locale]}</li>)}</ol>
-    </section>
-    {course.gradeNumber === 2 && <GradeTwoLab locale={locale} packageId={lesson.packageId} />}
-    {course.gradeNumber === 6 && <GradeSixLab locale={locale} packageId={lesson.packageId} />}
-    {course.gradeNumber === 7 && <GradeSevenLab locale={locale} packageId={lesson.packageId} />}
-    {course.gradeNumber === 7 && lesson.packageId === 'G07-03' && <GradeSixLab locale={locale} packageId="G06-06" />}
-    {course.gradeNumber === 7 && lesson.packageId === 'G07-09' && <GradeSixLab locale={locale} packageId="G06-12" />}
-    {course.gradeNumber === 5 && <GradeFiveLab locale={locale} packageId={lesson.packageId} />}
-    {course.gradeNumber >= 3 && <UpperPrimaryLab locale={locale} packageId={lesson.packageId} />}
-    <section class="card stack-sm"><h2>{es ? 'Un error para pensar' : 'An error to think about'}</h2><p>{lesson.misconception[locale]}</p></section>
-    <section class="card stack-md"><h2>{es ? 'Probá por tu cuenta' : 'Try it yourself'}</h2><GradeOneChecks locale={locale} checks={lesson.checks} id={entry.id} /></section>
-    <section class="card stack-sm"><h2>{es ? 'Dibujá, mostrá y explicá' : 'Draw, show, and explain'}</h2><p>{lesson.exit[locale]}</p>
-      <details><summary>{es ? 'Cómo revisar con un adulto' : 'How to review with an adult'}</summary><p>{es ? 'Pedile que observe si tu dibujo o tus objetos representan la situación, si la respuesta coincide y si podés explicar por qué. Si todavía cuesta, volvé al ejemplo y probá con menos objetos. Esta actividad se revisa conversando; no tiene una nota automática.' : 'Ask them to check whether your drawing or objects represent the situation, whether the answer matches, and whether you can explain why. If it is still hard, revisit the example with fewer objects. Review this activity by talking; it does not receive an automatic score.'}</p></details>
-    </section>
-    {isLastInPackage && <section class="card stack-md" id="package-check"><h2>{es ? 'Comprobamos el recorrido' : 'Check the learning path'}</h2>
-      <p>{es ? 'Cinco preguntas nuevas para reconocer, resolver, aplicar y explicar. Después, volvé a probar con otros objetos dentro de una o dos semanas.' : 'Five new questions to recognize, solve, apply, and explain. Then try again with different objects in one or two weeks.'}</p>
-      <GradeOneChecks locale={locale} checks={course.assessments[pack.id]} id={`${pack.id}-check`} assessment />
-      <p class="text-sm text-muted">{es ? 'Estas respuestas sirven para practicar aquí. No suman recompensas ni se guardan en tu progreso de juego.' : 'These answers are for practice here. They do not add rewards or save to your game progress.'}</p>
-    </section>}
-    <nav class="card flex-between" aria-label={es ? 'Continuar aprendiendo' : 'Keep learning'}>
-      {previous && <a class="btn btn-outline" href={buildSchoolLessonUrl(locale, course.gradeId, previous.id)}>← {previous.data.title[locale]}</a>}
-      {next ? <a class="btn btn-primary" href={buildSchoolLessonUrl(locale, course.gradeId, next.id)}>{next.data.title[locale]} →</a> : <a class="btn btn-primary" href={`${buildGradeUrl(locale, course.gradeId)}#project`}>{es ? 'Proyecto: ' : 'Project: '}{course.project.title[locale]} →</a>}
-    </nav>
-  </article>}
-  <script>import '../../../../../scripts/gradeOneClient';</script>
-  <script>import '../../../../../scripts/gradeTwoLabs';</script>
-  <script>import '../../../../../scripts/upperPrimaryLabs';</script>
-  <script>import '../../../../../scripts/gradeFiveLabs';</script>
-  <script>import '../../../../../scripts/gradeSixLabs';</script>
-  <script>import '../../../../../scripts/gradeSevenLabs';</script>
-  <script>import '../../../../../scripts/replayButton';</script>
+{school ? (
+  <SchoolLessonPage locale={locale} school={school} showLock={showLock} signedIn={access.signedIn} returnPath={Astro.url.pathname} />
+) : secondary && (
+<AppLayout legacyContent title={secondary.lesson.title[locale]} description={secondary.lesson.objective[locale]} locale={locale} activeNav="learn" switchLocaleHref={buildSchoolLessonUrl(es ? 'en-US' : 'es-AR', secondary.course.gradeId, secondary.lesson.id)} system>
+  {showLock
+    ? <PremiumLock locale={locale} missionTitle={secondary.lesson.title[locale]} mapHref={buildGradeUrl(locale, secondary.course.gradeId)} signedIn={access.signedIn} returnPath={Astro.url.pathname} secondary />
+    : <SecondaryLesson locale={locale} lessonId={secondary.lesson.id} />}
 </AppLayout>
+)}

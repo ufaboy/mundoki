@@ -8,7 +8,8 @@ import { reconcileSyncedState } from '../game/core/syncState';
 import type { TopicId } from '../math/core/types';
 import { loadLocalGameState, saveLocalGameState } from './gameStateStorage';
 
-// Authored mission questions never change, so each one counts once per browser.
+// Authored mission questions never change, so each one counts once per account (once per
+// browser while signed out). Two students sharing a device each get their own list.
 const COUNTED_KEY = 'mundoki_mission_checks_v1';
 
 function isPremium(): boolean {
@@ -19,14 +20,50 @@ function isPremium(): boolean {
   }
 }
 
-/** Mission questions (`lessonId:checkIndex`) already answered right in this browser. */
+/** The signed-in account's list, or the browser's list when signed out. */
+function countedKey(): string {
+  try {
+    const user: unknown = JSON.parse(window.localStorage.getItem('mundoki_user') ?? 'null');
+    const id = user && typeof user === 'object' ? (user as { id?: unknown }).id : undefined;
+    return typeof id === 'string' && id ? `${COUNTED_KEY}:${id}` : COUNTED_KEY;
+  } catch {
+    return COUNTED_KEY;
+  }
+}
+
+/** Mission questions (`lessonId:checkIndex`) this account (or this signed-out browser) answered right. */
 export function readCounted(): string[] {
   try {
-    const parsed: unknown = JSON.parse(window.localStorage.getItem(COUNTED_KEY) ?? '[]');
+    const key = countedKey();
+    let raw = window.localStorage.getItem(key);
+    if (raw === null && key !== COUNTED_KEY) {
+      // An account without a list yet takes over the browser's list once: answers given
+      // while signed out, or by everyone on this browser before 2.3.0. Moving (not copying)
+      // it means a second account on the same device starts with its own empty list.
+      raw = window.localStorage.getItem(COUNTED_KEY);
+      if (raw !== null) {
+        window.localStorage.setItem(key, raw);
+        window.localStorage.removeItem(COUNTED_KEY);
+      }
+    }
+    const parsed: unknown = JSON.parse(raw ?? '[]');
     return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
   } catch {
     return [];
   }
+}
+
+/** Marks a question as counted; false when it already was. */
+function markCounted(lessonId: string, checkIndex: number): boolean {
+  const key = `${lessonId}:${checkIndex}`;
+  const counted = readCounted();
+  if (counted.includes(key)) return false;
+  try {
+    window.localStorage.setItem(countedKey(), JSON.stringify([...counted, key]));
+  } catch {
+    // Storage blocked: count it for this visit anyway.
+  }
+  return true;
 }
 
 function newAttemptId(): string {
@@ -99,6 +136,29 @@ export function recordPracticeAnswer(input: {
 }
 
 /**
+ * A secundaria lesson item answered correctly: `answer` is the typed text (a number,
+ * an "x;y" pair) or the chosen option index. The server re-checks it. Returns the
+ * star total, or null when this item was already counted for this account.
+ */
+export function recordSecondaryAnswer(input: { lessonId: string; checkIndex: number; answer: string; topicId: TopicId }): number | null {
+  if (!markCounted(input.lessonId, input.checkIndex)) return null;
+  return record({
+    attemptId: newAttemptId(),
+    exerciseId: `mission-${input.lessonId}-c${input.checkIndex}`,
+    topicId: input.topicId,
+    seed: input.checkIndex,
+    difficulty: 1,
+    userAnswer: input.answer,
+    isCorrect: true,
+    timestamp: new Date().toISOString(),
+    syncedToServer: false,
+    source: 'mission',
+    lessonId: input.lessonId,
+    checkIndex: input.checkIndex,
+  });
+}
+
+/**
  * The mission's own question, answered correctly. Returns the star total, or
  * null when this question was already counted in this browser.
  */
@@ -108,14 +168,7 @@ export function recordMissionCheck(input: {
   optionIndex: number;
   topicId: TopicId;
 }): number | null {
-  const key = `${input.lessonId}:${input.checkIndex}`;
-  const counted = readCounted();
-  if (counted.includes(key)) return null;
-  try {
-    window.localStorage.setItem(COUNTED_KEY, JSON.stringify([...counted, key]));
-  } catch {
-    // Storage blocked: count it for this visit anyway.
-  }
+  if (!markCounted(input.lessonId, input.checkIndex)) return null;
   return record({
     attemptId: newAttemptId(),
     exerciseId: `mission-${input.lessonId}-c${input.checkIndex}`,

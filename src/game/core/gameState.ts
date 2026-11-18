@@ -264,7 +264,8 @@ export interface AttemptRecord {
    * Where the answer was given. Absent: the "Jugar" trainer.
    * "practice": a generated "new numbers" exercise inside a mission (`skill` + `seed`).
    * "mission": the mission's own authored question (`lessonId` + `checkIndex`).
-   * For both, `userAnswer` is the index of the chosen option.
+   * For both, `userAnswer` is the index of the chosen option — except secundaria lessons
+   * (G08–G12 ids), where it is the typed answer: a number or an "x;y" pair.
    */
   source?: 'practice' | 'mission';
   skill?: string;
@@ -326,6 +327,9 @@ export const INITIAL_GAME_STATE: PlayerGameState = {
  * Pure state transition function that applies a validated exercise outcome
  * to the player's adventure state and returns emitted reward events.
  */
+/** Secundaria lesson ids (G08-07-L01 … G12-xx-Lxx): exam-prep mode, no world or guardians. */
+export const SECONDARY_LESSON_ID = /^G(0[89]|1[0-2])-\d{2}-L\d{2}$/i;
+
 export function applyExerciseOutcome(
   prevState: PlayerGameState,
   attempt: AttemptRecord,
@@ -364,15 +368,19 @@ export function applyExerciseOutcome(
 
   events.push({ type: 'ENERGY_EARNED', amount: energyGain });
 
+  // Secundaria answers earn stars and energy, but no world rewards (ships, guardians,
+  // outfits, planets): teens have no world (docs/secundaria-exam-prep-design.md).
+  const worldRewards = !(attempt.lessonId && SECONDARY_LESSON_ID.test(attempt.lessonId));
+
   // Check vehicle tier upgrades
-  for (const tier of VEHICLE_TIERS) {
+  for (const tier of worldRewards ? VEHICLE_TIERS : []) {
     if (prevState.energy < tier.requiredEnergy && newEnergy >= tier.requiredEnergy) {
       events.push({ type: 'VEHICLE_UPGRADED', shipId: tier.id });
     }
   }
 
   // Check guardian completion (3 correct answers in a topic defeats the topic's friendly guardian)
-  const guardianDefeatedNow = !prevTopic.guardianDefeated && newTopicSolved >= 3;
+  const guardianDefeatedNow = worldRewards && !prevTopic.guardianDefeated && newTopicSolved >= 3;
   if (guardianDefeatedNow) {
     events.push({ type: 'GUARDIAN_OVERCOME', topicId: attempt.topicId });
   }
@@ -380,10 +388,9 @@ export function applyExerciseOutcome(
   // Check cosmetic unlocks
   const unlockedCosmetics = [...prevState.unlockedCosmetics];
   const equippedCosmetics = { ...prevState.equippedCosmetics };
-  for (const item of COSMETIC_CATALOG) {
+  for (const item of worldRewards ? COSMETIC_CATALOG : []) {
     if (item.premiumOnly && !isPremiumEntitled) continue;
-    const topicSolvedOk =
-      item.requiredTopic === attempt.topicId && newTopicSolved >= 3;
+    const topicSolvedOk = item.requiredTopic === attempt.topicId && newTopicSolved >= 3;
     const starsOk = newStars >= item.requiredStars;
     if ((topicSolvedOk || starsOk) && !unlockedCosmetics.includes(item.id)) {
       unlockedCosmetics.push(item.id);
@@ -396,7 +403,7 @@ export function applyExerciseOutcome(
 
   // Check planet destination unlocks
   const unlockedPlanets = [...prevState.unlockedPlanets];
-  for (const planet of PLANET_DESTINATIONS) {
+  for (const planet of worldRewards ? PLANET_DESTINATIONS : []) {
     if (
       newTotalSolved >= planet.requiredSolvedCount &&
       !unlockedPlanets.includes(planet.id)

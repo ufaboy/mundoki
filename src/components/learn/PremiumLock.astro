@@ -14,33 +14,49 @@ interface Props {
   signedIn: boolean;
   /** This page's path, so the account page can send the visitor back after signing in. */
   returnPath: string;
+  /** Secundaria (Grades 8–12): calm, adult copy and no child hero. */
+  secondary?: boolean;
 }
 
-const { locale, missionTitle, mapHref, signedIn, returnPath } = Astro.props;
+const { locale, missionTitle, mapHref, signedIn, returnPath, secondary = false } = Astro.props;
 const L = (es: string, en: string) => (locale === 'es-AR' ? es : en);
 const { total } = countMissions();
 const accountHref = `${buildLoginUrl(locale)}?next=${encodeURIComponent(returnPath)}`;
 ---
 
 <section class="mk-card mk-card--grape mk-hello mk-lock" aria-labelledby="lock-title">
-  <div class="mk-hello__art"><HeroCharacter /></div>
+  {!secondary && <div class="mk-hello__art"><HeroCharacter /></div>}
   <div class="mk-hello__body">
     <span class="mk-chip mk-chip--grape mk-lock__chip">
       <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3" /></svg>
       Premium
     </span>
     <h1 class="mk-title" id="lock-title">{missionTitle}</h1>
-    <p class="mk-text">
-      {L(
-        `Esta misión es parte de Premium. La primera aventura de cada grado es gratis; con Premium se abren las ${total} misiones de 1.º a 7.º grado.`,
-        `This mission is part of Premium. The first adventure of every grade is free; Premium opens all ${total} missions from Grade 1 to Grade 7.`
-      )}
-    </p>
-    <p class="mk-label">{L('Pedile a una persona adulta de tu familia que lo active.', 'Ask a grown-up in your family to turn it on.')}</p>
+    {secondary ? (
+      <>
+        <p class="mk-text">
+          {L(
+            'Este tema es parte de Premium. El primer tema de cada año de secundaria es gratis; con Premium se abren todos los temas, con su práctica y su control final.',
+            'This topic is part of Premium. The first topic of each secondary year is free; Premium opens every topic, with its practice and exit check.'
+          )}
+        </p>
+        <p class="mk-label">{L('La suscripción la activa una persona adulta de la familia.', 'A parent or guardian activates the subscription.')}</p>
+      </>
+    ) : (
+      <>
+        <p class="mk-text">
+          {L(
+            `Esta misión es parte de Premium. La primera aventura de cada grado es gratis; con Premium se abren las ${total} misiones de 1.º a 7.º grado.`,
+            `This mission is part of Premium. The first adventure of every grade is free; Premium opens all ${total} missions from Grade 1 to Grade 7.`
+          )}
+        </p>
+        <p class="mk-label">{L('Pedile a una persona adulta de tu familia que lo active.', 'Ask a grown-up in your family to turn it on.')}</p>
+      </>
+    )}
     <div class="mk-row mk-lock__actions">
       <a class="mk-btn mk-btn--premium" href={buildPremiumUrl(locale)}>{L('Ver Premium', 'See Premium')}</a>
       {!signedIn && <a class="mk-btn" href={accountHref}>{L('Ya tengo Premium: entrar', 'I have Premium: sign in')}</a>}
     </div>
-    <a class="mk-btn mk-btn--quiet" href={mapHref}>{L('Volver al mapa', 'Back to the map')}</a>
+    <a class="mk-btn mk-btn--quiet" href={mapHref}>{secondary ? L('Volver al año', 'Back to the year') : L('Volver al mapa', 'Back to the map')}</a>
   </div>
 </section>
