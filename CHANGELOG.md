@@ -3,6 +3,12 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.2.10] - 2026-11-18
+
+### Security
+- Hardened social sign-in: the sign-in window now hands its result only to Mundoki itself, and an account with two-step verification is no longer left signed in before the second step is completed.
+- Two-step verification recovery codes and authenticator secrets are now generated only with a cryptographically secure random generator.
+
 ## [2.2.9] - 2026-11-17
 
 ### Changed

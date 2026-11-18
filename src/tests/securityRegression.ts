@@ -166,6 +166,44 @@ const backupResponses = await Promise.all(challenges.map(pending2faToken => call
 assert.deepEqual(backupResponses.map(response => response.status).sort(), [200, 401]);
 console.log('PASS [2FA regression] native magic link gated, provisional session revoked, backup code single use');
 
+// OAuth popup (/auth/callback?oauth_done=1): the token goes to our own origin only, profile
+// text cannot inject script, and no live session is left behind while 2FA is pending.
+{
+  const { GET: oauthCallback } = await import('../pages/auth/callback');
+  const popup = (token: string) => oauthCallback({
+    request: new Request('http://localhost:3333/auth/callback?oauth_done=1', { headers: { authorization: `Bearer ${token}` } }),
+  } as any) as Promise<Response>;
+  const bearer = (token: string) => new Headers({ authorization: `Bearer ${token}` });
+  await authContext.internalAdapter.updateUser(spoofed.user.id, { name: '</script><script>stealToken()</script>' });
+  const plainHtml = await (await popup(ordinaryPayload.token)).text();
+  assert.match(plainHtml, /postMessage\(data, window\.location\.origin\)/);
+  assert.ok(!plainHtml.includes("'*'"), 'never posted to any origin');
+  assert.ok(!plainHtml.includes('</script><script>'), 'profile text cannot close the script tag');
+  assert.ok(plainHtml.includes(ordinaryPayload.token), 'without 2FA the token still reaches our own page');
+
+  await authContext.internalAdapter.updateUser(spoofed.user.id, { twoFactorEnabled: true, name: 'Role test' });
+  const pendingResponse = await popup(ordinaryPayload.token);
+  const pendingHtml = await pendingResponse.text();
+  assert.match(pendingHtml, /"requiresTwoFactor":true/);
+  assert.ok(!pendingHtml.includes(ordinaryPayload.token), 'no session token while 2FA is pending');
+  assert.equal(await memoryAuth.api.getSession({ headers: bearer(ordinaryPayload.token) }), null, 'provisional OAuth session revoked');
+  assert.match(pendingResponse.headers.get('set-cookie') ?? '', /mundoki_session=;.*Max-Age=0/);
+  await authContext.internalAdapter.updateUser(spoofed.user.id, { twoFactorEnabled: false });
+}
+console.log('PASS [OAuth popup] token posted to own origin only, no script injection, provisional 2FA session revoked');
+
+// 2FA secrets and backup codes come from the Web Crypto CSPRNG only.
+{
+  const totpSource = readFileSync(path.join(root, 'src/lib/auth/totp.ts'), 'utf8');
+  assert.ok(!/Math\.random\s*\(/.test(totpSource), 'no Math.random in 2FA code generation');
+  const { generateBackupCodes, generateBase32Secret } = await import('../lib/auth/totp');
+  const codes = Array.from({ length: 50 }, () => generateBackupCodes(8)).flat();
+  assert.ok(codes.every((code) => /^MG-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}$/.test(code)), 'backup code format');
+  assert.equal(new Set(codes).size, codes.length, 'backup codes do not repeat');
+  assert.match(generateBase32Secret(20), /^[A-Z2-7]{20}$/);
+}
+console.log('PASS [2FA codes] backup codes and secrets use crypto.getRandomValues');
+
 // A magic link is only issued for registered emails, and the answer never reveals which ones exist.
 const magicFor = async (email: string) => (await call(auth, request('/api/auth/magic-link/request', { email, locale: 'en-US' }, { authorization: '' }), 'magic-link/request')).json();
 const unknownMagic = await magicFor('nobody-here@example.invalid');

@@ -8,7 +8,8 @@ import {
   getTwoFactorRecordInStore,
   getUserAppBundle,
 } from '../../lib/db/d1Store';
-import { getAppOrigin, getRuntimeEnv, isDevSandboxEnabled } from '../../lib/server/runtimeEnv';
+import { getAppOrigin, getRuntimeEnv, isDevSandboxEnabled, type RuntimeEnv } from '../../lib/server/runtimeEnv';
+import { createBetterAuthInstance } from '../../lib/auth/betterAuth';
 import { Locale } from '../../math/core/types';
 
 export const prerender = false;
@@ -35,6 +36,7 @@ export const GET: APIRoute = async ({ request }) => {
   // Better Auth OAuth redirect target: session cookie is already set by /api/auth/callback/:provider
   if (oauthDone) {
     const authUser = await getAuthenticatedSessionUser(request, env);
+    let revokedSession = false;
     let payloadJson = JSON.stringify({
       type: 'OAUTH_AUTH_ERROR',
       error: 'OAuth session was not established.',
@@ -45,6 +47,11 @@ export const GET: APIRoute = async ({ request }) => {
       const bundle = await getUserAppBundle(authUser, env);
 
       if (bundle.user.twoFactorEnabled) {
+        // /api/auth/callback/:provider already created a full session and set its cookie.
+        // Revoke it before issuing the 2FA challenge, as magic-link verify does; otherwise
+        // the cookie would sign the browser in without the second factor.
+        await revokeProvisionalSession(request, env, authUser.sessionToken);
+        revokedSession = true;
         const tf = await getTwoFactorRecordInStore(authUser.id, env);
         const pending2faToken = await create2faChallengeInStore(authUser.id, env);
         payloadJson = JSON.stringify({
@@ -68,10 +75,11 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const html = buildPopupHtml(payloadJson, locale);
-    return new Response(html, {
-      status: 200,
-      headers: { 'Content-Type': 'text/html; charset=utf-8' },
-    });
+    const headers = new Headers({ 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+    if (revokedSession) {
+      headers.append('Set-Cookie', 'mundoki_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0');
+    }
+    return new Response(html, { status: 200, headers });
   }
 
   // Legacy direct Google OAuth callback fallback (?code=...&state=...)
@@ -180,17 +188,34 @@ export const GET: APIRoute = async ({ request }) => {
   });
 };
 
+/** Deletes the session the provider callback just created (2FA still pending). */
+async function revokeProvisionalSession(request: Request, env: RuntimeEnv, sessionToken: string | null): Promise<void> {
+  if (!sessionToken) return;
+  const auth = createBetterAuthInstance(env, {
+    baseURL: getAppOrigin(request, env),
+    requestOrigin: new URL(request.url).origin,
+  });
+  try {
+    await (await auth.$context).internalAdapter.deleteSession(sessionToken);
+  } catch {
+    // Already gone: nothing to revoke.
+  }
+}
+
 function buildPopupHtml(payloadJson: string, locale: Locale): string {
   const fallbackPath = locale === 'en-US' ? '/en-us/account' : '/es-ar/cuenta';
+  // The payload can carry a session token. It is posted only to this page's own origin:
+  // a page on another site that opened this window (window.open) receives nothing, and
+  // the account page also checks event.origin (src/scripts/accountClient.ts).
   return `<!doctype html>
 <html lang="en">
   <head><meta charset="utf-8" /><title>Mundoki OAuth Callback</title></head>
   <body style="font-family: system-ui, sans-serif; padding: 2rem; text-align: center;">
     <script>
       (function() {
-        var data = ${payloadJson};
+        var data = ${payloadJson.replace(/</g, '\\u003c')};
         if (window.opener) {
-          window.opener.postMessage(data, '*');
+          window.opener.postMessage(data, window.location.origin);
           window.close();
         } else {
           window.location.href = '${fallbackPath}';
