@@ -81,17 +81,21 @@ export interface SecondaryLessonRef {
   all: SecondaryLesson[];
 }
 
-export function findSecondaryLesson(lessonId: string): SecondaryLessonRef | null {
-  const id = lessonId.toUpperCase();
-  for (const course of SECONDARY_COURSES) {
+// Built once: isFreeLesson asks about every lesson id (Grades 1–7 too) on each sync
+// attempt and mission page, so lookups must not scan the courses.
+const LESSONS_BY_ID = new Map<string, SecondaryLessonRef>(
+  SECONDARY_COURSES.flatMap((course) => {
     const all = course.packages.flatMap((pack) => pack.lessons);
-    const index = all.findIndex((lesson) => lesson.id === id);
-    if (index < 0) continue;
-    const lesson = all[index];
-    const pack = course.packages.find((p) => p.id === lesson.packageId)!;
-    return { course, pack, lesson, index, all };
-  }
-  return null;
+    return all.map((lesson, index): [string, SecondaryLessonRef] => [
+      lesson.id,
+      { course, pack: course.packages.find((p) => p.id === lesson.packageId)!, lesson, index, all },
+    ]);
+  }),
+);
+
+/** Case-insensitive, as lesson ids appear lower-case in URLs. */
+export function findSecondaryLesson(lessonId: string): SecondaryLessonRef | null {
+  return LESSONS_BY_ID.get(lessonId.toUpperCase()) ?? null;
 }
 
 /** The item behind a server check index, or null. */

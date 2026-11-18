@@ -5,6 +5,7 @@
 
 import type { TopicId } from '../math/core/types';
 import { checkSecondaryAnswer, joinPair, matchesValue, readRational, type SecondaryAnswerSpec } from '../math/core/secondaryAnswer';
+import { formatRational, normalizeRational } from '../math/core/fraction';
 import { readCounted, recordSecondaryAnswer } from './missionProgress';
 
 interface ClientData {
@@ -160,21 +161,10 @@ function init(lesson: HTMLElement, data: ClientData) {
 
 // ---------- Number formatting ----------
 
-function gcd(a: number, b: number): number {
-  let x = Math.abs(a);
-  let y = Math.abs(b);
-  while (y) [x, y] = [y, x % y];
-  return x || 1;
-}
-
-/** Exact fraction text for num/den, e.g. "5/2", "−3". */
+/** Exact fraction text for num/den, e.g. "5/2", "−3", with a typographic minus. */
 function fraction(num: number, den: number): string {
-  if (den < 0) [num, den] = [-num, -den];
-  const g = gcd(num, den);
-  const n = num / g;
-  const d = den / g;
-  const sign = n < 0 ? '−' : '';
-  return d === 1 ? `${sign}${Math.abs(n)}` : `${sign}${Math.abs(n)}/${d}`;
+  const r = normalizeRational(num, den);
+  return r ? formatRational(r).replace('-', '−') : '—';
 }
 
 function decimal(value: number, comma: string): string {
