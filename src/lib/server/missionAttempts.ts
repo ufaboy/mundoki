@@ -8,12 +8,13 @@ import type { TopicId } from '../../math/core/types';
 import { findMissionCheck } from '../../content/missionChecks';
 import { findSecondaryItem } from '../../content/secondary';
 import { checkSecondaryAnswer, MAX_SECONDARY_ANSWER } from '../../math/core/secondaryAnswer';
+import { SECONDARY_LESSON_ID } from '../../game/core/gameState';
+import { generatePractice, isPracticeSkill, PRACTICE_TOPIC } from '../../math/practice/generators';
 
 /** Secundaria lesson ids: G08-07-L01 … G12-xx-Lxx. */
 export function isSecondaryLessonId(value: unknown): boolean {
-  return typeof value === 'string' && /^G(0[89]|1[0-2])-\d{2}-L\d{2}$/i.test(value);
+  return typeof value === 'string' && SECONDARY_LESSON_ID.test(value);
 }
-import { generatePractice, isPracticeSkill, PRACTICE_TOPIC } from '../../math/practice/generators';
 
 export interface ResolvedMissionAttempt {
   source: 'practice' | 'mission';
@@ -31,7 +32,12 @@ export interface ResolvedMissionAttempt {
   checkIndex?: number;
 }
 
-/** Results bucket for secundaria lessons (Grades 8–12): the old linear-equations topic id. */
+/**
+ * Results bucket for secundaria lessons (Grades 8–12). It reuses the old linear-equations
+ * topic id (a row in the D1 `topics` table, so no migration is needed); that trainer topic
+ * is gone, so the bucket holds secundaria answers only, and applyExerciseOutcome gives
+ * them no guardian or topic-cosmetic rewards.
+ */
 export const SECONDARY_TOPIC: TopicId = 'linear-equations';
 
 /** Returns null when the payload is malformed or names an unknown skill, lesson or question. */

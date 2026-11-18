@@ -20,6 +20,14 @@ assert.equal(checkSecondaryAnswer(n('5/2'), '2,5'), 'correct', 'decimal comma eq
 assert.equal(checkSecondaryAnswer(n('5/2'), '10/4'), 'correct', 'equivalent fraction');
 assert.equal(checkSecondaryAnswer(n('7'), '8'), 'incorrect');
 assert.equal(checkSecondaryAnswer(n('50'), '50°'), 'correct', 'a degree sign is allowed');
+assert.equal(checkSecondaryAnswer(n('6200'), '6,200'), 'correct', 'en-US thousands separator');
+assert.equal(checkSecondaryAnswer(n('13500'), '13.500'), 'correct', 'es-AR thousands separator');
+assert.equal(checkSecondaryAnswer(n('1500000'), '1.500.000'), 'correct', 'several groups');
+assert.equal(checkSecondaryAnswer(n('3/2'), '1,500'), 'correct', '"1,500" still reads as a decimal 1.5');
+assert.equal(checkSecondaryAnswer(n('250'), '0,250'), 'incorrect', 'a leading 0 is never a thousands group');
+assert.equal(checkSecondaryAnswer(n('6200'), '6,20'), 'incorrect', 'groups have three digits');
+assert.equal(checkSecondaryAnswer(n('6200'), '6.200,5'), 'invalid', 'mixed separators are not read');
+assert.equal(checkSecondaryAnswer({ kind: 'pair', x: '1500', y: '2' }, '1.500;2'), 'correct', 'pairs read groups too');
 assert.equal(checkSecondaryAnswer(n('7'), 'siete'), 'invalid');
 assert.equal(checkSecondaryAnswer(n('7'), '3+4'), 'invalid', 'expressions are not evaluated');
 assert.equal(checkSecondaryAnswer(n('7'), '1/0'), 'invalid');
@@ -175,5 +183,11 @@ result = await post([
 ]);
 assert.equal(result.gameState.totalSolved, 5);
 assert.deepEqual(result.syncedAttemptIds, []);
+
+// Five secundaria answers (with Premium) earn stars but no world rewards from the old
+// linear-equations trainer topic, which is only the results bucket now.
+assert.equal(result.gameState.topicMastery['linear-equations'].solved, 5);
+assert.equal(result.gameState.topicMastery['linear-equations'].guardianDefeated, false, 'no planet guardian for secundaria');
+assert.ok(!result.gameState.unlockedCosmetics.includes('acc-math-visor'), 'no topic cosmetic for secundaria');
 
 console.log(`PASS [Secundaria] ${ids.size} lessons, ${itemCount} items: answer checker, content rules, free first package, typed/pair/choice answers re-checked on the server once each`);

@@ -327,6 +327,9 @@ export const INITIAL_GAME_STATE: PlayerGameState = {
  * Pure state transition function that applies a validated exercise outcome
  * to the player's adventure state and returns emitted reward events.
  */
+/** Secundaria lesson ids (G08-07-L01 … G12-xx-Lxx): exam-prep mode, no world or guardians. */
+export const SECONDARY_LESSON_ID = /^G(0[89]|1[0-2])-\d{2}-L\d{2}$/i;
+
 export function applyExerciseOutcome(
   prevState: PlayerGameState,
   attempt: AttemptRecord,
@@ -372,8 +375,12 @@ export function applyExerciseOutcome(
     }
   }
 
+  // Secundaria answers earn stars and energy, but no topic rewards: teens have no world,
+  // and their results bucket is not a trainer topic (docs/secundaria-exam-prep-design.md).
+  const topicRewards = !(attempt.lessonId && SECONDARY_LESSON_ID.test(attempt.lessonId));
+
   // Check guardian completion (3 correct answers in a topic defeats the topic's friendly guardian)
-  const guardianDefeatedNow = !prevTopic.guardianDefeated && newTopicSolved >= 3;
+  const guardianDefeatedNow = topicRewards && !prevTopic.guardianDefeated && newTopicSolved >= 3;
   if (guardianDefeatedNow) {
     events.push({ type: 'GUARDIAN_OVERCOME', topicId: attempt.topicId });
   }
@@ -384,7 +391,7 @@ export function applyExerciseOutcome(
   for (const item of COSMETIC_CATALOG) {
     if (item.premiumOnly && !isPremiumEntitled) continue;
     const topicSolvedOk =
-      item.requiredTopic === attempt.topicId && newTopicSolved >= 3;
+      topicRewards && item.requiredTopic === attempt.topicId && newTopicSolved >= 3;
     const starsOk = newStars >= item.requiredStars;
     if ((topicSolvedOk || starsOk) && !unlockedCosmetics.includes(item.id)) {
       unlockedCosmetics.push(item.id);

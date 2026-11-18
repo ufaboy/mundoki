@@ -9,7 +9,7 @@ Release notes describe user-facing and product impact — never include secrets,
 - Secundaria exam-prep mode for 1.º and 2.º año (Grades 8 and 9): calm, adult lessons without story heroes, built to help teens understand a topic and arrive ready for their *prueba*. Each lesson has a readiness check, a real-life situation, an interactive model, a worked example, a common mistake, typed practice with one hint per exercise, and an exit check; typical wrong answers get a short explanation of the mistake.
 - Grade 8 (1.º año) now covers its whole year: 12 topics and 36 lessons — integers, rationals, algebraic expressions, tables and graphs, direct and inverse proportion, first equations, angles between parallel lines, geometric loci, frequencies, probability through experiments, and modelling. Grade 9 (2.º año) has its first four topics.
 - New interactive models: parallel lines cut by a transversal, equidistant points (circle, perpendicular bisector, angle bisector), an editable frequency table with a bar chart, and a coin and die simulator that shows the relative frequency approaching the probability.
-- Answers are typed on the phone's number keypad and sit inside the math line; angle answers may include the degree sign.
+- Answers are typed on the phone's number keypad and sit inside the math line; angle answers may include the degree sign, and large numbers may be written with a thousands separator (6,200 or 13.500).
 
 ### Changed
 - The first topic of each secondary year is free: G08-01 (integers) for Grade 8 and G09-03 (linear relationship) for Grade 9. Other topics require Premium, and answers are checked on the server.

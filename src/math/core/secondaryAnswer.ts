@@ -14,20 +14,40 @@ export type SecondaryVerdict = 'correct' | 'incorrect' | 'invalid';
 /** Longest answer text accepted anywhere (input, sync payload). */
 export const MAX_SECONDARY_ANSWER = 40;
 
-/** Reads "−3", "x = 5/2", "2,5" as an exact rational; null when it is not a number. */
-export function readRational(raw: string): Rational | null {
-  const cleaned = raw
+function clean(raw: string): string {
+  return raw
     .trim()
     .replace(/[−‒–—]/g, '-')
     .replace(/^[a-zA-Z]\s*=\s*/, '')
     .replace(/°/g, '') // angles may be typed as "50°"
     .replace(/\s+/g, '');
+}
+
+/** Reads "−3", "x = 5/2", "2,5" as an exact rational; null when it is not a number. */
+export function readRational(raw: string): Rational | null {
+  const cleaned = clean(raw);
   if (!cleaned || cleaned.length > MAX_SECONDARY_ANSWER || !/^-?[0-9.,]+(\/-?[0-9.,]+)?$/.test(cleaned)) return null;
   const parsed = parseRationalInput(cleaned);
   return parsed.valid && parsed.rational ? parsed.rational : null;
 }
 
+/** A whole number written with a thousands separator: "6,200" (en-US) or "13.500" (es-AR). */
+const GROUPED = /^-?[1-9]\d{0,2}([.,])\d{3}(?:\1\d{3})*$/;
+
+/**
+ * Every reasonable reading of a typed number. "1,500" is 3/2 with a decimal comma, but
+ * also 1500 with a thousands separator, as prices are written in the prompts ("$11,000",
+ * "$1.500"); the answer is right when either reading matches.
+ */
+function readings(raw: string): Rational[] {
+  const cleaned = clean(raw);
+  // "1.500.000" has no decimal reading at all, so the grouped one may be the only one.
+  const whole = GROUPED.test(cleaned) ? readRational(cleaned.replace(/[.,]/g, '')) : null;
+  return [readRational(raw), whole].filter((r): r is Rational => r !== null);
+}
+
 const same = (a: Rational, b: Rational) => a.numerator === b.numerator && a.denominator === b.denominator;
+const matches = (given: Rational[], expected: Rational) => given.some((g) => same(g, expected));
 
 /** Pair answers travel as "x;y". */
 export function joinPair(x: string, y: string): string {
@@ -46,20 +66,20 @@ export function checkSecondaryAnswer(spec: SecondaryAnswerSpec, raw: string): Se
   }
 
   if (spec.kind === 'number') {
-    const given = readRational(text);
+    const given = readings(text);
     const expected = readRational(spec.value);
-    if (!given || !expected) return 'invalid';
-    return same(given, expected) ? 'correct' : 'incorrect';
+    if (!given.length || !expected) return 'invalid';
+    return matches(given, expected) ? 'correct' : 'incorrect';
   }
 
   const parts = text.split(';');
   if (parts.length !== 2) return 'invalid';
-  const gx = readRational(parts[0]);
-  const gy = readRational(parts[1]);
+  const gx = readings(parts[0]);
+  const gy = readings(parts[1]);
   const ex = readRational(spec.x);
   const ey = readRational(spec.y);
-  if (!gx || !gy || !ex || !ey) return 'invalid';
-  return same(gx, ex) && same(gy, ey) ? 'correct' : 'incorrect';
+  if (!gx.length || !gy.length || !ex || !ey) return 'invalid';
+  return matches(gx, ex) && matches(gy, ey) ? 'correct' : 'incorrect';
 }
 
 /** True when the typed answer equals a listed typical wrong value (same rules as the check). */
