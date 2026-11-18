@@ -5,33 +5,39 @@
 
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-export function generateBase32Secret(length = 16): string {
-  const randomValues = new Uint8Array(length);
-  if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.getRandomValues) {
-    globalThis.crypto.getRandomValues(randomValues);
-  } else {
-    for (let i = 0; i < length; i++) {
-      randomValues[i] = Math.floor(Math.random() * 256);
+const BACKUP_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+/**
+ * Uniformly random characters from `alphabet`, from the Web Crypto CSPRNG only.
+ * 2FA secrets and backup codes must be unpredictable, so there is deliberately no
+ * fallback to a non-cryptographic generator: without Web Crypto this throws. Rejection sampling keeps the
+ * distribution uniform for alphabets whose size does not divide 256.
+ */
+function randomChars(alphabet: string, length: number): string {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi || typeof cryptoApi.getRandomValues !== 'function') {
+    throw new Error('Web Crypto (crypto.getRandomValues) is required to generate 2FA secrets.');
+  }
+  const limit = 256 - (256 % alphabet.length);
+  let out = '';
+  while (out.length < length) {
+    for (const byte of cryptoApi.getRandomValues(new Uint8Array(length - out.length + 8))) {
+      if (byte >= limit) continue;
+      out += alphabet[byte % alphabet.length];
+      if (out.length === length) break;
     }
   }
-  let secret = '';
-  for (let i = 0; i < length; i++) {
-    secret += BASE32_ALPHABET[randomValues[i] % 32];
-  }
-  return secret;
+  return out;
+}
+
+export function generateBase32Secret(length = 16): string {
+  return randomChars(BASE32_ALPHABET, length);
 }
 
 export function generateBackupCodes(count = 6): string[] {
   const codes: string[] = [];
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   for (let c = 0; c < count; c++) {
-    let partA = '';
-    let partB = '';
-    for (let i = 0; i < 4; i++) {
-      partA += chars[Math.floor(Math.random() * chars.length)];
-      partB += chars[Math.floor(Math.random() * chars.length)];
-    }
-    codes.push(`MG-${partA}-${partB}`);
+    codes.push(`MG-${randomChars(BACKUP_CODE_ALPHABET, 4)}-${randomChars(BACKUP_CODE_ALPHABET, 4)}`);
   }
   return codes;
 }

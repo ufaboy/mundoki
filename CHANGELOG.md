@@ -15,6 +15,12 @@ Release notes describe user-facing and product impact — never include secrets,
 - The first topic of each secondary year is free: G08-01 (integers) for Grade 8 and G09-03 (linear relationship) for Grade 9. Other topics require Premium, and answers are checked on the server.
 - The previous space-themed Grade 8/9 units and the old linear-equations topic page were replaced by the new lessons.
 
+## [2.2.10] - 2026-11-18
+
+### Security
+- Hardened social sign-in: the sign-in window now hands its result only to Mundoki itself, and an account with two-step verification is no longer left signed in before the second step is completed.
+- Two-step verification recovery codes and authenticator secrets are now generated only with a cryptographically secure random generator.
+
 ## [2.2.9] - 2026-11-17
 
 ### Changed
