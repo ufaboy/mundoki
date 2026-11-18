@@ -1,0 +1,100 @@
+---
+// One checkable item of a secundaria lesson: prompt, equation, answer field(s) or four options,
+// one hint (a nudge, shown on request) and feedback. There is no worked solution here: the
+// lesson's worked example is the only one. The browser logic is in src/scripts/secondaryLesson.ts.
+import type { Locale } from '../../math/core/types';
+import type { SecondaryItem } from '../../content/secondary/model';
+import { renderLatexToHtml } from '../../lib/katexRender';
+import AtomoIcon from './AtomoIcon.astro';
+import SecondaryAnswerBox from './SecondaryAnswerBox.astro';
+
+interface Props {
+  locale: Locale;
+  item: SecondaryItem;
+  index: number;
+  typeLabel: string;
+  hintLabel: string;
+}
+
+const { locale, item, index, typeLabel, hintLabel } = Astro.props;
+const es = locale === 'es-AR';
+const id = `sec-item-${index}`;
+const kind = item.answer.kind;
+const pairLabels = item.labels ? item.labels.map((l) => l[locale]) : ['x', 'y'];
+const answerLabel = es ? 'Tu respuesta' : 'Your answer';
+const latex = item.latex;
+
+// Where the answer box goes, so the item reads as one line of mathematics:
+// - "blank": the expression has a \square → the box replaces it (−3(x − 5) = −3x + [ ]);
+// - "tail": a plain expression → "3 · 4 + 5 = [ ]";
+// - "unknown": the item's `unknown` letter, or the only letter of an equation → the equation, then "x = [ ]";
+// - otherwise the equation (if any), then "Your answer [ ]".
+const math = (tex: string) => renderLatexToHtml(tex, false);
+const blank = kind === 'number' && latex?.includes('\\square') ? latex.split('\\square') : null;
+const tail = kind === 'number' && !!latex && !blank && !latex.includes('=') && !latex.includes('\\quad');
+const letters = latex ? [...new Set(latex.replace(/\\[a-zA-Z]+/g, '').match(/[a-zA-Z]/g) ?? [])] : [];
+const guessed = !!latex && latex.includes('=') && letters.length === 1 ? letters[0] : null;
+const unknown = kind === 'number' && !blank ? (item.unknown ?? guessed) : null;
+const showMath = !!latex && !blank && !tail;
+const isLetter = (label: string) => /^[a-zA-Z]$/.test(label);
+// The / key appears only where the expected answer is written as a fraction.
+const slash = item.answer.kind === 'number' ? item.answer.value.includes('/')
+  : item.answer.kind === 'pair' ? `${item.answer.x}${item.answer.y}`.includes('/') : false;
+---
+
+<section class="mk-card sec-item" id={id} data-sec-item={index} data-kind={kind} aria-labelledby={`${id}-prompt`}>
+  <p class="mk-label sec-item__type">{typeLabel}</p>
+  <p class="mk-text sec-item__prompt" id={`${id}-prompt`}>{item.prompt[locale]}</p>
+  {showMath && <div class="sec-math" set:html={renderLatexToHtml(latex!, true)} />}
+
+  <form class="mk-stack mk-stack--tight" data-sec-form novalidate>
+    {kind === 'number' && (
+      <div class="sec-eq">
+        {blank ? (
+          <>
+            {blank[0].trim() && <span set:html={math(`${blank[0]}{}`)} />}
+            <SecondaryAnswerBox locale={locale} label={answerLabel} slash={slash} />
+            {blank[1]?.trim() && <span set:html={math(`{}${blank[1]}`)} />}
+          </>
+        ) : tail ? (
+          <>
+            <span set:html={math(`${latex} =`)} />
+            <SecondaryAnswerBox locale={locale} label={answerLabel} slash={slash} />
+          </>
+        ) : (
+          <label class="sec-eq__pair">
+            {unknown ? <span set:html={math(`${unknown} =`)} /> : <span class="sec-eq__word">{answerLabel}</span>}
+            <SecondaryAnswerBox locale={locale} label={unknown ? undefined : answerLabel} slash={slash} />
+          </label>
+        )}
+      </div>
+    )}
+    {kind === 'pair' && (
+      <div class="sec-eq">
+        {pairLabels.map((label) => (
+          <label class="sec-eq__pair">
+            {isLetter(label) ? <span set:html={math(`${label} =`)} /> : <span class="sec-eq__word">{label} =</span>}
+            <SecondaryAnswerBox locale={locale} slash={slash} maxlength={18} />
+          </label>
+        ))}
+      </div>
+    )}
+    {kind === 'choice' && item.options && (
+      <div class="mk-choices mk-choices--stack" role="group" aria-labelledby={`${id}-prompt`}>
+        {item.options.map((option, j) => (
+          <button type="button" class="mk-choice mk-choice--text" data-sec-choice={j} aria-pressed="false">{option[locale]}</button>
+        ))}
+      </div>
+    )}
+    <div class="mk-row sec-actions">
+      {kind !== 'choice' && <button type="submit" class="mk-btn mk-btn--primary">{es ? 'Comprobar' : 'Check'}</button>}
+      <button type="button" class="mk-btn" data-sec-hint aria-controls={`${id}-hint`} aria-expanded="false">
+        <AtomoIcon />
+        <span>{hintLabel}</span>
+      </button>
+    </div>
+  </form>
+
+  <p class="mk-feedback" data-sec-feedback role="status" aria-live="polite" hidden></p>
+  <p class="mk-text sec-hint" id={`${id}-hint`} data-sec-hint-text hidden>{item.hint[locale]}</p>
+</section>

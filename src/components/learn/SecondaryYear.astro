@@ -1,0 +1,130 @@
+---
+// Secundaria year page (Grades 8–12, exam-prep mode): calm header, the topics that already
+// have lessons, and the whole year from the plan. No world, no heroes.
+// Design: docs/secundaria-exam-prep-design.md.
+import type { Locale } from '../../math/core/types';
+import type { SecondaryCourse } from '../../content/secondary/model';
+import { buildSchoolLessonUrl } from '../../i18n/routes';
+import { GRADE_STORAGE_KEY } from '../../content/savedGrade';
+
+interface Props {
+  locale: Locale;
+  course: SecondaryCourse;
+}
+
+const { locale, course } = Astro.props;
+const es = locale === 'es-AR';
+const ready = new Set(course.packages.map((pack) => pack.id));
+const first = course.packages[0];
+const firstLesson = first.lessons[0];
+const boot = { key: GRADE_STORAGE_KEY, gradeId: course.gradeId };
+let lessonNumber = 0;
+---
+
+<div class="mk-stack mk-stack--loose sec-year">
+  <header class="mk-card sec-year__head mk-stack">
+    <p class="mk-label sec-year__label">{course.label[locale]}</p>
+    <h1 class="mk-display">{course.title[locale]}</h1>
+    <p class="mk-text">{course.intro[locale]}</p>
+    <div>
+      <a class="mk-btn mk-btn--primary" href={buildSchoolLessonUrl(locale, course.gradeId, firstLesson.id)}>
+        <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+        {es ? 'Empezar' : 'Start'}: {first.title[locale]}
+      </a>
+    </div>
+  </header>
+
+  <section class="mk-stack" aria-labelledby="sec-ready">
+    <h2 class="mk-title" id="sec-ready">{es ? 'Temas para estudiar' : 'Topics to study'}</h2>
+    {course.packages.map((pack, index) => (
+      <details class="mk-chapter" id={pack.id.toLowerCase()} open={index === 0}>
+        <summary>
+          <span class="mk-chapter__icon sec-year__code" aria-hidden="true">{pack.id.slice(4)}</span>
+          <span class="mk-chapter__title">
+            <span class="mk-label">
+              {pack.id} · {index === 0
+                ? <span class="mk-chip mk-chip--leaf">{es ? 'Gratis' : 'Free'}</span>
+                : <span class="mk-chip mk-chip--grape">Premium</span>}
+            </span>
+            <span class="mk-heading">{pack.title[locale]}</span>
+          </span>
+          <svg class="mk-icon mk-chapter__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </summary>
+        <p class="mk-text sec-year__goal">{pack.goal[locale]}</p>
+        <ol class="mk-missions">
+          {pack.lessons.map((lesson) => (
+            <li>
+              <a class="mk-mission" href={buildSchoolLessonUrl(locale, course.gradeId, lesson.id)}>
+                <span class="mk-mission__num" aria-hidden="true">{++lessonNumber}</span>
+                <span class="mk-mission__title">{lesson.title[locale]}</span>
+                <svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    ))}
+  </section>
+
+  <section class="mk-stack" aria-labelledby="sec-plan">
+    <h2 class="mk-title" id="sec-plan">{es ? 'El año completo' : 'The whole year'}</h2>
+    <p class="mk-text">{es ? 'Los temas del programa en orden. Vamos sumando lecciones tema por tema.' : 'The year’s topics in order. We are adding lessons topic by topic.'}</p>
+    <ol class="sec-plan">
+      {course.plan.map((row) => (
+        <li class:list={['sec-plan__row', { 'is-ready': ready.has(row.id) }]}>
+          <span class="sec-plan__code">{row.id}</span>
+          {ready.has(row.id)
+            ? <a href={`#${row.id.toLowerCase()}`}>{row.title[locale]}</a>
+            : <span>{row.title[locale]}</span>}
+          <span class:list={['mk-chip', ready.has(row.id) ? 'mk-chip--leaf' : '']}>{ready.has(row.id) ? (es ? 'Disponible' : 'Available') : (es ? 'Próximamente' : 'Coming soon')}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <details class="mk-card mk-card--sunk sec-year__family">
+    <summary class="mk-heading">{es ? 'Para la familia' : 'For families'}</summary>
+    <div class="mk-stack mk-stack--tight">
+      <p class="mk-text">{es
+        ? 'Cada lección dura entre 15 y 25 minutos: ejemplo resuelto, práctica con pistas y un control final. Las respuestas correctas se guardan en el progreso de la cuenta familiar y el servidor las vuelve a revisar.'
+        : 'Each lesson takes 15–25 minutes: a worked example, practice with hints, and an exit check. Correct answers are saved to the family account’s progress, and the server checks them again.'}</p>
+      <p class="mk-text">{es
+        ? 'El primer tema de cada año es gratis; los demás temas son parte de Premium.'
+        : 'The first topic of each year is free; the other topics are part of Premium.'}</p>
+    </div>
+  </details>
+</div>
+
+<script is:inline define:vars={{ boot }}>
+  // Remember this year so the home page can offer "continue".
+  try {
+    localStorage.setItem(boot.key, boot.gradeId);
+  } catch (error) {
+    // Storage blocked: nothing to remember.
+  }
+</script>
+
+<style>
+  .sec-year__label { color: var(--mk-grape-deep); }
+  .sec-year__code { font-size: var(--mk-text-body); font-weight: var(--mk-weight-display); color: var(--mk-grape-deep); }
+  /* Same side padding as the summary and the lesson list (.mk-chapter, .mk-missions). */
+  .sec-year__goal { margin: 0; padding: 0 var(--mk-s4) var(--mk-s1); color: var(--mk-ink-soft); }
+  .sec-plan { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--mk-s2); }
+  .sec-plan__row {
+    display: grid; grid-template-columns: auto 1fr; gap: var(--mk-s1) var(--mk-s3); align-items: center;
+    padding: var(--mk-s3) var(--mk-s4); border: var(--mk-border) solid var(--mk-line); border-radius: var(--mk-radius-sm);
+    background: var(--mk-surface); color: var(--mk-ink-soft);
+  }
+  .sec-plan__row > .mk-chip { grid-column: 2; justify-self: start; }
+  .sec-plan__row.is-ready { border-color: var(--mk-leaf); color: var(--mk-ink); }
+  .sec-plan__row a { color: var(--mk-sky-deep); font-weight: var(--mk-weight-strong); }
+  .sec-plan__row a:hover { color: var(--mk-ink); }
+  .sec-plan__code { font-weight: var(--mk-weight-strong); font-variant-numeric: tabular-nums; }
+  .sec-year__family > summary { cursor: pointer; }
+  .sec-year__family > summary:hover { color: var(--mk-sky-deep); }
+  .sec-year__family[open] > summary { margin-bottom: var(--mk-s3); }
+  @media (min-width: 48rem) {
+    .sec-plan__row { grid-template-columns: auto 1fr auto; }
+    .sec-plan__row > .mk-chip { grid-column: auto; justify-self: end; }
+  }
+</style>

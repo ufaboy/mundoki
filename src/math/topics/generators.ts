@@ -160,33 +160,6 @@ export const TOPICS_CATALOG: TopicMetadata[] = [
     estimatedMinutes: 9,
     rewardItemId: 'suit-quantum-vest',
   },
-  {
-    id: 'linear-equations',
-    stage: 'middle',
-    gradeId: 'grade-8',
-    gradeNumber: 8,
-    slugEs: 'ecuaciones-lineales',
-    slugEn: 'linear-equations',
-    title: {
-      'es-AR': 'Ecuaciones Lineales en Equilibrio',
-      'en-US': 'Linear Equations in Balance',
-    },
-    subtitle: {
-      'es-AR': 'Despejá la incógnita manteniendo los dos lados de la balanza iguales.',
-      'en-US': 'Isolate the unknown while keeping both sides of the scale balanced.',
-    },
-    planetName: {
-      'es-AR': 'Equilibria Prime',
-      'en-US': 'Equilibria Prime',
-    },
-    guardianName: {
-      'es-AR': 'Arquitecta Balanza',
-      'en-US': 'Architect Balance',
-    },
-    accessLevel: 'premium',
-    estimatedMinutes: 10,
-    rewardItemId: 'acc-math-visor',
-  },
 ];
 
 export function generateMathExercise(

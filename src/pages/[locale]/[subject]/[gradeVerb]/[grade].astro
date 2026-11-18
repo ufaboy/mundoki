@@ -11,6 +11,10 @@ import DayMap from '../../../../components/learn/DayMap.astro';
 import GradeHub from '../../../../components/learn/GradeHub.astro';
 import MascotSvg from '../../../../components/play/MascotSvg.astro';
 import { SCHOOL_COURSES } from '../../../../content/schoolCourses';
+import { getSecondaryCourse } from '../../../../content/secondary';
+import SecondaryYear from '../../../../components/learn/SecondaryYear.astro';
+import { TOPICS_CATALOG } from '../../../../math/topics/generators';
+import type { TopicId } from '../../../../math/core/types';
 import { t } from '../../../../i18n/translations';
 import { buildGradeUrl, buildLearnTopicUrl, buildTrainHubUrl, normalizeUrlLocale } from '../../../../i18n/routes';
 import { getBlockById, GRADES_CATALOG, resolveGradeFromSlug } from '../../../../math/curriculum';
@@ -74,7 +78,11 @@ const n = currentGrade.gradeNumber;
 // Pages already on the design system: grade 1 (a day with the hero), grade 3 (city world) and every grade
 // without a world of its own (secundaria), which share the topic template.
 // The other worlds still render their legacy pages until they are moved.
+const secondaryCourse = getSecondaryCourse(currentGrade.id);
 const onSystem = n === 1 || n === 3 || (n > 7 && !course);
+// Grades 10–12 have no lessons yet; their units link to a topic page only where one exists.
+const topicPage = (topicId: TopicId) => TOPICS_CATALOG.some((topic) => topic.id === topicId);
+const hubStart = topicPage(currentGrade.primaryTopicId) ? buildLearnTopicUrl(locale, currentGrade.primaryTopicId) : buildTrainHubUrl(locale);
 const gradeLabel = currentGrade.labelShort[locale].replace('.°', '.º');
 const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentGrade.summary[locale];
 ---
@@ -87,7 +95,7 @@ const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentG
   switchLocaleHref={switchHref}
   system={onSystem}
 >
-  {n === 1 ? <DayMap locale={locale} /> : n === 2 ? <QuestMap locale={locale} /> : n === 3 ? <HouseMap locale={locale} /> : n === 4 ? <IslandMap locale={locale} /> : n === 5 ? <MoonMap locale={locale} /> : n === 6 ? <RaceMap locale={locale} /> : n === 7 ? <DetectiveMap locale={locale} /> : course ? <SchoolCourseCatalog locale={locale} course={course} /> : (
+  {n === 1 ? <DayMap locale={locale} /> : n === 2 ? <QuestMap locale={locale} /> : n === 3 ? <HouseMap locale={locale} /> : n === 4 ? <IslandMap locale={locale} /> : n === 5 ? <MoonMap locale={locale} /> : n === 6 ? <RaceMap locale={locale} /> : n === 7 ? <DetectiveMap locale={locale} /> : course ? <SchoolCourseCatalog locale={locale} course={course} /> : secondaryCourse ? <SecondaryYear locale={locale} course={secondaryCourse} /> : (
     <GradeHub
       locale={locale}
       gradeId={currentGrade.id}
@@ -95,7 +103,7 @@ const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentG
       accent="var(--mk-grape)"
       title={gradeLabel}
       intro={gradeTheme}
-      startHref={buildLearnTopicUrl(locale, currentGrade.primaryTopicId)}
+      startHref={hubStart}
       startLabel={t(locale, 'gradeStart')}
     >
       <MascotSvg slot="art" mood="happy" size={180} idPrefix="grade-atomo" />
@@ -107,7 +115,7 @@ const gradeTheme = currentGrade.title[locale].split('·')[1]?.trim() || currentG
             {unit.accessLevel !== 'free' && <span class="mk-chip mk-chip--grape" style="align-self:flex-start;">{t(locale, 'badgePremium')}</span>}
           </div>
           <div class="mk-unit__actions">
-            <a class="mk-btn" href={buildLearnTopicUrl(locale, unit.linkedTopicId)}>{t(locale, 'gradeLearn')}</a>
+            {topicPage(unit.linkedTopicId) && <a class="mk-btn" href={buildLearnTopicUrl(locale, unit.linkedTopicId)}>{t(locale, 'gradeLearn')}</a>}
             <a class="mk-btn" href={buildTrainHubUrl(locale)}>
               <svg class="mk-icon mk-icon--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
               {t(locale, 'gradePractice')}

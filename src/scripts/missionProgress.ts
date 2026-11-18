@@ -99,6 +99,36 @@ export function recordPracticeAnswer(input: {
 }
 
 /**
+ * A secundaria lesson item answered correctly: `answer` is the typed text (a number,
+ * an "x;y" pair) or the chosen option index. The server re-checks it. Returns the
+ * star total, or null when this item was already counted in this browser.
+ */
+export function recordSecondaryAnswer(input: { lessonId: string; checkIndex: number; answer: string; topicId: TopicId }): number | null {
+  const key = `${input.lessonId}:${input.checkIndex}`;
+  const counted = readCounted();
+  if (counted.includes(key)) return null;
+  try {
+    window.localStorage.setItem(COUNTED_KEY, JSON.stringify([...counted, key]));
+  } catch {
+    // Storage blocked: count it for this visit anyway.
+  }
+  return record({
+    attemptId: newAttemptId(),
+    exerciseId: `mission-${input.lessonId}-c${input.checkIndex}`,
+    topicId: input.topicId,
+    seed: input.checkIndex,
+    difficulty: 1,
+    userAnswer: input.answer,
+    isCorrect: true,
+    timestamp: new Date().toISOString(),
+    syncedToServer: false,
+    source: 'mission',
+    lessonId: input.lessonId,
+    checkIndex: input.checkIndex,
+  });
+}
+
+/**
  * The mission's own question, answered correctly. Returns the star total, or
  * null when this question was already counted in this browser.
  */

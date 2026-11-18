@@ -10,7 +10,7 @@ import {
   jsonResponse,
   saveGameStateInStore,
 } from '../../../lib/db/d1Store';
-import { resolveMissionAttempt } from '../../../lib/server/missionAttempts';
+import { isSecondaryLessonId, resolveMissionAttempt } from '../../../lib/server/missionAttempts';
 import { isFreeLesson } from '../../../content/premiumAccess';
 import { getRuntimeEnv } from '../../../lib/server/runtimeEnv';
 import { TopicId } from '../../../math/core/types';
@@ -77,8 +77,11 @@ export const POST: APIRoute = async ({ request }) => {
     if (item.source === 'practice' || item.source === 'mission') {
       const resolved = resolveMissionAttempt(item, user.id);
       if (!resolved) continue;
-      const missionTopic = TOPICS_CATALOG.find((t) => t.id === resolved.topicId);
-      if (!missionTopic || (missionTopic.accessLevel === 'premium' && !isPremium)) continue;
+      // Secundaria lessons have no trainer topic: access is decided per lesson below.
+      if (!isSecondaryLessonId(resolved.lessonId)) {
+        const missionTopic = TOPICS_CATALOG.find((t) => t.id === resolved.topicId);
+        if (!missionTopic || (missionTopic.accessLevel === 'premium' && !isPremium)) continue;
+      }
       // Missions after a grade's first chapter need Premium (see content/premiumAccess.ts).
       if (resolved.source === 'mission' && resolved.lessonId && !isFreeLesson(resolved.lessonId) && !isPremium) continue;
 

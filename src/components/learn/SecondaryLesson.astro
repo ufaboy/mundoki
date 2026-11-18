@@ -1,0 +1,275 @@
+---
+// Secundaria lesson page (Grades 8–12, exam-prep mode). Calm layout on the design system,
+// lesson sizes of stage 3. Answers are typed or chosen; src/scripts/secondaryLesson.ts checks
+// them with the same rules as the server and records correct ones.
+// Design: docs/secundaria-exam-prep-design.md.
+import type { Locale } from '../../math/core/types';
+import type { SecondaryItem } from '../../content/secondary/model';
+import { findSecondaryLesson, lessonItems } from '../../content/secondary';
+import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
+import { renderLatexToHtml } from '../../lib/katexRender';
+import { SECONDARY_TOPIC } from '../../lib/server/missionAttempts';
+import SecondaryItemCard from './SecondaryItemCard.astro';
+import SolutionSteps from './SolutionSteps.astro';
+
+interface Props {
+  locale: Locale;
+  lessonId: string;
+}
+
+const { locale, lessonId } = Astro.props;
+const es = locale === 'es-AR';
+const ref = findSecondaryLesson(lessonId);
+if (!ref) throw new Error(`Unknown secundaria lesson: ${lessonId}`);
+const { course, pack, lesson, index, all } = ref;
+const previous = all[index - 1];
+const next = all[index + 1];
+const items = lessonItems(lesson);
+const practiceStart = 1;
+const exitIndex = items.length - 1;
+
+const math = (latex: string, display = true) => renderLatexToHtml(latex, display);
+const typeLabel: Record<SecondaryItem['type'], string> = es
+  ? { A: 'Reconocer', B: 'Resolver', C: 'Aplicar', D: 'Explicar' }
+  : { A: 'Recognise', B: 'Solve', C: 'Apply', D: 'Explain' };
+
+// What the browser needs to check answers: the same key the server uses, plus error notes.
+const client = {
+  lessonId: lesson.id,
+  topicId: SECONDARY_TOPIC,
+  items: items.map((item) => ({
+    answer: item.answer,
+    errors: (item.errors ?? []).map((e) => ({ value: e.value, note: e.note[locale] })),
+  })),
+  text: {
+    correct: es ? 'Correcto.' : 'Correct.',
+    retry: es ? 'Todavía no. Revisá el planteo o pedí una pista.' : 'Not yet. Check your setup or ask for a hint.',
+    invalid: es ? 'Escribí un número, por ejemplo −3, 5/2 o 2,5.' : 'Type a number, for example −3, 5/2, or 2.5.',
+    invalidPair: es ? 'Completá los dos valores con números.' : 'Fill in both values with numbers.',
+    hint: es ? 'Pista' : 'Hint',
+    done: es ? 'resueltos' : 'solved',
+    balanceRemove: es ? 'Quitar 1 de cada lado' : 'Remove 1 from each side',
+    balanceSplit: es ? 'Repartir en grupos iguales' : 'Split into equal groups',
+    balanceNext: es ? 'Otra balanza' : 'Another balance',
+    balanceDone: es ? 'Listo: cada caja vale' : 'Done: each box is worth',
+    balanceNeedUnits: es ? 'Primero quitá las unidades sueltas de la izquierda.' : 'First remove the loose units on the left.',
+    balanceNowSplit: es ? 'Ya no quedan sueltas a la izquierda: ahora repartí en grupos iguales.' : 'No loose units are left on the left: now split into equal groups.',
+    left: es ? 'Izquierda' : 'Left',
+    right: es ? 'Derecha' : 'Right',
+    same: es ? 'Los dos lados dan lo mismo: es solución.' : 'Both sides match: it is a solution.',
+    different: es ? 'Los lados no coinciden: no es solución.' : 'The sides do not match: it is not a solution.',
+    slope: es ? 'Pendiente' : 'Slope',
+    intercept: es ? 'Ordenada al origen' : 'y-intercept',
+    cross: es ? 'Se cortan en' : 'They cross at',
+    parallel: es ? 'Misma pendiente y distinta ordenada: paralelas, sin solución.' : 'Same slope, different intercept: parallel, no solution.',
+    same_line: es ? 'Es la misma recta: infinitas soluciones.' : 'It is the same line: infinitely many solutions.',
+    decimal: es ? ',' : '.',
+    lineIntercept: es ? 'Corta el eje y en y =' : 'It crosses the y-axis at y =',
+    lineSlope: es ? 'Por cada 1 que avanza x, y cambia' : 'For each 1 that x moves right, y changes by',
+    hypotenuse: es ? 'Hipotenusa' : 'Hypotenuse',
+  },
+};
+
+const explorer = lesson.explorer;
+const chainBack = explorer?.kind === 'chain' ? explorer : null;
+---
+
+<article class="mk-lesson sec-lesson mk-stack mk-stack--loose" data-stage="3" data-sec-lesson>
+  <nav class="mk-row mk-row--between sec-lesson__nav" aria-label={es ? 'Navegación de la lección' : 'Lesson navigation'}>
+    <a class="mk-btn mk-btn--quiet" href={`${buildGradeUrl(locale, course.gradeId)}#${pack.id.toLowerCase()}`}>← {course.label[locale].split('·')[0].trim()}</a>
+    <span class="mk-chip">{es ? 'Lección' : 'Lesson'} {index + 1} / {all.length} · 15–25 min</span>
+  </nav>
+
+  <header class="mk-stack mk-stack--tight">
+    <p class="mk-label sec-lesson__kicker">{pack.id} · {pack.title[locale]}</p>
+    <h1 class="mk-display">{lesson.title[locale]}</h1>
+    <p class="mk-text"><strong>{es ? 'Objetivo:' : 'Goal:'}</strong> {lesson.objective[locale]}</p>
+    <div class="sec-progress" aria-hidden="true"><ol class="mk-steps">{items.map(() => <li data-sec-step />)}</ol></div>
+    <p class="sec-progress__text" data-sec-count aria-live="polite">0 / {items.length} {client.text.done}</p>
+  </header>
+
+  <section class="mk-stack" aria-labelledby="sec-ready-title">
+    <h2 class="mk-title" id="sec-ready-title">{es ? 'Antes de empezar' : 'Before you start'}</h2>
+    <SecondaryItemCard locale={locale} item={items[0]} index={0} typeLabel={typeLabel[items[0].type]} hintLabel={client.text.hint} />
+
+  </section>
+
+  <section class="mk-card mk-stack" aria-labelledby="sec-situation">
+    <h2 class="mk-title" id="sec-situation">{es ? 'La situación' : 'The situation'}</h2>
+    <p class="mk-text">{lesson.situation[locale]}</p>
+  </section>
+
+  {explorer && (
+    <section class="mk-card mk-stack" aria-labelledby="sec-explore">
+      <h2 class="mk-title" id="sec-explore">{es ? 'Explorá' : 'Explore'}</h2>
+      {lesson.explorerNote && <p class="mk-text">{lesson.explorerNote[locale]}</p>}
+      {explorer.kind === 'balance' && (
+        <div class="sec-explorer" data-explorer="balance" data-examples={JSON.stringify(explorer.examples)}>
+          <p class="sec-explorer__eq" data-balance-eq aria-live="polite"></p>
+          <div class="sec-balance" data-balance-view></div>
+          <div class="mk-row sec-explorer__tools">
+            <button type="button" class="mk-btn" data-balance-remove>{client.text.balanceRemove}</button>
+            <button type="button" class="mk-btn" data-balance-split>{client.text.balanceSplit}</button>
+            <button type="button" class="mk-btn mk-btn--quiet" data-balance-next>{client.text.balanceNext}</button>
+          </div>
+          <p class="sec-explorer__status" data-balance-status role="status"></p>
+        </div>
+      )}
+      {chainBack && (
+        <div class="sec-explorer" data-explorer="chain">
+          <ol class="sec-chain" aria-label={es ? 'Cadena de ida' : 'Forward chain'}>
+            <li class="sec-chain__value">{chainBack.start}</li>
+            {chainBack.ops.map((op) => <li class="sec-chain__op">{op.forward[locale]}</li>)}
+            <li class="sec-chain__value">{chainBack.result}</li>
+          </ol>
+          <ol class="sec-chain sec-chain--back" aria-label={es ? 'Cadena de vuelta' : 'Backward chain'}>
+            <li class="sec-chain__value">{chainBack.result}</li>
+            {[...chainBack.ops].reverse().map((op, i) => (
+              <>
+                <li class="sec-chain__op" data-chain-step={i} hidden>{op.inverse[locale]}</li>
+                <li class="sec-chain__value" data-chain-step={i} hidden>{chainBack.back[i]}</li>
+              </>
+            ))}
+          </ol>
+          <div class="mk-row sec-explorer__tools">
+            <button type="button" class="mk-btn" data-chain-undo>{es ? 'Deshacer un paso' : 'Undo one step'}</button>
+            <button type="button" class="mk-btn mk-btn--quiet" data-chain-reset>{es ? 'Empezar de nuevo' : 'Start again'}</button>
+          </div>
+        </div>
+      )}
+      {explorer.kind === 'substitute' && (
+        <div class="sec-explorer" data-explorer="substitute" data-left={JSON.stringify(explorer.left)} data-right={JSON.stringify(explorer.right)}>
+          <div class="sec-math" set:html={math(explorer.latex)} />
+          <label class="mk-field sec-explorer__field">
+            <span>{es ? 'Valor de x' : 'Value of x'}</span>
+            <input class="mk-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" maxlength="12" data-sub-input />
+          </label>
+          <div class="mk-row sec-explorer__tools">
+            {explorer.tries.map((value) => <button type="button" class="mk-btn" data-sub-try={String(value)}>x = {es ? String(value).replace('.', ',') : String(value)}</button>)}
+          </div>
+          <p class="sec-explorer__status" data-sub-status role="status" aria-live="polite"></p>
+        </div>
+      )}
+      {explorer.kind === 'lines' && (
+        <div class="sec-explorer" data-explorer="lines" data-fixed={JSON.stringify(explorer.fixed)} data-start={JSON.stringify(explorer.start)}
+          data-xlabel={explorer.xLabel?.[locale] ?? 'x'} data-ylabel={explorer.yLabel?.[locale] ?? 'y'}>
+          <div class="sec-lines" data-lines-view></div>
+          <div class="sec-lines__controls">
+            <label class="mk-field"><span>{client.text.slope}: <output data-lines-m></output></span><input type="range" min="-3" max="3" step="0.5" data-lines-slope /></label>
+            <label class="mk-field"><span>{client.text.intercept}: <output data-lines-b></output></span><input type="range" min="-6" max="6" step="1" data-lines-intercept /></label>
+          </div>
+          <p class="sec-explorer__eq" data-lines-eq></p>
+          <p class="sec-explorer__status" data-lines-status role="status" aria-live="polite"></p>
+        </div>
+      )}
+      {explorer.kind === 'numberline' && (
+        <div class="sec-explorer" data-explorer="numberline" data-start={JSON.stringify(explorer.start)}>
+          <div class="sec-lines" data-nl-view></div>
+          <div class="sec-lines__controls">
+            <label class="mk-field"><span>{es ? 'Punto de partida' : 'Starting point'}: <output data-nl-a></output></span><input type="range" min="-10" max="10" step="1" data-nl-start /></label>
+            <label class="mk-field"><span>{es ? 'Desplazamiento' : 'Move'}: <output data-nl-b></output></span><input type="range" min="-10" max="10" step="1" data-nl-move /></label>
+          </div>
+          <p class="sec-explorer__eq" data-nl-eq aria-live="polite"></p>
+        </div>
+      )}
+      {explorer.kind === 'triangle' && (
+        <div class="sec-explorer" data-explorer="triangle" data-start={JSON.stringify(explorer.start)}>
+          <div class="sec-lines sec-triangle" data-tri-view></div>
+          <div class="sec-lines__controls">
+            <label class="mk-field"><span>{es ? 'Cateto' : 'Leg'} a: <output data-tri-a></output></span><input type="range" min="1" max="10" step="1" data-tri-leg-a /></label>
+            <label class="mk-field"><span>{es ? 'Cateto' : 'Leg'} b: <output data-tri-b></output></span><input type="range" min="1" max="10" step="1" data-tri-leg-b /></label>
+          </div>
+          <p class="sec-explorer__eq" data-tri-eq aria-live="polite"></p>
+          <p class="sec-explorer__status" data-tri-status role="status"></p>
+        </div>
+      )}
+      <noscript><p class="mk-text">{es ? 'Activá JavaScript para usar el modelo interactivo.' : 'Enable JavaScript to use the interactive model.'}</p></noscript>
+    </section>
+  )}
+
+  <section class="mk-card mk-stack" aria-labelledby="sec-worked">
+    <h2 class="mk-title" id="sec-worked">{es ? 'Ejemplo resuelto' : 'Worked example'}: {lesson.worked.title[locale]}</h2>
+    <SolutionSteps locale={locale} steps={lesson.worked.steps} />
+  </section>
+
+  <section class="mk-card mk-card--sun mk-stack mk-stack--tight" aria-labelledby="sec-mistake">
+    <h2 class="mk-title" id="sec-mistake">{es ? 'Error frecuente' : 'Common mistake'}</h2>
+    <p class="mk-text"><strong>✗</strong> {lesson.mistake.wrong[locale]}</p>
+    <p class="mk-text"><strong>✓</strong> {lesson.mistake.right[locale]}</p>
+  </section>
+
+  <section class="mk-stack" aria-labelledby="sec-practice">
+    <h2 class="mk-title" id="sec-practice">{es ? 'Práctica' : 'Practice'}</h2>
+    <p class="mk-text">{es ? 'Cada ejercicio tiene una pista por si te trabás. Si no sale, volvé al ejemplo resuelto de arriba.' : 'Each exercise has one hint in case you get stuck. If it still does not work out, go back to the worked example above.'}</p>
+    {items.slice(practiceStart, exitIndex).map((item, i) => (
+      <SecondaryItemCard locale={locale} item={item} index={practiceStart + i} typeLabel={typeLabel[item.type]} hintLabel={client.text.hint} />
+    ))}
+  </section>
+
+  <section class="mk-stack" aria-labelledby="sec-exit">
+    <h2 class="mk-title" id="sec-exit">{es ? 'Control final' : 'Exit check'}</h2>
+    <SecondaryItemCard locale={locale} item={items[exitIndex]} index={exitIndex} typeLabel={typeLabel[items[exitIndex].type]} hintLabel={client.text.hint} />
+  </section>
+
+  <nav class="mk-row mk-row--between sec-lesson__next" aria-label={es ? 'Seguir' : 'Keep going'}>
+    {previous ? <a class="mk-btn" href={buildSchoolLessonUrl(locale, course.gradeId, previous.id)}>← {previous.title[locale]}</a> : <span />}
+    {next
+      ? <a class="mk-btn mk-btn--primary" href={buildSchoolLessonUrl(locale, course.gradeId, next.id)}>{next.title[locale]} →</a>
+      : <a class="mk-btn mk-btn--primary" href={buildGradeUrl(locale, course.gradeId)}>{es ? 'Volver al año' : 'Back to the year'} →</a>}
+  </nav>
+
+  <script type="application/json" data-sec-data set:html={JSON.stringify(client).replace(/</g, '\\u003c')} />
+</article>
+
+<script>import '../../scripts/secondaryLesson';</script>
+
+<style>
+  .sec-lesson { max-width: 46rem; margin-inline: auto; width: 100%; }
+  .sec-lesson__kicker { color: var(--mk-grape-deep); }
+  .sec-lesson__next { flex-wrap: wrap; gap: var(--mk-s3); }
+  .sec-progress__text { margin: 0; font-size: var(--mk-text-label); color: var(--mk-ink-soft); }
+  .sec-lesson :global(.sec-math) { overflow-x: auto; padding: var(--mk-s2) 0; font-size: 1.15em; }
+  .sec-lesson :global(.sec-steps) { margin: 0; padding-left: 1.4em; display: grid; gap: var(--mk-s3); }
+  .sec-lesson :global(.sec-steps .sec-math) { padding: var(--mk-s1) 0 0; }
+  .sec-lesson :global(.sec-item) { display: grid; gap: var(--mk-s3); }
+  .sec-lesson :global(.sec-item.is-solved) { border-color: var(--mk-leaf); }
+  .sec-lesson :global(.sec-item__type) { color: var(--mk-ink-soft); }
+  .sec-lesson :global(.sec-item__prompt) { margin: 0; font-weight: var(--mk-weight-strong); }
+  .sec-lesson :global(.sec-item > .sec-math) { padding-bottom: 0; margin-bottom: calc(-1 * var(--mk-s2)); }
+  .sec-lesson :global(.sec-eq) { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--mk-s2) var(--mk-s4); font-size: 1.15em; }
+  .sec-lesson :global(.sec-eq__pair) { display: inline-flex; align-items: center; gap: var(--mk-s2); }
+  .sec-lesson :global(.sec-eq__word) { font-size: var(--mk-text-body); font-weight: var(--mk-weight-strong); }
+  .sec-lesson :global(.sec-eq__input) { width: clamp(4em, 20vw, 6.5em); min-width: 0; text-align: center; font-size: inherit; font-variant-numeric: tabular-nums; }
+  /* Answer box: the input plus small ± and / keys for the phone's number keypad, which has neither. */
+  .sec-lesson :global(.sec-box) { display: inline-flex; align-items: center; gap: var(--mk-s1); }
+  .sec-lesson :global(.sec-box__key) {
+    min-width: 2.75rem; min-height: 2.75rem; padding: 0 var(--mk-s2);
+    border: 2px solid var(--mk-line-strong); border-radius: var(--mk-radius-sm);
+    background: var(--mk-surface); color: var(--mk-ink); font: inherit; font-size: var(--mk-text-body); font-weight: var(--mk-weight-strong);
+    cursor: pointer;
+  }
+  .sec-lesson :global(.sec-box__key:focus-visible) { outline: 3px solid var(--mk-sky); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) { .sec-lesson :global(.sec-box__key) { display: none; } }
+  .sec-lesson :global(.sec-actions) { flex-wrap: wrap; gap: var(--mk-s3); }
+  .sec-lesson :global(.sec-hint) { margin: 0; padding: var(--mk-s3); border-radius: var(--mk-radius-sm); background: var(--mk-sky-tint); }
+  .sec-lesson :global(.sec-atomo) { width: 1.5em; height: 1.5em; flex: none; }
+  .sec-lesson :global([hidden]) { display: none !important; }
+
+  .sec-explorer { display: grid; gap: var(--mk-s3); }
+  .sec-explorer__eq { margin: 0; font-size: var(--mk-text-title); font-weight: var(--mk-weight-display); text-align: center; font-variant-numeric: tabular-nums; }
+  .sec-explorer__status { margin: 0; min-height: 1.5em; font-weight: var(--mk-weight-strong); text-align: center; }
+  .sec-explorer__tools { flex-wrap: wrap; gap: var(--mk-s3); justify-content: center; }
+  .sec-explorer__field { max-width: 14rem; margin-inline: auto; }
+  .sec-balance :global(svg), .sec-lines :global(svg) { display: block; width: 100%; height: auto; }
+  .sec-lines__controls { display: grid; gap: var(--mk-s3); }
+  .sec-triangle { max-width: 26rem; margin-inline: auto; width: 100%; }
+  .sec-lines__controls input[type='range'] { width: 100%; min-height: 44px; accent-color: var(--mk-sky); }
+  @media (min-width: 48rem) { .sec-lines__controls { grid-template-columns: 1fr 1fr; } }
+
+  .sec-chain { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--mk-s2); }
+  .sec-chain__value { min-width: 3rem; padding: var(--mk-s2) var(--mk-s3); border: var(--mk-border) solid var(--mk-line-strong); border-radius: var(--mk-radius-sm); text-align: center; font-weight: var(--mk-weight-display); font-size: var(--mk-text-title); background: var(--mk-surface); }
+  .sec-chain__op { font-weight: var(--mk-weight-strong); color: var(--mk-sky-deep); }
+  .sec-chain__op::before { content: '→ '; color: var(--mk-ink-soft); }
+  .sec-chain--back .sec-chain__value { border-color: var(--mk-leaf); }
+  .sec-chain--back .sec-chain__op { color: var(--mk-leaf-deep); }
+</style>

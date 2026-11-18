@@ -18,6 +18,7 @@ import {
   SCHOOL_BLOCKS,
 } from '../math/curriculum';
 import { generateMathExercise, TOPICS_CATALOG } from '../math/topics/generators';
+import { getSecondaryCourse } from '../content/secondary';
 
 export interface TestCaseResult {
   id: string;
@@ -238,7 +239,10 @@ export function runAllVerificationTests(): {
   const primaryGrades = getGradesByBlock('primary');
   const middleGrades = getGradesByBlock('middle');
   const highGrades = getGradesByBlock('high');
-  const allGradesHaveLessons = GRADES_CATALOG.every((g) => g.lessons.length > 0);
+  // Grades 8–9 keep their lessons in the secundaria exam-prep courses (content/secondary).
+  const allGradesHaveLessons = GRADES_CATALOG.every(
+    (g) => g.lessons.length > 0 || (getSecondaryCourse(g.id)?.packages.length ?? 0) > 0
+  );
   const sampleEsUrl = buildGradeUrl('es-AR', 'grade-1');
   const sampleEnUrl = buildGradeUrl('en-US', 'grade-7');
 

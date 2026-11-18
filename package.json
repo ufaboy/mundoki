@@ -16,7 +16,7 @@
     "db:migrate:local": "wrangler d1 migrations apply mundoki-d1 --local",
     "db:migrate:remote": "wrangler d1 migrations apply mundoki-d1 --remote",
     "db:migrate:staging": "wrangler d1 migrations apply mundoki-d1-test --remote --env staging",
-    "test": "tsx src/tests/runCliTests.ts && tsx src/tests/securityRegression.ts && tsx src/tests/promoSuite.ts && tsx src/tests/practiceGenerators.ts && tsx src/tests/missionProgress.ts && tsx src/tests/skillGamesSuite.ts && tsx src/tests/premiumAccessSuite.ts",
+    "test": "tsx src/tests/runCliTests.ts && tsx src/tests/securityRegression.ts && tsx src/tests/promoSuite.ts && tsx src/tests/practiceGenerators.ts && tsx src/tests/missionProgress.ts && tsx src/tests/skillGamesSuite.ts && tsx src/tests/premiumAccessSuite.ts && tsx src/tests/secondarySuite.ts",
     "clean": "rm -rf dist .astro",
     "lint": "tsc --noEmit",
     "promo:deploy:check": "wrangler deploy --config wrangler.promo.jsonc --dry-run",

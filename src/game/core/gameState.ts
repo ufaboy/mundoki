@@ -264,7 +264,8 @@ export interface AttemptRecord {
    * Where the answer was given. Absent: the "Jugar" trainer.
    * "practice": a generated "new numbers" exercise inside a mission (`skill` + `seed`).
    * "mission": the mission's own authored question (`lessonId` + `checkIndex`).
-   * For both, `userAnswer` is the index of the chosen option.
+   * For both, `userAnswer` is the index of the chosen option — except secundaria lessons
+   * (G08–G12 ids), where it is the typed answer: a number or an "x;y" pair.
    */
   source?: 'practice' | 'mission';
   skill?: string;

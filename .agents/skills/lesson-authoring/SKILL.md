@@ -9,6 +9,10 @@ metadata:
 
 Use this skill when creating, rewriting, auditing, or reviewing lesson content or its game narrative. Read `AGENTS.md` and `docs/lesson-creation-plan.md` for project constraints, course scope, and grade expectations. Use the matching grade skill when one exists (`.agents/skills/grade-1-lesson-authoring/`, `.agents/skills/grade-2-lesson-authoring/`, `.agents/skills/grade-3-lesson-authoring/` — the grade skills also hold their story maps); for other grades take age, vocabulary, and number ranges from the plan and from neighboring lessons.
 
+## Secundaria (Grades 8–12) is different
+
+Secundaria uses the **exam-prep mode** (`docs/secundaria-exam-prep-design.md`), not story missions: no child heroes, no world, no rewards; Átomo appears only as the hint-button icon. Lessons live in `src/content/secondary/` (model in `model.ts`) and follow readiness check → situation → explorer → worked example → common mistake → practice (types A–D, typed answers or four options, one hint that nudges but never contains the computation or the result, no worked solution inside exercises, typical errors with a short note) → exit check. Contexts are realistic and age-appropriate (phone plans, transport, savings), written in a direct, respectful tone with voseo in es-AR. The story rules below apply to Grades 1–7 only. `src/tests/secondarySuite.ts` checks the content rules.
+
 ## The core rule
 
 In a story mission, **the challenge is the plot step.** A learner answers a challenge because a character needs that answer to decide or do something; the answer then changes the scene.

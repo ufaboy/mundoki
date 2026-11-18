@@ -1,10 +1,12 @@
-// What is free and what needs Premium (decided 2026-11-17):
+// What is free and what needs Premium (decided 2026-11-17; secundaria 2026-11-18):
 //   free     the first chapter (package) of every grade, training games on level 1
-//   Premium  every other mission of grades 1–7, game levels 2 and 3
+//   Premium  every other mission of grades 1–7, game levels 2 and 3,
+//            every secundaria package after the first one of its year (content/secondary)
 // Server-only: it reads the course catalogue, which must never reach client bundles.
 // Client code uses LOCKED_LESSON_PATH in src/lib/access/lockedLessonPath.ts instead;
 // premiumAccessSuite.ts keeps the two in step.
 import { SCHOOL_COURSES } from './schoolCourses';
+import { isFreeSecondaryLesson } from './secondary';
 
 export const FREE_SKILL_LEVEL = 1;
 
@@ -17,6 +19,7 @@ const LESSON_PACKAGE = new Map<string, string>(
 
 /** True for missions of a grade's first chapter. Unknown ids are treated as locked. */
 export function isFreeLesson(lessonId: string): boolean {
+  if (isFreeSecondaryLesson(lessonId)) return true;
   const packageId = LESSON_PACKAGE.get(lessonId);
   return packageId !== undefined && FREE_PACKAGES.has(packageId);
 }

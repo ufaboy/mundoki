@@ -154,34 +154,6 @@ const { topicId, locale } = Astro.props;
       ></svg>
     </div>
   )}
-
-  {topicId === 'linear-equations' && (
-    <div class="stack-md">
-      <div class="flex-between">
-        <strong id="eq-step-caption" class="text-sm">
-          {locale === 'es-AR' ? 'Estado inicial en equilibrio: 2x + 3 = 11' : 'Initial balanced equation: 2x + 3 = 11'}
-        </strong>
-        <div class="flex-row">
-          <button type="button" class="btn btn-primary btn-sm" data-eq-step="0">
-            1) 2x + 3 = 11
-          </button>
-          <button type="button" class="btn btn-outline btn-sm" data-eq-step="1">
-            {locale === 'es-AR' ? '2) Restar 3 (−3)' : '2) Subtract 3 (−3)'}
-          </button>
-          <button type="button" class="btn btn-outline btn-sm" data-eq-step="2">
-            {locale === 'es-AR' ? '3) Dividir ÷ 2 (x = 4)' : '3) Divide ÷ 2 (x = 4)'}
-          </button>
-        </div>
-      </div>
-      <svg
-        id="eq-svg"
-        viewBox="0 0 620 195"
-        style="width:100%;height:auto;background:#fff;border:1px solid var(--border-subtle);border-radius:8px;"
-        role="img"
-        aria-label="2x + 3 = 11"
-      ></svg>
-    </div>
-  )}
 </div>
 
 <script>

@@ -294,85 +294,6 @@ export function initInteractiveDiagrams(): void {
       inputTotal.addEventListener('input', render);
       render();
     }
-
-    if (topicId === 'linear-equations') {
-      const svg = document.getElementById('eq-svg');
-      const caption = document.getElementById('eq-step-caption');
-      const stepBtns = container.querySelectorAll<HTMLButtonElement>('[data-eq-step]');
-      if (!svg) return;
-
-      let step = 0;
-      const render = () => {
-        if (caption) {
-          if (step === 0) {
-            caption.textContent =
-              locale === 'es-AR'
-                ? 'Estado inicial en equilibrio: 2x + 3 = 11'
-                : 'Initial balanced equation: 2x + 3 = 11';
-          } else if (step === 1) {
-            caption.textContent =
-              locale === 'es-AR'
-                ? 'Paso 1: Quitamos 3 pesas de AMBOS platillos → 2x = 8'
-                : 'Step 1: Removed 3 unit weights from BOTH pans → 2x = 8';
-          } else {
-            caption.textContent =
-              locale === 'es-AR'
-                ? 'Paso 2: Dividimos por 2 en AMBOS platillos → x = 4'
-                : 'Step 2: Divided BOTH pans by 2 → x = 4';
-          }
-        }
-
-        stepBtns.forEach((b) => {
-          const isCurrent = Number(b.dataset.eqStep) === step;
-          b.className = isCurrent ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
-        });
-
-        let parts = `
-          <polygon points="285,180 335,180 310,125" fill="#475569" />
-          <line x1="120" y1="125" x2="500" y2="125" stroke="#0F172A" stroke-width="5" />
-          <line x1="170" y1="125" x2="170" y2="105" stroke="#475569" stroke-width="3" />
-          <rect x="95" y="100" width="150" height="8" rx="3" fill="#0284C7" />
-          <line x1="450" y1="125" x2="450" y2="105" stroke="#475569" stroke-width="3" />
-          <rect x="375" y="100" width="150" height="8" rx="3" fill="#059669" />
-        `;
-
-        const boxCount = step === 2 ? 1 : 2;
-        for (let i = 0; i < boxCount; i++) {
-          parts += `<g transform="translate(${110 + i * 44}, 62)">
-            <rect width="36" height="36" rx="5" fill="#0284C7" />
-            <text x="18" y="23" text-anchor="middle" font-size="15" fill="#FFFFFF" font-weight="700" font-family="monospace">x</text>
-          </g>`;
-        }
-
-        if (step === 0) {
-          for (let i = 0; i < 3; i++) {
-            parts += `<circle cx="${208 + i * 14}" cy="88" r="6" fill="#D97706" />`;
-          }
-        }
-
-        const rightWeights = step === 0 ? 11 : step === 1 ? 8 : 4;
-        for (let i = 0; i < rightWeights; i++) {
-          const col = i % 4;
-          const row = Math.floor(i / 4);
-          parts += `<g transform="translate(${395 + col * 28}, ${82 - row * 22})">
-            <circle cx="10" cy="10" r="8" fill="#059669" />
-            <text x="10" y="13" text-anchor="middle" font-size="9" fill="#FFFFFF" font-family="monospace">1</text>
-          </g>`;
-        }
-
-        const eqText = step === 0 ? '2x + 3 = 11' : step === 1 ? '2x = 8' : 'x = 4';
-        parts += `<text x="310" y="32" text-anchor="middle" font-size="16" fill="#0F172A" font-weight="700" font-family="monospace">${eqText}</text>`;
-        svg.innerHTML = parts;
-      };
-
-      stepBtns.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          step = Number(btn.dataset.eqStep) || 0;
-          render();
-        });
-      });
-      render();
-    }
   });
 
   // Initialize Quick Check cards on Lesson pages
@@ -404,7 +325,7 @@ export function initInteractiveDiagrams(): void {
   const masterclassBox = document.getElementById('masterclass-result-box');
   if (masterclassBtn && masterclassBox) {
     masterclassBtn.addEventListener('click', async () => {
-      const topicId = masterclassBtn.dataset.topicId || 'linear-equations';
+      const topicId = masterclassBtn.dataset.topicId || 'percentages-proportions';
       const locale = masterclassBtn.dataset.locale || 'es-AR';
       const token = window.localStorage.getItem('mundoki_token') || '';
       masterclassBox.style.display = 'block';
