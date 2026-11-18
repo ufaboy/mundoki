@@ -131,10 +131,13 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const url = new URL(request.url);
-  const topicId = (url.searchParams.get('topicId') as TopicId) || 'percentages-proportions';
+  const requested = url.searchParams.get('topicId') ?? '';
   const locale: Locale = url.searchParams.get('locale') === 'en-US' ? 'en-US' : 'es-AR';
-  const masterclass =
-    SERVER_PROTECTED_MASTERCLASS[topicId] || SERVER_PROTECTED_MASTERCLASS['percentages-proportions']!;
+  // Own keys only: "constructor" or "__proto__" must fall back, not reach Object.prototype.
+  const topicId: TopicId = Object.hasOwn(SERVER_PROTECTED_MASTERCLASS, requested)
+    ? (requested as TopicId)
+    : 'percentages-proportions';
+  const masterclass = SERVER_PROTECTED_MASTERCLASS[topicId]!;
 
   return jsonResponse({
     entitled: true,

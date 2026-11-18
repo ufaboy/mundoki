@@ -36,7 +36,9 @@ export interface ResolvedMissionAttempt {
  * Results bucket for secundaria lessons (Grades 8–12). It reuses the old linear-equations
  * topic id (a row in the D1 `topics` table, so no migration is needed); that trainer topic
  * is gone, so the bucket holds secundaria answers only, and applyExerciseOutcome gives
- * them no guardian or topic-cosmetic rewards.
+ * them no world rewards (ships, guardians, outfits, planets).
+ * A dedicated topic id would need a `topics` row first: every progress save upserts
+ * user_progress for each topic, so deploying it before the migration would break saving.
  */
 export const SECONDARY_TOPIC: TopicId = 'linear-equations';
 
@@ -48,7 +50,8 @@ export function resolveMissionAttempt(item: Record<string, unknown>, userId: str
   if (item.source === 'mission' && isSecondaryLessonId(item.lessonId)) {
     const lessonId = String(item.lessonId).toUpperCase();
     const checkIndex = Number(item.checkIndex);
-    if (!Number.isInteger(checkIndex) || checkIndex < 0 || checkIndex > 20 || answerText.length > MAX_SECONDARY_ANSWER) return null;
+    if (answerText.length > MAX_SECONDARY_ANSWER) return null;
+    // Bounds come from the lesson itself: an index without an item resolves to null.
     const secondary = findSecondaryItem(lessonId, checkIndex);
     if (!secondary) return null;
     const verdict = checkSecondaryAnswer(secondary.answer, answerText);

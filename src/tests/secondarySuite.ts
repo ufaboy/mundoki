@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { checkSecondaryAnswer, matchesValue } from '../math/core/secondaryAnswer';
+import { checkSecondaryAnswer, matchesValue, readsAsNumber } from '../math/core/secondaryAnswer';
+import { applyExerciseOutcome, INITIAL_GAME_STATE, PLANET_DESTINATIONS, VEHICLE_TIERS, type AttemptRecord } from '../game/core/gameState';
 import { SECONDARY_COURSES, findSecondaryItem, findSecondaryLesson, isFreeSecondaryLesson, lessonItems } from '../content/secondary';
 import { isFreeLesson } from '../content/premiumAccess';
 import { buildSchoolLessonUrl } from '../i18n/routes';
@@ -28,6 +29,9 @@ assert.equal(checkSecondaryAnswer(n('250'), '0,250'), 'incorrect', 'a leading 0 
 assert.equal(checkSecondaryAnswer(n('6200'), '6,20'), 'incorrect', 'groups have three digits');
 assert.equal(checkSecondaryAnswer(n('6200'), '6.200,5'), 'invalid', 'mixed separators are not read');
 assert.equal(checkSecondaryAnswer({ kind: 'pair', x: '1500', y: '2' }, '1.500;2'), 'correct', 'pairs read groups too');
+assert.equal(checkSecondaryAnswer({ kind: 'pair', x: '1500000', y: '2' }, '1.500.000;2'), 'correct', 'pairs read several groups');
+assert.equal(checkSecondaryAnswer({ kind: 'pair', x: '1', y: '2' }, ';2'), 'invalid', 'an empty box makes the pair invalid');
+assert.ok(readsAsNumber('1.500.000') && readsAsNumber('−2,5') && !readsAsNumber('dos') && !readsAsNumber(''), 'readsAsNumber follows the checker');
 assert.equal(checkSecondaryAnswer(n('7'), 'siete'), 'invalid');
 assert.equal(checkSecondaryAnswer(n('7'), '3+4'), 'invalid', 'expressions are not evaluated');
 assert.equal(checkSecondaryAnswer(n('7'), '1/0'), 'invalid');
@@ -180,6 +184,7 @@ result = await post([
   answer('s-text', 'G08-07-L01', 3, 'siete'),
   answer('s-unknown', 'G09-01-L01', 0, '1'),
   answer('s-past', 'G08-07-L01', 99, '1'),
+  answer('s-negative', 'G08-07-L01', -1, '1'),
 ]);
 assert.equal(result.gameState.totalSolved, 5);
 assert.deepEqual(result.syncedAttemptIds, []);
@@ -189,5 +194,20 @@ assert.deepEqual(result.syncedAttemptIds, []);
 assert.equal(result.gameState.topicMastery['linear-equations'].solved, 5);
 assert.equal(result.gameState.topicMastery['linear-equations'].guardianDefeated, false, 'no planet guardian for secundaria');
 assert.ok(!result.gameState.unlockedCosmetics.includes('acc-math-visor'), 'no topic cosmetic for secundaria');
+
+// No world rewards for secundaria: an answer that would unlock a planet, an outfit and a
+// new ship for a Grade 1–7 child unlocks none of them for a secundaria student.
+{
+  const planet = PLANET_DESTINATIONS.find((p) => p.requiredSolvedCount > 0)!;
+  const tier = VEHICLE_TIERS.find((t) => t.requiredEnergy > 0)!;
+  const edge = { ...INITIAL_GAME_STATE, totalSolved: planet.requiredSolvedCount - 1, stars: 999, energy: tier.requiredEnergy - 1, unlockedCosmetics: [], unlockedPlanets: [] };
+  const base: AttemptRecord = { attemptId: 'w', exerciseId: 'w', topicId: 'linear-equations', seed: 0, difficulty: 1, userAnswer: '1', isCorrect: true, timestamp: '', syncedToServer: true, source: 'mission', checkIndex: 0 };
+  const kinds = (lessonId: string) => applyExerciseOutcome(edge, { ...base, lessonId }, true).events.map((e) => e.type);
+  const kid = kinds('G03-02-L01');
+  assert.ok(kid.includes('PLANET_UNLOCKED') && kid.includes('OUTFIT_UNLOCKED') && kid.includes('VEHICLE_UPGRADED'), 'the edge state does unlock world rewards for a child');
+  const teen = kinds('G08-07-L01');
+  assert.deepEqual(teen.filter((t) => t !== 'ENERGY_EARNED'), [], 'secundaria earns no planet, outfit, ship or guardian');
+  assert.equal(applyExerciseOutcome(edge, { ...base, lessonId: 'G08-07-L01' }, true).nextState.stars, 1000, 'but still earns a star');
+}
 
 console.log(`PASS [Secundaria] ${ids.size} lessons, ${itemCount} items: answer checker, content rules, free first package, typed/pair/choice answers re-checked on the server once each`);

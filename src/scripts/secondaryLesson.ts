@@ -4,7 +4,7 @@
 // a correct one is recorded and re-checked by POST /api/progress/sync.
 
 import type { TopicId } from '../math/core/types';
-import { checkSecondaryAnswer, joinPair, matchesValue, readRational, type SecondaryAnswerSpec } from '../math/core/secondaryAnswer';
+import { checkSecondaryAnswer, joinPair, matchesValue, readRational, readsAsNumber, type SecondaryAnswerSpec } from '../math/core/secondaryAnswer';
 import { formatRational, normalizeRational } from '../math/core/fraction';
 import { readCounted, recordSecondaryAnswer } from './missionProgress';
 
@@ -59,7 +59,7 @@ function init(lesson: HTMLElement, data: ClientData) {
     const settle = (answer: string, verdictText?: string) => {
       const verdict = checkSecondaryAnswer(spec.answer, answer);
       if (verdict === 'invalid') {
-        inputs.forEach((input) => input.setAttribute('aria-invalid', String(!readRational(input.value))));
+        inputs.forEach((input) => input.setAttribute('aria-invalid', String(!readsAsNumber(input.value))));
         say('hint', verdictText ?? (spec.answer.kind === 'pair' ? T.invalidPair : T.invalid));
         return;
       }
@@ -78,14 +78,8 @@ function init(lesson: HTMLElement, data: ClientData) {
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       if (spec.answer.kind === 'number') settle(inputs[0]?.value ?? '');
-      else if (spec.answer.kind === 'pair') {
-        const [x, y] = inputs.map((input) => input.value);
-        if (!readRational(x ?? '') || !readRational(y ?? '')) {
-          settle('');
-          return;
-        }
-        settle(joinPair(x, y));
-      }
+      // An empty or unreadable box makes the pair 'invalid' in checkSecondaryAnswer itself.
+      else if (spec.answer.kind === 'pair') settle(joinPair(inputs[0]?.value ?? '', inputs[1]?.value ?? ''));
     });
 
     choices.forEach((button) => {

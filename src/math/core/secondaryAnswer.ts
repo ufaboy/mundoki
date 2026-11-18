@@ -46,6 +46,11 @@ function readings(raw: string): Rational[] {
   return [readRational(raw), whole].filter((r): r is Rational => r !== null);
 }
 
+/** True when the text reads as a number under the same rules as the check (grouped ones too). */
+export function readsAsNumber(raw: string): boolean {
+  return readings(raw).length > 0;
+}
+
 const same = (a: Rational, b: Rational) => a.numerator === b.numerator && a.denominator === b.denominator;
 const matches = (given: Rational[], expected: Rational) => given.some((g) => same(g, expected));
 

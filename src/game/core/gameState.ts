@@ -368,19 +368,19 @@ export function applyExerciseOutcome(
 
   events.push({ type: 'ENERGY_EARNED', amount: energyGain });
 
+  // Secundaria answers earn stars and energy, but no world rewards (ships, guardians,
+  // outfits, planets): teens have no world (docs/secundaria-exam-prep-design.md).
+  const worldRewards = !(attempt.lessonId && SECONDARY_LESSON_ID.test(attempt.lessonId));
+
   // Check vehicle tier upgrades
-  for (const tier of VEHICLE_TIERS) {
+  for (const tier of worldRewards ? VEHICLE_TIERS : []) {
     if (prevState.energy < tier.requiredEnergy && newEnergy >= tier.requiredEnergy) {
       events.push({ type: 'VEHICLE_UPGRADED', shipId: tier.id });
     }
   }
 
-  // Secundaria answers earn stars and energy, but no topic rewards: teens have no world,
-  // and their results bucket is not a trainer topic (docs/secundaria-exam-prep-design.md).
-  const topicRewards = !(attempt.lessonId && SECONDARY_LESSON_ID.test(attempt.lessonId));
-
   // Check guardian completion (3 correct answers in a topic defeats the topic's friendly guardian)
-  const guardianDefeatedNow = topicRewards && !prevTopic.guardianDefeated && newTopicSolved >= 3;
+  const guardianDefeatedNow = worldRewards && !prevTopic.guardianDefeated && newTopicSolved >= 3;
   if (guardianDefeatedNow) {
     events.push({ type: 'GUARDIAN_OVERCOME', topicId: attempt.topicId });
   }
@@ -388,10 +388,9 @@ export function applyExerciseOutcome(
   // Check cosmetic unlocks
   const unlockedCosmetics = [...prevState.unlockedCosmetics];
   const equippedCosmetics = { ...prevState.equippedCosmetics };
-  for (const item of COSMETIC_CATALOG) {
+  for (const item of worldRewards ? COSMETIC_CATALOG : []) {
     if (item.premiumOnly && !isPremiumEntitled) continue;
-    const topicSolvedOk =
-      topicRewards && item.requiredTopic === attempt.topicId && newTopicSolved >= 3;
+    const topicSolvedOk = item.requiredTopic === attempt.topicId && newTopicSolved >= 3;
     const starsOk = newStars >= item.requiredStars;
     if ((topicSolvedOk || starsOk) && !unlockedCosmetics.includes(item.id)) {
       unlockedCosmetics.push(item.id);
@@ -404,7 +403,7 @@ export function applyExerciseOutcome(
 
   // Check planet destination unlocks
   const unlockedPlanets = [...prevState.unlockedPlanets];
-  for (const planet of PLANET_DESTINATIONS) {
+  for (const planet of worldRewards ? PLANET_DESTINATIONS : []) {
     if (
       newTotalSolved >= planet.requiredSolvedCount &&
       !unlockedPlanets.includes(planet.id)

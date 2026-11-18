@@ -14,6 +14,8 @@ Release notes describe user-facing and product impact — never include secrets,
 ### Changed
 - The first topic of each secondary year is free: G08-01 (integers) for Grade 8 and G09-03 (linear relationship) for Grade 9. Other topics require Premium, and answers are checked on the server.
 - The previous space-themed Grade 8/9 units and the old linear-equations topic page were replaced by the new lessons.
+- Secondary answers earn stars but no rewards from the children's game world (ships, planets, outfits, guardians).
+- On a shared device, each signed-in account now keeps its own list of solved questions, so a second student's correct answers are counted too.
 
 ## [2.2.10] - 2026-11-18
 
