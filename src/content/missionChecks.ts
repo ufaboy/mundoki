@@ -7,8 +7,9 @@ import { GRADES_CATALOG } from '../math/curriculum';
 import { SCHOOL_COURSES } from './schoolCourses';
 
 export interface MissionCheckKey {
-  /** Index of the right option. */
+  /** Index of the right option, or the expected number when `input` is 'number'. */
   answer: number;
+  input?: 'number';
   /** Results bucket: the grade's main topic. */
   topicId: TopicId;
 }
@@ -20,10 +21,10 @@ export function findMissionCheck(lessonId: string, checkIndex: number): MissionC
     if (!lesson) continue;
     const check = lesson.checks?.[checkIndex];
     const grade = GRADES_CATALOG.find((item) => item.id === course.gradeId);
-    // Typed-number checks (Grade 2) keep the expected number in `answer`, not an
-    // option index, and are not reported to the server.
-    if (!check || !grade || check.input === 'number') return null;
-    return { answer: check.answer, topicId: grade.primaryTopicId };
+    // Typed-number checks keep the expected number in `answer`, not an option index.
+    // Grade 3 reports them; Grade 2 pages do not report answers at all.
+    if (!check || !grade) return null;
+    return { answer: check.answer, topicId: grade.primaryTopicId, ...(check.input === 'number' ? { input: 'number' as const } : {}) };
   }
   return null;
 }

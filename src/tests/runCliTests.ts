@@ -11,10 +11,12 @@ import { runAllVerificationTests } from './mathEngineSuite.ts';
 import { runGradeOneTests } from './gradeOneSuite.ts';
 import { runGradeTwoTests } from './gradeTwoSuite.ts';
 import { runHouseAdventureTests } from './houseAdventureSuite.ts';
+import { runGradeThreeTests } from './gradeThreeSuite.ts';
 
 runGradeOneTests();
 runGradeTwoTests();
 runHouseAdventureTests();
+runGradeThreeTests();
 runIslandAdventureTests();
 runMoonAdventureTests();
 runRaceAdventureTests();

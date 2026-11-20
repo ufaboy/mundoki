@@ -1,13 +1,15 @@
 ---
 // Grade 3 mission page: the hero builds a house for the family. Story header,
-// house scene (one piece per correct answer), worked example, two challenges,
-// and the housewarming epilogue after the last mission. Story texts may name
+// house scene (one piece per correct answer), worked example, two challenges
+// (each with generated versions shown after a wrong answer, see
+// content/grade3/variants), and the housewarming epilogue after the last mission. Story texts may name
 // the chosen hero ({name}), so they render through HeroText.
 // Class and data-city-* names are shared with the other primary worlds' styles.
 import type { Locale } from '../../math/core/types';
 import { GRADE_THREE_LESSONS, GRADE_THREE_PROJECT } from '../../content/grade3';
 import { GRADE_THREE_ASSESSMENTS } from '../../content/grade3/assessments';
 import { getGradeThreeHints } from '../../content/grade3/hints';
+import { gradeThreeVariants } from '../../content/grade3/variants';
 import { HOUSE_MISSIONS, HOUSE_EPILOGUE, HOUSE_PIECES, houseChapterAt } from '../../content/grade3/houseStory';
 import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
 import HouseScene from './HouseScene.astro';
@@ -15,9 +17,7 @@ import HouseChoices from './HouseChoices.astro';
 import GradeOneChecks from './GradeOneChecks.astro';
 import UpperPrimaryLab from './UpperPrimaryLab.astro';
 import HeroText from '../shared/HeroText.astro';
-import { MISSION_PRACTICE, MISSION_PRACTICE_CHECK } from '../../math/practice/generators';
 import { GRADES_CATALOG } from '../../math/curriculum';
-import { t } from '../../i18n/translations';
 const {locale,lessonId}=Astro.props as {locale:Locale;lessonId:string};
 const es=locale==='es-AR';
 const index=GRADE_THREE_LESSONS.findIndex(l=>l.id===lessonId);
@@ -27,7 +27,16 @@ const hints=getGradeThreeHints(lesson.id);
 const chapter=houseChapterAt(index);
 const next=GRADE_THREE_LESSONS[index+1];
 const lastInPackage=!next||next.packageId!==lesson.packageId;
-const practiceSkill=MISSION_PRACTICE[lesson.id];
+// After a wrong answer the page shows the next version of the challenge: new numbers
+// (and, in "why" questions, another right answer). Version 0 is the authored challenge
+// (seed 0); the server rebuilds any other version from its seed to check the answer.
+const VERSIONS=4;
+const pageSeed=1+Math.floor(Math.random()*(2**31-2));
+// Mission 1, challenge 1 shows a tap-a-digit model of the bricks; 3528 is the authored number.
+const versions=lesson.checks.map((check,i)=>[
+ {...check,hint:hints[i],reward:mission.rewards[i],seed:0,model:index===0&&i===0?3528:undefined},
+ ...gradeThreeVariants(lesson.id,i,check.prompt['en-US'],VERSIONS,pageSeed+i*104729).map(v=>({...v,reward:v.reward??mission.rewards[i],model:index===0&&i===0?v.model:undefined})),
+]);
 // Results bucket for this grade's mission answers (see missionProgress.ts).
 const topicId=GRADES_CATALOG.find(grade=>grade.id==='grade-3')!.primaryTopicId;
 const placeLabels=es?['Palés de 1.000','Pilas de 100','Paquetes de 10','Sueltos']:['Pallets of 1,000','Stacks of 100','Packs of 10','Loose'];
@@ -46,9 +55,17 @@ const placeLabels=es?['Palés de 1.000','Pilas de 100','Paquetes de 10','Sueltos
  <span class="mk-ui mk-chip mk-chip--sun mk-mission-stars" data-mission-stars hidden><span aria-hidden="true">★</span> <span data-mission-stars-value></span></span>
  <p>{es?'Ahora te toca. Leé la pregunta y probá.':'Now it’s your turn. Read the question and try it.'}</p>
  {lesson.packageId==='G03-09' && <figure class="city-question-map"><figcaption>{lesson.scene.caption[locale]}</figcaption><table aria-label={es?'Plano para estos desafíos':'Map for these challenges'}><tbody>{lesson.scene.items.map(row=><tr>{row.split(' ').map(cell=><td>{cell}</td>)}</tr>)}</tbody></table></figure>}
- {lesson.checks.map((check,i)=><div data-city-question={i} hidden={i!==0} data-answer={check.answer} data-practice-skill={i===MISSION_PRACTICE_CHECK?practiceSkill:undefined}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / 2</p><h2 tabindex="-1" data-city-question-title>{check.prompt[locale]}</h2>
- {index===0 && i===0 && <div class="city-place-model"><p>{es?'Tocá una cifra para ver cuántos ladrillos vale.':'Tap a digit to see how many bricks it is worth.'}</p><div>{[3,5,2,8].map((digit,j)=><button type="button" data-city-place={`${digit} × ${[1000,100,10,1][j]} = ${digit*[1000,100,10,1][j]}`} aria-pressed="false"><span>{placeLabels[j]}</span><strong>{digit}</strong></button>)}</div><p data-city-place-result role="status" aria-live="polite"></p></div>}
- <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option,j)=><button type="button" data-city-answer={j}>{option[locale]}</button>)}</div>{i===MISSION_PRACTICE_CHECK&&practiceSkill&&<button type="button" class="mk-ui mk-btn mk-new-numbers" data-city-new-numbers><svg class="mk-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M17 4l3 3-3 3M17 14l3 3-3 3"/></svg>{t(locale,'practiceNew')}</button>}<p class="city-hint" data-city-hint hidden>{hints[i][locale]}</p><p class="city-hint" data-city-explanation hidden>{check.explanation[locale]}</p></div>)}
+ {lesson.checks.map((check,i)=><div data-city-question={i} hidden={i!==0}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / 2</p>
+ {versions[i].map((variant,k)=><div data-city-variant={k} data-answer={variant.answer} data-input={variant.input??'choice'} data-seed={variant.seed} hidden={k!==0}>
+  <h2 tabindex="-1" data-city-question-title>{variant.prompt[locale]}</h2>
+  {variant.model!==undefined && <div class="city-place-model"><p>{es?'Tocá una cifra para ver cuántos ladrillos vale.':'Tap a digit to see how many bricks it is worth.'}</p><div>{String(variant.model).padStart(4,'0').split('').map(Number).map((digit,j)=><button type="button" data-city-place={`${digit} × ${[1000,100,10,1][j]} = ${digit*[1000,100,10,1][j]}`} aria-pressed="false"><span>{placeLabels[j]}</span><strong>{digit}</strong></button>)}</div><p data-city-place-result role="status" aria-live="polite"></p></div>}
+  {variant.input==='number'
+   ? <form class="road-entry" data-city-entry autocomplete="off"><label class="road-entry-field"><span class="visually-hidden">{es?'Tu respuesta':'Your answer'}</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" data-city-entry-input aria-describedby={variant.unit?`city-unit-${i}-${k}`:undefined}/>{variant.unit&&<span id={`city-unit-${i}-${k}`}>{variant.unit[locale]}</span>}</label>
+     <div class="road-keypad" aria-label={es?'Teclado de números':'Number pad'}>{['1','2','3','4','5','6','7','8','9'].map(d=><button type="button" data-city-key={d}>{d}</button>)}<button type="button" data-city-key="back" aria-label={es?'Borrar':'Delete'}>⌫</button><button type="button" data-city-key="0">0</button><button type="submit" class="road-keypad-ok">{es?'Listo':'Done'}</button></div></form>
+   : <div class="city-answer-options" role="group" aria-label={variant.prompt[locale]}>{variant.options.map((option,j)=><button type="button" data-city-answer={j}>{option[locale]}</button>)}</div>}
+  <p class="city-hint" data-city-hint hidden>{variant.hint[locale]}</p><p class="city-hint" data-city-explanation hidden>{variant.explanation[locale]}</p><div data-city-reward-source hidden><HeroText text={variant.reward[locale]} /></div>
+ </div>)}
+ </div>)}
  <p class="city-feedback" data-city-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-city-help>{es?'Una pista de Átomo':'A hint from Átomo'}</button><button type="button" class="city-secondary" data-city-reset>{es?'Volver a jugar':'Play again'}</button><button type="button" class="city-primary" data-city-next hidden>{es?'Siguiente desafío':'Next challenge'} →</button><a class="city-primary" data-city-finish hidden href={next?buildSchoolLessonUrl(locale,'grade-3',next.id):'#city-celebration'}>{next?(es?'Siguiente misión':'Next mission'):(es?'¡A la fiesta!':'Let’s celebrate!')} →</a></div>
  </section>
  {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es?'Un desafío extra: cinco preguntas':'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_THREE_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-city-check`} assessment/></div></details>}

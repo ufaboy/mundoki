@@ -58,7 +58,7 @@ export function runUpperPrimaryTests() {
   }
   const checks=[...course.lessons.flatMap(l=>l.checks),...Object.values(course.assessments).flat()];
   assert.equal(checks.length,152);
-  for(const check of checks){assert(Number.isInteger(check.answer)&&check.answer>=0&&check.answer<check.options.length);for(const locale of ['es-AR','en-US'] as const)assert.equal(new Set(check.options.map(o=>o[locale])).size,check.options.length);}
+  for(const check of checks){if(check.input==='number'){assert(Number.isInteger(check.answer)&&check.answer>=0&&check.options.length===0);continue;}assert(Number.isInteger(check.answer)&&check.answer>=0&&check.answer<check.options.length);for(const locale of ['es-AR','en-US'] as const)assert.equal(new Set(check.options.map(o=>o[locale])).size,check.options.length);}
  }
  for(const d of [2,4,8])for(let n=0;n<=d;n++){const f=fractionModel(n,d);assert.equal(f.eighths/8,n/d);assert(Number.isInteger(f.eighths));}
  for(let a=10;a<=49;a++)for(let b=2;b<=29;b++){const p=areaProduct(a,b);assert.equal(p.parts.reduce((s,n)=>s+n,0),a*b);assert.equal(p.tensA+p.onesA,a);assert.equal(p.tensB+p.onesB,b);}

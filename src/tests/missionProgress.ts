@@ -13,6 +13,7 @@ const store = await import('../lib/db/d1Store');
 const { POST: sync } = await import('../pages/api/progress/sync');
 const { generatePractice } = await import('../math/practice/generators');
 const { findMissionCheck } = await import('../content/missionChecks');
+const { gradeThreeVariant } = await import('../content/grade3/variants');
 
 const db = store.loadDb();
 for (const id of ['u1', 'u2']) {
@@ -76,10 +77,11 @@ assert.deepEqual(result.syncedAttemptIds, []);
 const lessonId = 'G03-01-L02'; // first chapter: free
 const key = findMissionCheck(lessonId, 0);
 assert.ok(key, 'grade 3 mission must be in the answer key');
-const mission = (attemptId: string, optionIndex: number) => ({
-  attemptId, source: 'mission', lessonId, checkIndex: 0, userAnswer: String(optionIndex), isCorrect: true,
+assert.equal(key.input, 'number', 'grade 3 number answers are typed');
+const mission = (attemptId: string, answer: number) => ({
+  attemptId, source: 'mission', lessonId, checkIndex: 0, userAnswer: String(answer), isCorrect: true,
 });
-result = await post([mission('m-wrong', 1 - key.answer)]);
+result = await post([mission('m-wrong', key.answer + 1)]);
 assert.equal(result.gameState.totalSolved, 2, 'a wrong mission answer must not count');
 assert.equal(result.gameState.totalAttempts, 3, 'a wrong mission answer is not recorded as an attempt');
 result = await post([mission('m-right', key.answer)]);
@@ -116,4 +118,22 @@ assert.equal(result.gameState.totalSolved, 4, 'with Premium the same mission cou
 result = await post([{ attemptId: `mission:u1:G03-03-L01:0`, topicId: 'addition-subtraction', seed: 5, difficulty: 1, userAnswer: '0' }], 'u2');
 assert.deepEqual(result.syncedAttemptIds, []);
 
-console.log('PASS [Mission progress] forged flag rejected, generated and authored answers verified on the server, one credit per exercise per child, malformed payloads ignored');
+// A Grade 3 version shown after a wrong answer is rebuilt on the server from its seed;
+// it counts for the same mission question (once), and a forged answer does not.
+const variantLesson = 'G03-01-L01'; // first chapter: free
+const variant = gradeThreeVariant(variantLesson, 0, 4242);
+const versionAttempt = (attemptId: string, answer: number, variantSeed: unknown = 4242) => ({
+  attemptId, source: 'mission', lessonId: variantLesson, checkIndex: 0, userAnswer: String(answer), variantSeed, isCorrect: true,
+});
+const before = (await post([], 'u2')).gameState.totalSolved;
+result = await post([versionAttempt('v-wrong', variant.answer + 1)], 'u2');
+assert.equal(result.gameState.totalSolved, before, 'a wrong answer to a version does not count');
+result = await post([versionAttempt('v-bad-seed', variant.answer, -5), versionAttempt('v-huge-seed', variant.answer, 2 ** 40)], 'u2');
+assert.equal(result.gameState.totalSolved, before, 'out-of-range version seeds are refused');
+assert.deepEqual(result.syncedAttemptIds, []);
+result = await post([versionAttempt('v-right', variant.answer)], 'u2');
+assert.equal(result.gameState.totalSolved, before + 1, 'the right answer to a version counts');
+result = await post([versionAttempt('v-again', variant.answer), { ...versionAttempt('v-authored', 500), variantSeed: undefined }], 'u2');
+assert.equal(result.gameState.totalSolved, before + 1, 'a mission question counts once, whichever version was solved');
+
+console.log('PASS [Mission progress] forged flag rejected, generated, authored and Grade 3 version answers verified on the server, one credit per exercise per child, malformed payloads ignored');

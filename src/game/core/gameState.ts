@@ -265,12 +265,15 @@ export interface AttemptRecord {
    * "practice": a generated "new numbers" exercise inside a mission (`skill` + `seed`).
    * "mission": the mission's own authored question (`lessonId` + `checkIndex`).
    * For both, `userAnswer` is the index of the chosen option — except secundaria lessons
-   * (G08–G12 ids), where it is the typed answer: a number or an "x;y" pair.
+   * (G08–G12 ids), where it is the typed answer: a number or an "x;y" pair, and Grade 3
+   * typed challenges, where it is the typed number.
    */
   source?: 'practice' | 'mission';
   skill?: string;
   lessonId?: string;
   checkIndex?: number;
+  /** Grade 3: the generated version of the challenge that was shown (absent: the authored one). */
+  variantSeed?: number;
 }
 
 export interface PlayerGameState {

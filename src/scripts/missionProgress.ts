@@ -161,21 +161,26 @@ export function recordSecondaryAnswer(input: { lessonId: string; checkIndex: num
 /**
  * The mission's own question, answered correctly. Returns the star total, or
  * null when this question was already counted in this browser.
+ * `optionIndex` is the chosen option; Grade 3 sends `answer` instead (an option
+ * index or a typed number) and, for a generated version, its `variantSeed`.
  */
 export function recordMissionCheck(input: {
   lessonId: string;
   checkIndex: number;
-  optionIndex: number;
+  optionIndex?: number;
+  answer?: string;
+  variantSeed?: number;
   topicId: TopicId;
 }): number | null {
   if (!markCounted(input.lessonId, input.checkIndex)) return null;
   return record({
     attemptId: newAttemptId(),
-    exerciseId: `mission-${input.lessonId}-c${input.checkIndex}`,
+    exerciseId: `mission-${input.lessonId}-c${input.checkIndex}${input.variantSeed ? `-v${input.variantSeed}` : ''}`,
     topicId: input.topicId,
     seed: input.checkIndex,
     difficulty: 1,
-    userAnswer: String(input.optionIndex),
+    userAnswer: input.answer ?? String(input.optionIndex),
+    ...(input.variantSeed ? { variantSeed: input.variantSeed } : {}),
     isCorrect: true,
     timestamp: new Date().toISOString(),
     syncedToServer: false,

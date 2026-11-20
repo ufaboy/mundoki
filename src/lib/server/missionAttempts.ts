@@ -1,7 +1,9 @@
 // Server-side check of answers given inside a mission, for POST /api/progress/sync.
 // Two kinds arrive from the client:
 //   source "practice"  a generated "new numbers" exercise — re-created here from (skill, seed)
-//   source "mission"   the mission's own authored question — looked up in the answer key
+//   source "mission"   the mission's own question — looked up in the answer key, or, for a
+//                      Grade 3 version shown after a wrong answer, re-created from
+//                      (lesson, check, variantSeed)
 // Nothing the client says about correctness is used.
 
 import type { TopicId } from '../../math/core/types';
@@ -10,6 +12,7 @@ import { findSecondaryItem } from '../../content/secondary';
 import { checkSecondaryAnswer, MAX_SECONDARY_ANSWER } from '../../math/core/secondaryAnswer';
 import { SECONDARY_LESSON_ID } from '../../game/core/gameState';
 import { generatePractice, isPracticeSkill, PRACTICE_TOPIC } from '../../math/practice/generators';
+import { GRADE_THREE_GENERATORS, gradeThreeVariant, MAX_VARIANT_SEED } from '../../content/grade3/variants';
 
 /** Secundaria lesson ids: G08-07-L01 … G12-xx-Lxx. */
 export function isSecondaryLessonId(value: unknown): boolean {
@@ -68,10 +71,9 @@ export function resolveMissionAttempt(item: Record<string, unknown>, userId: str
     };
   }
 
-  if (!/^\d$/.test(answerText)) return null;
-  const answer = Number(answerText);
-
   if (item.source === 'practice') {
+    if (!/^\d$/.test(answerText)) return null;
+    const answer = Number(answerText);
     const skill = item.skill;
     const seed = Number(item.seed);
     if (!isPracticeSkill(skill) || !Number.isSafeInteger(seed) || seed <= 0 || answer > 2) return null;
@@ -93,12 +95,27 @@ export function resolveMissionAttempt(item: Record<string, unknown>, userId: str
     if (!/^[A-Za-z0-9-]{3,32}$/.test(lessonId) || !Number.isInteger(checkIndex) || checkIndex < 0 || checkIndex > 20) return null;
     const key = findMissionCheck(lessonId, checkIndex);
     if (!key) return null;
+    // A Grade 3 version shown after a wrong answer: rebuild it from its seed.
+    let expected = { answer: key.answer, input: key.input };
+    const variantSeed = item.variantSeed === undefined || item.variantSeed === null ? 0 : Number(item.variantSeed);
+    if (!Number.isSafeInteger(variantSeed) || variantSeed < 0 || variantSeed >= MAX_VARIANT_SEED) return null;
+    if (variantSeed > 0) {
+      if (!GRADE_THREE_GENERATORS[lessonId]?.[checkIndex]) return null;
+      try {
+        const variant = gradeThreeVariant(lessonId, checkIndex, variantSeed);
+        expected = { answer: variant.answer, input: variant.input };
+      } catch {
+        return null;
+      }
+    }
+    // A typed number (up to 10,000) or a single option index.
+    if (!(expected.input === 'number' ? /^\d{1,5}$/ : /^\d$/).test(answerText)) return null;
     return {
       source: 'mission',
-      isCorrect: answer === key.answer,
+      isCorrect: Number(answerText) === expected.answer,
       topicId: key.topicId,
-      exerciseId: `mission-${lessonId}-c${checkIndex}`,
-      seed: checkIndex,
+      exerciseId: `mission-${lessonId}-c${checkIndex}${variantSeed ? `-v${variantSeed}` : ''}`,
+      seed: variantSeed || checkIndex,
       creditId: `mission:${userId}:${lessonId}:${checkIndex}`,
       lessonId,
       checkIndex,

@@ -3,6 +3,17 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.5.0] - 2026-11-20
+
+### Changed
+- Grade 3 challenges can no longer be passed by pressing every button in turn. Answers that are a number (up to 10,000) are typed on a large number pad, and every other question offers three or four options built from typical mistakes, reshuffled on each attempt.
+- After a wrong answer in a Grade 3 mission, the buttons pause briefly, Rosa writes the problem again with other numbers, and a new version of the challenge appears with Átomo's hint already open. Each version keeps the same skill and building-site object, and in "why" questions the right option changes too. A house piece is added only for a correct answer.
+- The five-question checks at the end of each Grade 3 unit also use typed numbers and three or four options.
+- Stars for Grade 3 missions count each challenge once, whichever version was solved, and the answer is re-checked on the server.
+
+### Fixed
+- The "Your answer" label next to typed answers is now read by screen readers only instead of appearing on the page (Grades 2 and 3).
+
 ## [2.4.0] - 2026-11-20
 
 ### Changed

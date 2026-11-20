@@ -13,7 +13,11 @@ Use this skill together with `.agents/skills/lesson-authoring/SKILL.md` (core ru
 
 - The child is 8–9, reads alone but may use read-aloud. Grade 2 gave place value to 1,000, mental addition and subtraction, and first meanings of multiplication and division. Grade 3 builds numbers to 10,000, written algorithms, multiplication facts and one-digit multiplication, division with remainders, strategies, plans, shapes and solids, length and mass, time, and data.
 - Visible model first: bricks in **pallets of 1,000, stacks of 100, packs of 10, loose bricks** (es-AR: palé, pila, paquete, sueltos); brick walls as rows × columns; equal rows of roof tiles; tables of boxes.
-- Two answer options per challenge (`check()` in `src/content/lessonModel.ts`); the wrong option shows a typical error (digit instead of its value, forgotten carry, smaller-from-larger subtraction, adding instead of multiplying, ignoring the remainder, confusing units).
+- No two-option challenges: a child can pass them by pressing both buttons. Build Grade 3 challenges with `src/content/grade3/checks.ts`:
+  - `entry(prompt, value, explanation, unit?)` when the answer is a number (whole numbers to 10,000) — the child types it on a number pad; the explanation must show the number;
+  - `choice(prompt, correct, [wrong, wrong(, wrong)], explanation)` otherwise — 3–4 options, each wrong one a typical error (digit instead of its value, forgotten carry, smaller-from-larger subtraction, adding instead of multiplying, ignoring the remainder, confusing units). The page reshuffles the options on every attempt. No wrong option may be true in its own right.
+- Every mission challenge has a **generator** in `src/content/grade3/variants/` (one file per building stage, builders in `kit.ts`). The mission page renders the authored challenge plus four generated versions; after a wrong answer the buttons pause, Rosa “writes the problem again with other numbers”, and the next version appears with its own hint open. A generator keeps the skill and the site object and changes the numbers; in “why” and “what does it count” questions it must also change **which** option is right (another number, a true and a false case, another context), so remembering a wrong button never helps. Each version brings its own `hint`, an explanation that shows a typed answer, and its own `reward` when the mission reward names the authored numbers. Versions use the same numbers in both languages and stay within 10,000; `gradeThreeSuite.ts` checks this over 400 seeds per generator. When you change an authored challenge, change its generator in the same edit.
+- A correct answer is counted once per mission challenge. The page sends the shown version’s seed; the server rebuilds that version to check the answer (`src/lib/server/missionAttempts.ts`), so a generator must stay deterministic for a seed.
 
 ## Plain language for 8–9-year-olds (mandatory)
 
@@ -49,13 +53,13 @@ Use this skill together with `.agents/skills/lesson-authoring/SKILL.md` (core ru
 - Hints, one per check: `src/content/grade3/hints.ts`.
 - Missions, rewards (`rewards[i]` after `checks[i]`), chapters, epilogue: `src/content/grade3/houseStory.ts`. Mission order must match the 41 lessons; a chapter never splits a package.
 - Pages: `HouseMap.astro` (grade map), `HouseLesson.astro` (mission page and epilogue), `HouseScene.astro` (house pieces), `HouseChoices.astro`; script `src/scripts/houseAdventure.ts`, state `src/scripts/houseState.ts`. CSS classes keep the shared `city-*` names used by other primary worlds.
-- Check 1 of G03-01…G03-03 has a “new numbers” generator (`MISSION_PRACTICE` in `src/math/practice/generators.ts`); keep those checks on the same skill.
+- Challenge builders `entry()`, `choice()`: `src/content/grade3/checks.ts`. Generators, one per mission challenge: `src/content/grade3/variants/`. Grade 3 pages no longer show the shared “new numbers” button; generated versions replace it.
 - Package checks: `assessments.ts` (outside the story; prompts must differ from lesson checks).
-- Tests: `src/tests/houseAdventureSuite.ts`, `src/tests/upperPrimarySuite.ts`.
+- Tests: `src/tests/houseAdventureSuite.ts`, `src/tests/upperPrimarySuite.ts`, `src/tests/gradeThreeSuite.ts` (formats and generators), `src/tests/missionProgress.ts` (server re-check of versions).
 
 ## Lesson-by-lesson story map
 
-Each row: scene, then check 1 → result, check 2 → result.
+Each row: scene, then check 1 → result, check 2 → result. The value after «/» is the main typical error among the options.
 
 | Ch. / stage | Lesson | Scene | Check 1 → result | Check 2 → result |
 |---|---|---|---|---|
