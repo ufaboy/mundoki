@@ -9,14 +9,16 @@ import { SCHOOL_COURSES } from './schoolCourses';
 export interface MissionCheckKey {
   /** Index of the right option, or the expected number when `input` is 'number'. */
   answer: number;
-  input?: 'number';
+  input?: 'number' | 'rational';
+  /** Expected value of a 'rational' answer. */
+  value?: string;
   /** Results bucket: the grade's main topic. */
   topicId: TopicId;
 }
 
 export function findMissionCheck(lessonId: string, checkIndex: number): MissionCheckKey | null {
   for (const course of SCHOOL_COURSES) {
-    const lessons = course.lessons as readonly { id: string; checks?: readonly { answer: number; input?: 'number' }[] }[];
+    const lessons = course.lessons as readonly { id: string; checks?: readonly { answer: number; input?: 'number' | 'rational'; value?: string }[] }[];
     const lesson = lessons.find((item) => item.id === lessonId);
     if (!lesson) continue;
     const check = lesson.checks?.[checkIndex];
@@ -24,7 +26,7 @@ export function findMissionCheck(lessonId: string, checkIndex: number): MissionC
     // Typed-number checks keep the expected number in `answer`, not an option index.
     // Grade 3 reports them; Grade 2 pages do not report answers at all.
     if (!check || !grade) return null;
-    return { answer: check.answer, topicId: grade.primaryTopicId, ...(check.input === 'number' ? { input: 'number' as const } : {}) };
+    return { answer: check.answer, topicId: grade.primaryTopicId, ...(check.input ? { input: check.input, value: check.value } : {}) };
   }
   return null;
 }

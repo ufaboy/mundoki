@@ -136,4 +136,12 @@ assert.equal(result.gameState.totalSolved, before + 1, 'the right answer to a ve
 result = await post([versionAttempt('v-again', variant.answer), { ...versionAttempt('v-authored', 500), variantSeed: undefined }], 'u2');
 assert.equal(result.gameState.totalSolved, before + 1, 'a mission question counts once, whichever version was solved');
 
-console.log('PASS [Mission progress] forged flag rejected, generated, authored and Grade 3 version answers verified on the server, one credit per exercise per child, malformed payloads ignored');
+// Grade 4 typed answers are exact values: equal ones count, others do not.
+const g4 = (attemptId: string, answer: string) => ({ attemptId, source: 'mission', lessonId: 'G04-01-L01', checkIndex: 0, userAnswer: answer, isCorrect: true });
+const beforeG4 = (await post([], 'u2')).gameState.totalSolved;
+result = await post([g4('g4-wrong', '7000'), g4('g4-junk', 'abc')], 'u2');
+assert.equal(result.gameState.totalSolved, beforeG4, 'a wrong or malformed Grade 4 answer does not count');
+result = await post([g4('g4-right', '700.000')], 'u2');
+assert.equal(result.gameState.totalSolved, beforeG4 + 1, 'a Grade 4 answer written with a thousands separator counts');
+
+console.log('PASS [Mission progress] forged flag rejected, generated, authored, Grade 3 version and Grade 4 exact answers verified on the server, one credit per exercise per child, malformed payloads ignored');

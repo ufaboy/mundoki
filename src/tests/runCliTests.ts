@@ -12,11 +12,13 @@ import { runGradeOneTests } from './gradeOneSuite.ts';
 import { runGradeTwoTests } from './gradeTwoSuite.ts';
 import { runHouseAdventureTests } from './houseAdventureSuite.ts';
 import { runGradeThreeTests } from './gradeThreeSuite.ts';
+import { runGradeFourTests } from './gradeFourSuite.ts';
 
 runGradeOneTests();
 runGradeTwoTests();
 runHouseAdventureTests();
 runGradeThreeTests();
+runGradeFourTests();
 runIslandAdventureTests();
 runMoonAdventureTests();
 runRaceAdventureTests();

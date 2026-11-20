@@ -3,6 +3,14 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.6.0] - 2026-11-20
+
+### Changed
+- Grade 4 challenges can no longer be passed by pressing every button in turn. Answers that are a number are typed on a large number pad — whole numbers up to millions, fractions such as 3/4, and decimals such as 2,08 — and every other question offers three or four options built from typical mistakes, reshuffled on each attempt.
+- Typed answers accept any equal way of writing the value: 1/2 for 2/4, 2.08 or 2,08, and 700.000 with a thousands separator.
+- After a wrong answer in a Grade 4 mission, the buttons pause briefly, Nina works the problem out again with other numbers, and a new version appears with its hint already open. The fraction strips, angles, number lines and other models above the question show that version's own numbers, and in "why" questions the right option changes too.
+- The five-question checks at the end of each Grade 4 unit also use typed answers and three or four options.
+
 ## [2.5.0] - 2026-11-20
 
 ### Changed

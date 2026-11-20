@@ -10,11 +10,18 @@ export interface GradeOneCheck {
   prompt: LocalizedText;
   /** Choice options; empty when the learner types a number (`input: 'number'`). */
   options: LocalizedText[];
-  /** Index of the right option, or the expected number when `input` is 'number'. */
+  /** Index of the right option, or the expected number when `input` is 'number'; unused (0) for 'rational'. */
   answer: number;
   explanation: LocalizedText;
-  /** Typed answer instead of choosing an option (Grade 2). */
-  input?: 'number';
+  /**
+   * Typed answer instead of choosing an option. 'number': a whole number in `answer`
+   * (Grades 2–3). 'rational': an exact value in `value` — a whole number, a fraction
+   * («3/4») or a decimal («2,08») — checked with the same rules as secundaria answers,
+   * so equal values count (2/4 = 1/2) and «2.08» or «2,08» both read (Grade 4).
+   */
+  input?: 'number' | 'rational';
+  /** Expected value of a 'rational' answer, as authored: «700000», «3/4», «2,08». */
+  value?: string;
   /** Unit shown after the typed number, e.g. "cm" or "gemas". */
   unit?: LocalizedText;
 }

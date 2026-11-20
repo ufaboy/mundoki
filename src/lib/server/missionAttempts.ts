@@ -96,7 +96,23 @@ export function resolveMissionAttempt(item: Record<string, unknown>, userId: str
     const key = findMissionCheck(lessonId, checkIndex);
     if (!key) return null;
     // A Grade 3 version shown after a wrong answer: rebuild it from its seed.
-    let expected = { answer: key.answer, input: key.input };
+    // An exact typed value (Grade 4): equal values count, as on the page.
+    if (key.input === 'rational') {
+      if (item.variantSeed !== undefined && item.variantSeed !== null) return null;
+      const verdict = checkSecondaryAnswer({ kind: 'number', value: key.value ?? '' }, answerText);
+      if (verdict === 'invalid') return null;
+      return {
+        source: 'mission',
+        isCorrect: verdict === 'correct',
+        topicId: key.topicId,
+        exerciseId: `mission-${lessonId}-c${checkIndex}`,
+        seed: checkIndex,
+        creditId: `mission:${userId}:${lessonId}:${checkIndex}`,
+        lessonId,
+        checkIndex,
+      };
+    }
+    let expected: { answer: number; input?: 'number' | 'rational' } = { answer: key.answer, input: key.input };
     const variantSeed = item.variantSeed === undefined || item.variantSeed === null ? 0 : Number(item.variantSeed);
     if (!Number.isSafeInteger(variantSeed) || variantSeed < 0 || variantSeed >= MAX_VARIANT_SEED) return null;
     if (variantSeed > 0) {

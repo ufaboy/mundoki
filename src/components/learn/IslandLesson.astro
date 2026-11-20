@@ -1,10 +1,15 @@
 ---
+// Grade 4 mission page: La Golondrina's journey. Each challenge has generated
+// versions (content/grade4/variants) shown after a wrong answer, so pressing every
+// button in turn never completes a mission. Typed answers may be whole numbers,
+// fractions («3/4») or decimals («2,08»); equal values count.
 import type { Locale } from '../../math/core/types';
 import { GRADE_FOUR_LESSONS, GRADE_FOUR_PROJECT } from '../../content/grade4';
 import { GRADE_FOUR_ASSESSMENTS } from '../../content/grade4/assessments';
 import { PLANE_MISSIONS, PLANE_CHAPTERS } from '../../content/grade4/planeAdventure';
 import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
 import { getGradeFourHints } from '../../content/grade4/hints';
+import { gradeFourVariants } from '../../content/grade4/variants';
 import IslandWorkedDiagram from './IslandWorkedDiagram.astro';
 import IslandModel from './IslandModel.astro';
 import PlaneScene from './PlaneScene.astro';
@@ -21,6 +26,15 @@ const hints=getGradeFourHints(lesson.id);
 const chapter=PLANE_CHAPTERS.find(c=>c.id===mission.chapterId)!;
 const next=GRADE_FOUR_LESSONS[index+1];
 const lastInPackage=!next||next.packageId!==lesson.packageId;
+// Version 0 is the authored challenge (its model comes from IslandModel's own table);
+// the others are generated with new numbers and bring their own model data.
+const VERSIONS=4;
+const pageSeed=Math.floor(Math.random()*2**31);
+const versions=lesson.checks.map((check,i)=>[
+ {...check,hint:hints[i],reward:mission.rewards[i],model:undefined,generated:false},
+ ...gradeFourVariants(lesson.id,i,check.prompt['en-US'],VERSIONS,pageSeed+i*104729).map(v=>({...v,reward:v.reward??mission.rewards[i],generated:true})),
+]);
+const decimalKey=es?',':'.';
 ---
 <article class="city-adventure city-lesson island-adventure" data-island-root data-island-lesson data-island-index={index} data-locale={locale}>
  <nav class="city-top"><a href={`${buildGradeUrl(locale,'grade-4')}#${chapter.id}`}>← {es?'Mapa del viaje':'Trip map'}</a><span>{es?'MISIÓN':'MISSION'} {index+1} / {GRADE_FOUR_LESSONS.length}</span></nav>
@@ -30,9 +44,18 @@ const lastInPackage=!next||next.packageId!==lesson.packageId;
  <section class="city-notebook island-worked-example" aria-label={es?'Ejemplo paso a paso':'Step-by-step example'}><p class="city-example-heading">{es?'Miremos un ejemplo':'Let’s try an example'}</p><div><h2>{lesson.title[locale]}</h2><p>{lesson.story[locale]}</p><h3>{es?'Ejemplo guiado (otros datos)':'Worked example (different data)'}</h3>{lesson.id!=='G04-13-L03' && <figure class="city-example" data-scene><div>{lesson.scene.items.map((item,i)=><button type="button" data-scene-item aria-pressed="false" aria-label={`${es?'Tarjeta':'Card'} ${i+1}: ${item}`}>{item}</button>)}</div><figcaption>{lesson.scene.caption[locale]}</figcaption><button type="button" class="city-secondary" data-scene-reset>{es?'Borrar marcas':'Clear marks'}</button></figure>}<ol>{lesson.steps.map(step=><li>{step[locale]}</li>)}</ol><IslandWorkedDiagram locale={locale} lessonId={lesson.id}/><p>{lesson.misconception[locale]}</p><UpperPrimaryLab locale={locale} packageId={lesson.packageId}/></div></section>
  <section class="city-challenge">
  <p>{es?'Ahora te toca. Leé la pregunta y probá.':'Now it’s your turn. Read the question and try it.'}</p>
- {lesson.checks.map((check,i)=><div data-island-question={i} hidden={i!==0} data-answer={check.answer}><div data-island-reward-source hidden><HeroText text={mission.rewards[i][locale]}/></div><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / {lesson.checks.length}</p><h2 tabindex="-1" data-island-question-title>{check.prompt[locale]}</h2>
- <IslandModel locale={locale} lessonId={lesson.id} question={i}/>
- <div class="city-answer-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option,j)=><button type="button" data-island-answer={j}>{option[locale]}</button>)}</div><p class="city-hint" data-island-hint hidden>{hints[i][locale]}</p><p class="city-hint" data-island-explanation hidden>{check.explanation[locale]}</p></div>)}
+ {lesson.checks.map((check,i)=><div data-island-question={i} hidden={i!==0}><p class="city-kicker">{es?'DESAFÍO':'CHALLENGE'} {i+1} / {lesson.checks.length}</p>
+ {versions[i].map((variant,k)=><div data-island-variant={k} data-input={variant.input??'choice'} data-answer={variant.answer} data-value={variant.input==='rational'?variant.value:undefined} hidden={k!==0}>
+  <div data-island-reward-source hidden><HeroText text={variant.reward[locale]}/></div>
+  <h2 tabindex="-1" data-island-question-title>{variant.prompt[locale]}</h2>
+  {variant.generated?<IslandModel locale={locale} lessonId={lesson.id} question={i} data={variant.model??null}/>:<IslandModel locale={locale} lessonId={lesson.id} question={i}/>}
+  {variant.input==='rational'
+   ? <form class="road-entry" data-island-entry autocomplete="off"><label class="road-entry-field"><span class="visually-hidden">{es?'Tu respuesta':'Your answer'}</span><input type="text" inputmode={variant.value?.includes('/')?'text':'decimal'} maxlength="12" data-island-entry-input aria-describedby={variant.unit?`island-unit-${i}-${k}`:undefined}/>{variant.unit&&<span id={`island-unit-${i}-${k}`}>{variant.unit[locale]}</span>}</label>
+     <div class="road-keypad" aria-label={es?'Teclado de números':'Number pad'}>{['1','2','3','4','5','6','7','8','9'].map(d=><button type="button" data-island-key={d}>{d}</button>)}{variant.value?.includes('/')&&<button type="button" data-island-key="/" aria-label={es?'Barra de fracción':'Fraction bar'}>/</button>}{variant.value?.includes(',')&&<button type="button" data-island-key={decimalKey} aria-label={es?'Coma decimal':'Decimal point'}>{decimalKey}</button>}<button type="button" data-island-key="back" aria-label={es?'Borrar':'Delete'}>⌫</button><button type="button" data-island-key="0">0</button><button type="submit" class="road-keypad-ok">{es?'Listo':'Done'}</button></div></form>
+   : <div class="city-answer-options" role="group" aria-label={variant.prompt[locale]}>{variant.options.map((option,j)=><button type="button" data-island-answer={j}>{option[locale]}</button>)}</div>}
+  <p class="city-hint" data-island-hint hidden>{variant.hint[locale]}</p><p class="city-hint" data-island-explanation hidden>{variant.explanation[locale]}</p>
+ </div>)}
+ </div>)}
  <p class="city-feedback" data-island-feedback role="status" aria-live="polite"></p><div class="city-controls"><button type="button" class="city-secondary" data-island-help>{es?'Una pista':'A hint'}</button><button type="button" class="city-secondary" data-island-reset>{es?'Volver a jugar':'Play again'}</button><button type="button" class="city-primary" data-island-next hidden>{es?'Siguiente desafío':'Next challenge'} →</button><a class="city-primary" data-island-finish hidden href={next?buildSchoolLessonUrl(locale,'grade-4',next.id):'#island-celebration'}>{next?(es?'Siguiente misión':'Next mission'):(es?'¡Abrir el festival!':'Open the festival!')} →</a></div>
  </section>
  {lastInPackage && <details class="city-notebook" id="package-check"><summary>{es?'Un desafío extra: cinco preguntas':'An extra challenge: five questions'}</summary><div><GradeOneChecks locale={locale} checks={GRADE_FOUR_ASSESSMENTS[lesson.packageId]} id={`${lesson.packageId}-city-check`} assessment/></div></details>}

@@ -1,4 +1,5 @@
 import { hasGradeOneEvidence } from '../content/grade1/evidence';
+import { checkSecondaryAnswer } from '../math/core/secondaryAnswer';
 
 document.querySelectorAll<HTMLFormElement>('[data-g1-checks]').forEach(form => {
   const es = form.dataset.locale === 'es-AR';
@@ -13,10 +14,13 @@ document.querySelectorAll<HTMLFormElement>('[data-g1-checks]').forEach(form => {
     event.preventDefault();
     if (!form.reportValidity()) return;
     const correct = Array.from(form.querySelectorAll<HTMLFieldSetElement>('fieldset')).map(field => {
-      // Typed-number checks (Grade 2) keep the expected number in data-answer.
+      // Typed-number checks (Grades 2–3) keep the expected number in data-answer; exact
+      // typed values (Grade 4: whole, fraction or decimal) keep it in data-value.
       const chosen = field.querySelector<HTMLInputElement>('input[data-entry]') ?? field.querySelector<HTMLInputElement>('input:checked');
       const value = chosen?.value.trim() ?? '';
-      const matches = /^\d+$/.test(value) && Number(value) === Number(field.dataset.answer);
+      const matches = field.dataset.value !== undefined
+        ? checkSecondaryAnswer({ kind: 'number', value: field.dataset.value }, value) === 'correct'
+        : /^\d+$/.test(value) && Number(value) === Number(field.dataset.answer);
       field.querySelector<HTMLElement>('[data-result]')!.textContent = matches
         ? (es ? 'Correcto.' : 'Correct.') : (es ? 'Revisemos.' : 'Let’s review.');
       field.querySelector<HTMLElement>('[data-feedback]')!.hidden = false;

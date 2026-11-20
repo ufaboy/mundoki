@@ -16,9 +16,9 @@ const schoolLessonSchema = z.object({
     misconception: localized, exit: localized,
     checks: z.array(z.object({
       prompt: localized, options: z.array(localized), answer: z.number(), explanation: localized,
-      input: z.literal('number').optional(), unit: localized.optional(),
-    }).refine(check => check.input === 'number' ? check.options.length === 0 : check.options.length >= 2,
-      'A check either takes a typed number or offers at least two options')).min(2),
+      input: z.enum(['number', 'rational']).optional(), value: z.string().optional(), unit: localized.optional(),
+    }).refine(check => check.input ? check.options.length === 0 && (check.input !== 'rational' || !!check.value) : check.options.length >= 2,
+      'A check either takes a typed answer or offers at least two options')).min(2),
   });
 const gradeOneLessons = defineCollection({ loader: async () => GRADE_ONE_LESSONS, schema: schoolLessonSchema });
 const gradeTwoLessons = defineCollection({ loader: async () => GRADE_TWO_LESSONS, schema: schoolLessonSchema });

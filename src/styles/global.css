@@ -1272,7 +1272,7 @@ input, select, textarea { font-size:var(--font-body); }
 .island-fraction-cells span.shaded { background:#64a79c; }
 .island-hundred { width:min(100%,280px); height:auto; aspect-ratio:1; }
 .island-hundred span { border-bottom:1px solid #32676b; }
-.island-array { display:grid; grid-template-columns:repeat(3,36px); gap:3px; }
+.island-array { display:grid; grid-template-columns:repeat(var(--cols,3),minmax(0,36px)); gap:3px; max-width:100%; }
 .island-array span { height:36px; border:2px solid #32676b; background:#a6d2b7; }
 .island-place { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; }
 .island-place>span { display:flex; flex-direction:column; text-align:center; border-radius:8px; background:#fff; padding:.5rem .15rem; }

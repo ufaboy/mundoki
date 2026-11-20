@@ -1,6 +1,10 @@
 ---
 import type {Locale} from '../../math/core/types';
-const {locale,lessonId,question}=Astro.props as {locale:Locale;lessonId:string;question:number};
+import type {IslandModelData} from '../../content/grade4/variants';
+// `data` comes with a generated version of the challenge (new numbers): the model then
+// draws that version's numbers, and nothing when it has none. Without `data`, the
+// authored challenge's model below is drawn.
+const {locale,lessonId,question,data}=Astro.props as {locale:Locale;lessonId:string;question:number;data?:IslandModelData|null};
 const es=locale==='es-AR';
 // Explicit question-specific models, never the unrelated quantities from the worked example.
 const strips:Record<string,[number,number][][]>={
@@ -12,24 +16,29 @@ const strips:Record<string,[number,number][][]>={
  'G04-08-L01':[[[10,100]],[[7,100]]],
  'G04-08-L03':[[[50,100]],[[25,100]]],
 };
-const fractions=strips[lessonId]?.[question]??[];
 const angles:Record<string,number[]>={'G04-10-L01':[180,90],'G04-10-L02':[65,135],'G04-10-L03':[60,60]};
-const angle=angles[lessonId]?.[question];
-const line=lessonId==='G04-06-L03'?(question===0?8:4):0;
-const array=lessonId==='G04-03-L01'&&question===0;
-const place=lessonId==='G04-01-L01'&&question===0;
-const net=lessonId==='G04-12-L03';
-const stars=lessonId==='G04-13-L02'&&question===0;
-const glasses=lessonId==='G04-09-L02'&&question===0;
+const generated=data!==undefined;
+const fractions=generated?(data?.strips??[]):(strips[lessonId]?.[question]??[]);
+const angle=generated?data?.angle:angles[lessonId]?.[question];
+const line=generated?(data?.line??0):lessonId==='G04-06-L03'?(question===0?8:4):0;
+const arrayDims=generated?data?.array:lessonId==='G04-03-L01'&&question===0?[3,4] as [number,number]:undefined;
+const array=!!arrayDims;
+const placeDigits=generated?data?.place:lessonId==='G04-01-L01'&&question===0?'3702040':undefined;
+const place=!!placeDigits;
+const net=!generated&&lessonId==='G04-12-L03';
+const starRow=generated?data?.stars:lessonId==='G04-13-L02'&&question===0?[5,2] as [number,number]:undefined;
+const stars=!!starRow;
+const glasses=!generated&&lessonId==='G04-09-L02'&&question===0;
+const angleLabel=!generated&&lessonId==='G04-10-L01'&&question===0?(es?'Media vuelta':'Half a turn'):`${angle}°`;
 const show=fractions.length||angle!==undefined||line||array||place||net||stars||glasses;
 ---
 {show && <figure class="island-model"><figcaption>{es?'Explorá los datos del desafío':'Explore the challenge data'}</figcaption>
  {fractions.map(([painted,total])=><div class="island-fraction"><div class:list={['island-fraction-cells',{'island-hundred':total===100}]} style={`--parts:${total===100?10:total}`} aria-label={es?`${painted} partes pintadas de ${total} partes iguales`:`${painted} shaded parts out of ${total} equal parts`}>{Array.from({length:total},(_,i)=><span class:list={{shaded:i<painted}}></span>)}</div><span>{es?'Un entero':'One whole'}</span></div>)}
  {line>0 && <svg viewBox="0 0 520 90" role="img" aria-label={es?`Recta de cero a uno, ${line} intervalos iguales`:`Number line from zero to one, ${line} equal intervals`}><path d="M30 40H490" stroke="currentColor" stroke-width="3"/>{Array.from({length:line+1},(_,i)=><path d={`M${30+i*460/line} 28v24`} stroke="currentColor" stroke-width="3"/>)}<text x="30" y="80" text-anchor="middle">0</text><text x="490" y="80" text-anchor="middle">1</text></svg>}
- {angle!==undefined && <svg viewBox="0 0 360 210" role="img" aria-label={es?`Ángulo de ${angle} grados`:`Angle of ${angle} degrees`}><path d={`M${180+130*Math.cos(angle*Math.PI/180)} ${165-130*Math.sin(angle*Math.PI/180)}L180 165H320`} fill="none" stroke="#276c73" stroke-width="5"/><path d={`M225 165A45 45 0 ${angle>180?1:0} 0 ${180+45*Math.cos(angle*Math.PI/180)} ${165-45*Math.sin(angle*Math.PI/180)}`} fill="none" stroke="#b66e43" stroke-width="3"/><circle cx="180" cy="165" r="5" fill="#b66e43"/><text x="180" y="35" text-anchor="middle">{lessonId==='G04-10-L01'&&question===0?(es?'Media vuelta':'Half a turn'):`${angle}°`}</text></svg>}
- {array && <><div class="island-array" aria-label={es?'Tres columnas y cuatro filas':'Three columns and four rows'}>{Array.from({length:12},()=> <span/>)}</div><p>3 × 4</p></>}
- {place && <div class="island-place">{['3','7','0','2','0','4','0'].map((digit,i)=><span><small>{(es?['Millones','Centenas de mil','Decenas de mil','Miles','Centenas','Decenas','Unidades']:['Millions','Hundred thousands','Ten thousands','Thousands','Hundreds','Tens','Ones'])[i]}</small><b>{digit}</b></span>)}</div>}
+ {angle!==undefined && <svg viewBox="0 0 360 210" role="img" aria-label={es?`Ángulo de ${angle} grados`:`Angle of ${angle} degrees`}><path d={`M${180+130*Math.cos(angle*Math.PI/180)} ${165-130*Math.sin(angle*Math.PI/180)}L180 165H320`} fill="none" stroke="#276c73" stroke-width="5"/><path d={`M225 165A45 45 0 ${angle>180?1:0} 0 ${180+45*Math.cos(angle*Math.PI/180)} ${165-45*Math.sin(angle*Math.PI/180)}`} fill="none" stroke="#b66e43" stroke-width="3"/><circle cx="180" cy="165" r="5" fill="#b66e43"/><text x="180" y="35" text-anchor="middle">{angleLabel}</text></svg>}
+ {array && arrayDims && <><div class="island-array" style={`--cols:${arrayDims[0]}`} aria-label={es?`${arrayDims[0]} columnas y ${arrayDims[1]} filas`:`${arrayDims[0]} columns and ${arrayDims[1]} rows`}>{Array.from({length:arrayDims[0]*arrayDims[1]},()=> <span/>)}</div><p>{arrayDims[0]} × {arrayDims[1]}</p></>}
+ {place && placeDigits && <div class="island-place">{placeDigits.padStart(7,'0').split('').map((digit,i)=><span><small>{(es?['Millones','Centenas de mil','Decenas de mil','Miles','Centenas','Decenas','Unidades']:['Millions','Hundred thousands','Ten thousands','Thousands','Hundreds','Tens','Ones'])[i]}</small><b>{digit}</b></span>)}</div>}
  {net && <svg viewBox="0 0 320 240" role="img" aria-label={es?'Red: cuatro cuadrados en fila, uno arriba del segundo y otro debajo':'Net: four squares in a row, one above the second and one below'}>{[[0,1],[1,1],[2,1],[3,1],[1,0],[1,2]].map(([x,y])=><rect x={40+x*60} y={30+y*60} width="60" height="60" fill="#c4e3d3" stroke="#276c73" stroke-width="2"/>)}</svg>}
- {stars && <><p>★ = {es?'2 votos':'2 votes'}</p><p class="island-stars" aria-label={es?'Cinco estrellas':'Five stars'}>★ ★ ★ ★ ★</p></>}
+ {stars && starRow && <><p>★ = {starRow[1]} {es?'votos':'votes'}</p><p class="island-stars" aria-label={es?`${starRow[0]} estrellas`:`${starRow[0]} stars`}>{Array.from({length:starRow[0]},()=>'★').join(' ')}</p></>}
  {glasses && <div class="island-measure"><span>1 L</span><span>↔</span><span>? × 250 mL</span></div>}
 </figure>}

@@ -1,6 +1,5 @@
-import { createLessonFactory, check, type GradeOneCheck } from '../lessonModel';
+import { createLessonFactory, type GradeOneCheck } from '../lessonModel';
 const lesson = createLessonFactory(4);
-export { check as q };
 /** Compact authoring only: every explanation and question is authored in both locales. */
 export function micro(p: number, n: number, title: string, objective: string, warmup: string,
   story: string, steps: string[], diagram: string[], mistake: string, exit: string, checks: GradeOneCheck[],
