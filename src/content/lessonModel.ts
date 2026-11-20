@@ -8,9 +8,15 @@ export const text = (value: string): LocalizedText => {
 
 export interface GradeOneCheck {
   prompt: LocalizedText;
+  /** Choice options; empty when the learner types a number (`input: 'number'`). */
   options: LocalizedText[];
+  /** Index of the right option, or the expected number when `input` is 'number'. */
   answer: number;
   explanation: LocalizedText;
+  /** Typed answer instead of choosing an option (Grade 2). */
+  input?: 'number';
+  /** Unit shown after the typed number, e.g. "cm" or "gemas". */
+  unit?: LocalizedText;
 }
 
 // Alternate the answer position; the author always supplies the correct option first.

@@ -1,4 +1,5 @@
-import { createLessonFactory, check as q } from '../lessonModel';
+import { createLessonFactory } from '../lessonModel';
+import { choice as c, entry as e } from './checks';
 const l = createLessonFactory(2);
 
 // Story: Gem Market (G02-01, G02-02) and Stepping-Stone River (G02-03). Gems come
@@ -12,7 +13,7 @@ export const numberLessons = [
     ['100 + 100','10 + 10 + 10 + 10','1 + 1 + 1','243 = 200 + 40 + 3'], 'Cajas de 100, bolsitas de 10 y gemas sueltas.|Boxes of 100, bags of 10, and loose gems.',
     'El 4 de 243 vale 40, no 4: cuenta bolsitas de diez.|The 4 in 243 means 40, not 4: it counts bags of ten.',
     'Representá 325 y explicá el valor de cada cifra.|Represent 325 and explain each digit’s value.',
-    [q('La soga cuesta 461 gemas. ¿Cuánto vale el 6?|The rope costs 461 gems. What is the 6 worth?','60|60','6|6','El 6 cuenta bolsitas de diez: 6 bolsitas son 60 gemas.|The 6 counts bags of ten: 6 bags are 60 gems.'), q('El mapa cuesta 222 gemas. ¿Por qué un 2 vale 200, otro 20 y otro 2?|The map costs 222 gems. Why is one 2 worth 200, another 20, and another 2?','Porque importa el lugar de la cifra|Because the digit’s place matters','Porque todos los 2 valen lo mismo|Because all the 2s are worth the same','Un 2 cuenta cajas, otro bolsitas y otro gemas sueltas: 200, 20 y 2.|One 2 counts boxes, one counts bags, and one counts loose gems: 200, 20, and 2.')]),
+    [e('La soga cuesta 461 gemas. ¿Cuánto vale el 6?|The rope costs 461 gems. What is the 6 worth?',60,'El 6 cuenta bolsitas de diez: 6 bolsitas son 60 gemas.|The 6 counts bags of ten: 6 bags are 60 gems.','gemas|gems'), c('El mapa cuesta 222 gemas. ¿Por qué un 2 vale 200, otro 20 y otro 2?|The map costs 222 gems. Why is one 2 worth 200, another 20, and another 2?','Porque importa el lugar de la cifra|Because the digit’s place matters',['Porque todos los 2 valen lo mismo|Because all the 2s are worth the same','Porque se suman: 2 + 2 + 2 = 6|Because they add up: 2 + 2 + 2 = 6'],'Un 2 cuenta cajas, otro bolsitas y otro gemas sueltas: 200, 20 y 2.|One 2 counts boxes, one counts bags, and one counts loose gems: 200, 20, and 2.')]),
   l(1, 2, 'Leemos y escribimos hasta mil|Reading and writing up to one thousand',
     'Relacionar palabras, cifras y grupos hasta 1.000.|Connect words, numerals, and groups up to 1,000.',
     'Decí cuántas centenas hay en 300.|Say how many hundreds are in 300.',
@@ -21,7 +22,7 @@ export const numberLessons = [
     ['400 + 0 + 6 = 406','10 × 100 = 1000'], 'El 0 cuida el lugar de las bolsitas.|The 0 keeps the bags’ place.',
     '406 no es 46: si borrás el 0, cambian los valores.|406 is not 46: if you erase the 0, the values change.',
     'Escribí setecientos ocho y mostrale a alguien por qué necesita un cero.|Write seven hundred eight and show someone why it needs a zero.',
-    [q('El vendedor de llaves dice: «novecientos treinta». ¿Cómo se escribe?|The key seller says: “nine hundred thirty.” How do you write it?','930|930','9030|9030','Son 9 cajas, 3 bolsitas y 0 gemas sueltas: 930.|It is 9 boxes, 3 bags, and 0 loose gems: 930.'), q('El farol mágico cuesta 507 gemas. ¿Qué indica el 0?|The magic lantern costs 507 gems. What does the 0 show?','Que no hay bolsitas|That there are no bags','Nada, se puede borrar|Nothing, it can be erased','507 = 500 + 0 + 7. Sin el 0 sería 57.|507 = 500 + 0 + 7. Without the 0 it would be 57.')]),
+    [e('El vendedor de llaves dice: «novecientos treinta». ¿Cómo se escribe?|The key seller says: “nine hundred thirty.” How do you write it?',930,'Son 9 cajas, 3 bolsitas y 0 gemas sueltas: 930.|It is 9 boxes, 3 bags, and 0 loose gems: 930.'), c('El farol mágico cuesta 507 gemas. ¿Qué indica el 0?|The magic lantern costs 507 gems. What does the 0 show?','Que no hay bolsitas|That there are no bags',['Nada, se puede borrar|Nothing, it can be erased','Que no hay cajas|That there are no boxes','Que no hay gemas sueltas|That there are no loose gems'],'507 = 500 + 0 + 7. Sin el 0 sería 57.|507 = 500 + 0 + 7. Without the 0 it would be 57.')]),
   l(1, 3, 'Comparamos en la recta|Comparing on the number line',
     'Comparar números mirando primero los valores mayores.|Compare numbers by looking at the largest place values first.',
     'Compará 40 y 70.|Compare 40 and 70.',
@@ -30,7 +31,7 @@ export const numberLessons = [
     ['360 ─ 370 ─ 380 ─ 390','368 < 386'], '368 está entre 360 y 370. 386 está entre 380 y 390.|368 is between 360 and 370. 386 is between 380 and 390.',
     'No mires primero las gemas sueltas. Mirá primero las cajas.|Do not look at the loose gems first. Look at the boxes first.',
     'Ubicá 405 y 450 entre 400 y 500 y explicá cuál es mayor.|Place 405 and 450 between 400 and 500 and explain which is greater.',
-    [q('En el candado dice 619 y 691. ¿Cuál es mayor?|The lock says 619 and 691. Which is greater?','691|691','619|619','Las cajas son iguales. 9 bolsitas son más que 1.|The boxes are equal. 9 bags are more than 1.'), q('El mago pide un número menor que 700. ¿Por qué 699 es menor que 700?|The wizard asks for a number less than 700. Why is 699 less than 700?','699 tiene 6 cajas y 700 tiene 7|699 has 6 boxes and 700 has 7','699 tiene más nueves|699 has more nines','Primero miramos las cajas: 6 es menos que 7.|We look at the boxes first: 6 is less than 7.')]),
+    [c('El candado muestra 619, 691 y 669. ¿Cuál es el mayor?|The lock shows 619, 691, and 669. Which is the greatest?','691|691',['619|619','669|669'],'Las cajas son iguales: 6. Después miramos las bolsitas: 9 es lo que más.|The boxes are equal: 6. Then we look at the bags: 9 is the most.'), c('El mago pide un número menor que 700. ¿Por qué 699 es menor que 700?|The wizard asks for a number less than 700. Why is 699 less than 700?','699 tiene 6 cajas y 700 tiene 7|699 has 6 boxes and 700 has 7',['699 tiene más nueves|699 has more nines','Porque 700 termina en 0|Because 700 ends in 0'],'Primero miramos las cajas: 6 es menos que 7.|We look at the boxes first: 6 is less than 7.')]),
   l(2, 1, 'Desarmamos un número|Taking a number apart',
     'Escribir un número como suma de sus valores de posición.|Write a number as the sum of its place values.',
     'Decí cuánto vale el 3 en 347.|Say what 3 is worth in 347.',
@@ -39,7 +40,7 @@ export const numberLessons = [
     ['300','40','7','300 + 40 + 7 = 347'], 'Cada ventanita guarda un valor.|Each little window holds one value.',
     '3 + 4 + 7 suma las cifras, pero no forma 347.|3 + 4 + 7 adds the digits, but it does not make 347.',
     'Descomponé 582 y comprobá juntando las partes.|Decompose 582 and check by putting the parts together.',
-    [q('La caja pide 619 gemas. ¿Qué suma es 619?|The box asks for 619 gems. Which sum is 619?','600 + 10 + 9|600 + 10 + 9','60 + 10 + 9|60 + 10 + 9','6 cajas son 600, 1 bolsita es 10 y hay 9 sueltas.|6 boxes are 600, 1 bag is 10, and 9 are loose.'), q('Ahora pide 304 gemas. ¿Por qué es 300 + 4?|Now it asks for 304 gems. Why is it 300 + 4?','Porque no hay bolsitas|Because there are no bags','Porque hay que poner 30 + 4|Because you must put 30 + 4','El 0 dice que hay 0 bolsitas: 300 + 0 + 4.|The 0 says there are 0 bags: 300 + 0 + 4.')]),
+    [c('La caja pide 619 gemas. ¿Qué suma es 619?|The box asks for 619 gems. Which sum is 619?','600 + 10 + 9|600 + 10 + 9',['60 + 10 + 9|60 + 10 + 9','6 + 1 + 9|6 + 1 + 9','600 + 100 + 9|600 + 100 + 9'],'6 cajas son 600, 1 bolsita es 10 y hay 9 sueltas.|6 boxes are 600, 1 bag is 10, and 9 are loose.'), c('Ahora pide 304 gemas. ¿Por qué es 300 + 4?|Now it asks for 304 gems. Why is it 300 + 4?','Porque no hay bolsitas|Because there are no bags',['Porque hay que poner 30 + 4|Because you must put 30 + 4','Porque no hay cajas|Because there are no boxes'],'El 0 dice que hay 0 bolsitas: 300 + 0 + 4.|The 0 says there are 0 bags: 300 + 0 + 4.')]),
   l(2, 2, 'Cambiamos una centena|Exchanging a hundred',
     'Cambiar una centena por diez decenas sin alterar el total.|Exchange a hundred for ten tens without changing the total.',
     'Contá de diez en diez hasta cien.|Count by tens to one hundred.',
@@ -48,7 +49,7 @@ export const numberLessons = [
     ['100 = 10 × 10','230 = 200 + 30','230 = 100 + 130'], 'Cambia cómo guardamos las gemas, no cuántas hay.|How we store the gems changes, not how many there are.',
     'Si cambiás una caja por una sola bolsita, perdés 90 gemas.|If you trade a box for just one bag, you lose 90 gems.',
     'Mostrá 420 después de cambiar una centena por diez decenas.|Show 420 after exchanging one hundred for ten tens.',
-    [q('¿Cuántas bolsitas de 10 hay en una caja de 100?|How many bags of 10 are in one box of 100?','10|10','100|100','10 bolsitas de 10 son 100 gemas.|10 bags of 10 are 100 gems.'), q('Antes había 300 + 50. Ahora hay 200 + 150. ¿Siguen siendo 350?|Before there were 300 + 50. Now there are 200 + 150. Is it still 350?','Sí, una caja se volvió 10 bolsitas|Yes, one box became 10 bags','No, se perdieron 100|No, 100 got lost','300 + 50 y 200 + 150 suman 350.|300 + 50 and 200 + 150 both make 350.')]),
+    [e('¿Cuántas bolsitas de 10 hay en una caja de 100?|How many bags of 10 are in one box of 100?',10,'10 bolsitas de 10 son 100 gemas.|10 bags of 10 are 100 gems.','bolsitas|bags'), c('Antes había 300 + 50. Ahora hay 200 + 150. ¿Siguen siendo 350?|Before there were 300 + 50. Now there are 200 + 150. Is it still 350?','Sí, una caja se volvió 10 bolsitas|Yes, one box became 10 bags',['No, se perdieron 100|No, 100 got lost','No, ahora hay 100 más|No, now there are 100 more'],'300 + 50 y 200 + 150 suman 350.|300 + 50 and 200 + 150 both make 350.')]),
   l(2, 3, 'Dos maneras de escribir lo mismo|Two ways to write the same number',
     'Escribir el mismo número con dos sumas y explicar cómo lo hicimos.|Write the same number as two sums and explain how we did it.',
     'Recordá cuántas decenas forman cien.|Recall how many tens make one hundred.',
@@ -57,7 +58,7 @@ export const numberLessons = [
     ['300 + 40 + 7','200 + 140 + 7','347'], 'Una parte pierde 100 y otra gana 100.|One part loses 100 and another gains 100.',
     'Si sacás 100 de una parte, tenés que ponerlos en otra.|If you take 100 from one part, you must put it in another.',
     'Escribí 256 de dos maneras y explicá el intercambio.|Write 256 in two ways and explain the exchange.',
-    [q('El espejo izquierdo dice 619 = 600 + 10 + 9. ¿Qué va en el derecho?|The left mirror says 619 = 600 + 10 + 9. What goes in the right one?','500 + 110 + 9|500 + 110 + 9','500 + 10 + 9|500 + 10 + 9','Una caja pasó a las bolsitas: 10 + 100 = 110.|One box moved to the bags: 10 + 100 = 110.'), q('¿500 + 20 + 8 y 400 + 120 + 8 son el mismo número?|Are 500 + 20 + 8 and 400 + 120 + 8 the same number?','Sí, los dos son 528|Yes, both are 528','No, tienen partes distintas|No, they have different parts','Partes distintas pueden formar el mismo número.|Different parts can make the same number.')]),
+    [c('El espejo izquierdo dice 619 = 600 + 10 + 9. ¿Qué va en el derecho?|The left mirror says 619 = 600 + 10 + 9. What goes in the right one?','500 + 110 + 9|500 + 110 + 9',['500 + 10 + 9|500 + 10 + 9','600 + 110 + 9|600 + 110 + 9','500 + 100 + 9|500 + 100 + 9'],'Una caja pasó a las bolsitas: 10 + 100 = 110.|One box moved to the bags: 10 + 100 = 110.'), c('¿500 + 20 + 8 y 400 + 120 + 8 son el mismo número?|Are 500 + 20 + 8 and 400 + 120 + 8 the same number?','Sí, los dos son 528|Yes, both are 528',['No, tienen partes distintas|No, they have different parts','No, el segundo es más grande|No, the second one is bigger'],'Partes distintas pueden formar el mismo número.|Different parts can make the same number.')]),
   l(3, 1, 'Saltos de diez y de cien|Jumps of ten and one hundred',
     'Continuar escalas con pasos de 10 o 100.|Continue scales with steps of 10 or 100.',
     'Contá 10, 20, 30 y seguí dos pasos.|Count 10, 20, 30 and continue two steps.',
@@ -66,7 +67,7 @@ export const numberLessons = [
     ['125 → 135 → 145  (+10)','125 → 225 → 325  (+100)'], 'Las dos filas empiezan igual, pero saltan distinto.|Both rows start the same, but jump differently.',
     'No mezcles saltos de 10 y de 100 en la misma fila.|Do not mix jumps of 10 and 100 in the same row.',
     'Desde 240, hacé tres saltos de diez y otros tres de cien.|From 240, make three jumps of ten and, separately, three jumps of one hundred.',
-    [q('Piedras grandes: 360, 460, 560. ¿Qué número sigue?|Big stones: 360, 460, 560. What number comes next?','660|660','570|570','Cada piedra grande suma 100.|Each big stone adds 100.'), q('Después de una piedra chica, 275 pasa a 285. ¿Por qué?|After a small stone, 275 becomes 285. Why?','Hay una decena más|There is one more ten','Cambiaron las unidades|The ones changed','Sumamos una decena: 275 + 10 = 285.|We add one ten: 275 + 10 = 285.')]),
+    [e('Piedras grandes: 360, 460, 560. ¿Qué número sigue?|Big stones: 360, 460, 560. What number comes next?',660,'Cada piedra grande suma 100.|Each big stone adds 100.'), c('Después de una piedra chica, 275 pasa a 285. ¿Por qué?|After a small stone, 275 becomes 285. Why?','Hay una decena más|There is one more ten',['Cambiaron las unidades|The ones changed','Hay una centena más|There is one more hundred'],'Sumamos una decena: 275 + 10 = 285.|We add one ten: 275 + 10 = 285.')]),
   l(3, 2, 'Escalas de veinte y cincuenta|Scales of twenty and fifty',
     'Continuar series con saltos de 20 o 50.|Continue sequences with jumps of 20 or 50.',
     'Mostrá que veinte son dos decenas.|Show that twenty is two tens.',
@@ -75,7 +76,7 @@ export const numberLessons = [
     ['20 → 40 → 60 → 80 → 100','50 → 100 → 150 → 200'], 'Cada fila tiene siempre el mismo salto.|Each row always keeps the same jump.',
     'Al pasar 100, la cuenta sigue: 80 + 20 = 100, y después 120.|After 100, the count keeps going: 80 + 20 = 100, then 120.',
     'Desde 70 seguí de veinte en veinte hasta 150. Explicá cada paso.|From 70, count by twenties to 150. Explain each step.',
-    [q('Había 150, 200 y 250 gotas. ¿Cuántas hay después de otra vuelta de 50?|There were 150, 200, and 250 drops. How many after one more turn of 50?','300|300','260|260','250 + 50 = 300. ¡Con 300 gotas el hielo se rompe!|250 + 50 = 300. At 300 drops the ice breaks!'), q('La soga tiene 5 trozos de 20 cm. ¿Por qué mide 100 cm?|The rope has 5 pieces of 20 cm. Why is it 100 cm long?','20 + 20 + 20 + 20 + 20 = 100|20 + 20 + 20 + 20 + 20 = 100','5 + 20 = 25|5 + 20 = 25','Cada uno de los 5 trozos mide 20 cm.|Each of the 5 pieces is 20 cm long.')]),
+    [e('Había 150, 200 y 250 gotas. ¿Cuántas hay después de otra vuelta de 50?|There were 150, 200, and 250 drops. How many after one more turn of 50?',300,'250 + 50 = 300. ¡Con 300 gotas el hielo se rompe!|250 + 50 = 300. At 300 drops the ice breaks!','gotas|drops'), c('La soga tiene 5 trozos de 20 cm. ¿Por qué mide 100 cm?|The rope has 5 pieces of 20 cm. Why is it 100 cm long?','20 + 20 + 20 + 20 + 20 = 100|20 + 20 + 20 + 20 + 20 = 100',['5 + 20 = 25|5 + 20 = 25','10 + 10 + 10 + 10 + 10 = 50|10 + 10 + 10 + 10 + 10 = 50'],'Cada uno de los 5 trozos mide 20 cm.|Each of the 5 pieces is 20 cm long.')]),
   l(3, 3, 'Diez o cien más y menos|Ten or one hundred more and less',
     'Sumar o restar 10 y 100, incluso al cruzar una centena.|Add or subtract 10 and 100, including across a hundred.',
     'Decí qué número es diez más que 80.|Say which number is ten more than 80.',
@@ -84,5 +85,5 @@ export const numberLessons = [
     ['247 ← 347 → 447  (100)','337 ← 347 → 357  (10)','195 + 10 = 205'], 'A veces cambia más de una cifra.|Sometimes more than one digit changes.',
     '190 + 10 = 200: sumar 10 también puede cambiar las centenas.|190 + 10 = 200: adding 10 can change the hundreds too.',
     'Encontrá diez menos que 302 y cien más que 690. Explicá los cambios.|Find ten less than 302 and one hundred more than 690. Explain the changes.',
-    [q('El martillo está en el nido que tiene 10 menos que 208. ¿Qué número tiene?|The hammer is in the nest that is 10 less than 208. What number is it?','198|198','108|108','208 − 10 = 198. Restamos 10, no 100.|208 − 10 = 198. We take away 10, not 100.'), q('El cincel está en el nido que tiene 10 más que 99. ¿Por qué no es 100?|The chisel is in the nest that is 10 more than 99. Why is it not 100?','99 + 10 = 109|99 + 10 = 109','Después de 99 siempre va 100|After 99 always comes 100','99 + 1 = 100 y faltan 9 más: 109.|99 + 1 = 100, and 9 more are left: 109.')]),
+    [e('El martillo está en el nido que tiene 10 menos que 208. ¿Qué número tiene?|The hammer is in the nest that is 10 less than 208. What number is it?',198,'208 − 10 = 198. Restamos 10, no 100.|208 − 10 = 198. We take away 10, not 100.'), c('El cincel está en el nido que tiene 10 más que 99. ¿Por qué no es 100?|The chisel is in the nest that is 10 more than 99. Why is it not 100?','99 + 10 = 109|99 + 10 = 109',['Después de 99 siempre va 100|After 99 always comes 100','99 + 10 = 190|99 + 10 = 190'],'99 + 1 = 100 y faltan 9 más: 109.|99 + 1 = 100, and 9 more are left: 109.')]),
 ];

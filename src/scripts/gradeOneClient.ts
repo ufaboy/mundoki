@@ -13,8 +13,10 @@ document.querySelectorAll<HTMLFormElement>('[data-g1-checks]').forEach(form => {
     event.preventDefault();
     if (!form.reportValidity()) return;
     const correct = Array.from(form.querySelectorAll<HTMLFieldSetElement>('fieldset')).map(field => {
-      const chosen = field.querySelector<HTMLInputElement>('input:checked');
-      const matches = chosen?.value === field.dataset.answer;
+      // Typed-number checks (Grade 2) keep the expected number in data-answer.
+      const chosen = field.querySelector<HTMLInputElement>('input[data-entry]') ?? field.querySelector<HTMLInputElement>('input:checked');
+      const value = chosen?.value.trim() ?? '';
+      const matches = /^\d+$/.test(value) && Number(value) === Number(field.dataset.answer);
       field.querySelector<HTMLElement>('[data-result]')!.textContent = matches
         ? (es ? 'Correcto.' : 'Correct.') : (es ? 'Revisemos.' : 'Let’s review.');
       field.querySelector<HTMLElement>('[data-feedback]')!.hidden = false;

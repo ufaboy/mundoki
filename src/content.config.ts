@@ -14,7 +14,11 @@ const schoolLessonSchema = z.object({
     warmup: localized, story: localized, steps: z.array(localized).min(3),
     scene: z.object({ kind: z.enum(['tokens', 'cards']), items: z.array(z.string()), caption: localized, layout: z.enum(['row', 'aligned']).optional() }),
     misconception: localized, exit: localized,
-    checks: z.array(z.object({ prompt: localized, options: z.array(localized).min(2), answer: z.number(), explanation: localized })).min(2),
+    checks: z.array(z.object({
+      prompt: localized, options: z.array(localized), answer: z.number(), explanation: localized,
+      input: z.literal('number').optional(), unit: localized.optional(),
+    }).refine(check => check.input === 'number' ? check.options.length === 0 : check.options.length >= 2,
+      'A check either takes a typed number or offers at least two options')).min(2),
   });
 const gradeOneLessons = defineCollection({ loader: async () => GRADE_ONE_LESSONS, schema: schoolLessonSchema });
 const gradeTwoLessons = defineCollection({ loader: async () => GRADE_TWO_LESSONS, schema: schoolLessonSchema });

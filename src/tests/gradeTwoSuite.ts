@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { GRADE_TWO_LESSONS, GRADE_TWO_PACKAGES, GRADE_TWO_PROJECT } from '../content/grade2';
 import { GRADE_TWO_ASSESSMENTS } from '../content/grade2/assessments';
 import { getGradeTwoHints } from '../content/grade2/hints';
+import { GRADE_TWO_GENERATORS, gradeTwoVariant, gradeTwoVariants } from '../content/grade2/variants';
 import { SCHOOL_COURSES, getCourseForPackage, getSchoolPackage } from '../content/schoolCourses';
 import { getGradeById } from '../math/curriculum';
 import { buildSchoolLessonUrl } from '../i18n/routes';
@@ -69,10 +70,21 @@ export function runGradeTwoTests() {
   assert.throws(() => getCourseForPackage('G02-99'));
   const checks = [...GRADE_TWO_LESSONS.flatMap(l => l.checks), ...Object.values(GRADE_TWO_ASSESSMENTS).flat()];
   assert.equal(checks.length, 137);
-  for (const check of checks) {
-    assert(Number.isInteger(check.answer) && check.answer >= 0 && check.answer < check.options.length);
-    for (const locale of ['es-AR', 'en-US'] as const) assert.equal(new Set(check.options.map(o => o[locale])).size, check.options.length);
-  }
+  // No two-button guessing: typed numbers, or 3–4 options with the right one not always in the same place.
+  const validCheck = (check: (typeof checks)[number], where: string) => {
+    if (check.input === 'number') {
+      assert.equal(check.options.length, 0, `Typed checks have no options: ${where}`);
+      assert(Number.isInteger(check.answer) && check.answer >= 0 && check.answer <= 1000, `Typed answer within 1,000: ${where}`);
+    } else {
+      assert(check.options.length >= 3 && check.options.length <= 4, `Grade 2 choices offer 3–4 options: ${where}`);
+      assert(Number.isInteger(check.answer) && check.answer >= 0 && check.answer < check.options.length);
+      for (const locale of ['es-AR', 'en-US'] as const) assert.equal(new Set(check.options.map(o => o[locale])).size, check.options.length);
+    }
+  };
+  checks.forEach((check, i) => validCheck(check, check.prompt['en-US'] || String(i)));
+  const choicePositions = new Set(checks.filter(c => c.input !== 'number').map(c => c.answer));
+  assert(choicePositions.size >= 3, 'The right option moves between positions');
+  assert(checks.filter(c => c.input === 'number').length >= 55, 'Number answers are typed, not picked');
   const visit = (value: unknown) => {
     if (!value || typeof value !== 'object') return;
     if ('es-AR' in value || 'en-US' in value) {
@@ -83,6 +95,36 @@ export function runGradeTwoTests() {
     }
     Object.values(value).forEach(visit);
   };
+  // Generated versions: shown one after another after wrong answers.
+  assert.deepEqual(Object.keys(GRADE_TWO_GENERATORS).sort(), GRADE_TWO_LESSONS.map(l => l.id).sort(), 'Every mission has generators');
+  const integers = (text: string) => (text.match(/\d+/g) ?? []).map(Number).sort((a, b) => a - b);
+  for (const lesson of GRADE_TWO_LESSONS) {
+    lesson.checks.forEach((main, i) => {
+      const where = `${lesson.id} #${i + 1}`;
+      const answers = new Set<string>(), prompts = new Set<string>();
+      for (let seed = 1; seed <= 400; seed++) {
+        const v = gradeTwoVariant(lesson.id, i, seed);
+        assert.deepEqual(gradeTwoVariant(lesson.id, i, seed), v, `Same seed, same version: ${where}`);
+        validCheck(v, where);
+        assert.equal(v.input, main.input, `A version keeps the answer format: ${where}`);
+        visit([v.prompt, v.explanation, v.hint, ...v.options, ...(v.reward ? [v.reward] : [])]);
+        for (const locale of ['es-AR', 'en-US'] as const) {
+          for (const value of [v.prompt, v.explanation, v.hint, ...v.options]) assert(!value[locale].includes('{'), `Version text is not personalized: ${where}`);
+          assert.notEqual(v.hint[locale], v.explanation[locale], `A hint is an action, not the answer: ${where}`);
+          assert(integers(v.prompt[locale]).every(n => n <= 1000), `Numbers stay within 1,000: ${where}`);
+        }
+        assert.deepEqual(integers(v.prompt['es-AR']), integers(v.prompt['en-US']), `Both languages use the same numbers: ${where} ${v.prompt['en-US']}`);
+        if (v.input === 'number') assert(integers(v.explanation['es-AR']).includes(v.answer), `The explanation shows the typed answer: ${where} ${v.prompt['en-US']}`);
+        answers.add(v.input === 'number' ? String(v.answer) : v.options[v.answer]['en-US']);
+        prompts.add(v.prompt['en-US']);
+      }
+      assert(answers.size >= 2, `The right answer changes between versions: ${where}`);
+      assert(prompts.size >= 2, `Versions change the question: ${where}`);
+      const shown = gradeTwoVariants(lesson.id, i, main.prompt['en-US'], 4, 12345);
+      assert(shown.length >= 1 && shown.every(v => v.prompt['en-US'] !== main.prompt['en-US']), `Versions differ from the authored challenge: ${where}`);
+      assert.equal(new Set(shown.map(v => v.prompt['en-US'])).size, shown.length, `Versions on one page differ: ${where}`);
+    });
+  }
   visit([GRADE_TWO_LESSONS, GRADE_TWO_PACKAGES, GRADE_TWO_ASSESSMENTS, GRADE_TWO_PROJECT]);
   for (const lesson of GRADE_TWO_LESSONS) {
     const hints = getGradeTwoHints(lesson.id);
@@ -127,5 +169,5 @@ export function runGradeTwoTests() {
   assert.deepEqual(equalGroupModel('pack', 18, 3), {groups: 6, each: 3, remainder: 0, total: 18});
   assert.throws(() => equalGroupModel('share', 18, 0));
   assert.throws(() => equalGroupModel('multiply', 7, 6));
-  console.log('PASS [Grade 2] 36 lessons, 13 packages, 137 bilingual checks, cross-grade prerequisites, routes, and exhaustive visual-model invariants');
+  console.log('PASS [Grade 2] 36 lessons, 13 packages, 137 bilingual checks (typed or 3–4 options) with generated versions for all 72 challenges, cross-grade prerequisites, routes, and exhaustive visual-model invariants');
 }

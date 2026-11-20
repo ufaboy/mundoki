@@ -15,12 +15,14 @@ export interface MissionCheckKey {
 
 export function findMissionCheck(lessonId: string, checkIndex: number): MissionCheckKey | null {
   for (const course of SCHOOL_COURSES) {
-    const lessons = course.lessons as readonly { id: string; checks?: readonly { answer: number }[] }[];
+    const lessons = course.lessons as readonly { id: string; checks?: readonly { answer: number; input?: 'number' }[] }[];
     const lesson = lessons.find((item) => item.id === lessonId);
     if (!lesson) continue;
     const check = lesson.checks?.[checkIndex];
     const grade = GRADES_CATALOG.find((item) => item.id === course.gradeId);
-    if (!check || !grade) return null;
+    // Typed-number checks (Grade 2) keep the expected number in `answer`, not an
+    // option index, and are not reported to the server.
+    if (!check || !grade || check.input === 'number') return null;
     return { answer: check.answer, topicId: grade.primaryTopicId };
   }
   return null;

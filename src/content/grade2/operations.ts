@@ -1,4 +1,5 @@
-import { createLessonFactory, check as q } from '../lessonModel';
+import { createLessonFactory } from '../lessonModel';
+import { choice as c, entry as e } from './checks';
 const l = createLessonFactory(2);
 
 // Story: Stepping-Stone River dam (G02-04) and Mirror Lake (G02-05, G02-06).
@@ -11,7 +12,7 @@ export const operationLessons = [
     ['[23] + [15] = [38]','23 → +15 → 38'], 'Los corchetes son pilas. La flecha es un cambio.|Brackets are piles. The arrow is a change.',
     'Si se usan 15 troncos, la cuenta cambia: 23 − 15.|If 15 logs are used, the calculation changes: 23 − 15.',
     'Inventá dos historias para 32 + 16: una de juntar y otra de recibir.|Invent two stories for 32 + 16: one about joining and one about receiving.',
-    [q('Había 42 troncos. Usaron 12 en una pared. ¿Cuántos quedan?|There were 42 logs. 12 were used for a wall. How many are left?','30|30','54|54','Usar troncos deja menos: 42 − 12 = 30.|Using logs leaves fewer: 42 − 12 = 30.'), q('¿Por qué las dos historias de troncos se resuelven con 23 + 15?|Why are both log stories solved with 23 + 15?','En las dos, dos partes forman el total|In both, two parts make the total','En las dos aparece la palabra «más»|Both use the word “more”','Juntar dos pilas o recibir más troncos: en los dos casos sumamos las partes.|Joining two piles or getting more logs: either way we add the parts.')]),
+    [e('Había 42 troncos. Usaron 12 en una pared. ¿Cuántos quedan?|There were 42 logs. 12 were used for a wall. How many are left?',30,'Usar troncos deja menos: 42 − 12 = 30.|Using logs leaves fewer: 42 − 12 = 30.','troncos|logs'), c('¿Por qué las dos historias de troncos se resuelven con 23 + 15?|Why are both log stories solved with 23 + 15?','En las dos, dos partes forman el total|In both, two parts make the total',['En las dos aparece la palabra «más»|Both use the word “more”','En las dos se saca una parte|In both, a part is taken away'],'Juntar dos pilas o recibir más troncos: en los dos casos sumamos las partes.|Joining two piles or getting more logs: either way we add the parts.')]),
   l(4, 2, 'Cuántos más: comparamos barras|How many more: comparing bars',
     'Resolver comparaciones buscando la diferencia.|Solve comparisons by finding the difference.',
     '¿Cuántos más hay en ocho que en cinco?|How many more are in eight than in five?',
@@ -20,7 +21,7 @@ export const operationLessons = [
     ['36: [24][12]','24: [24]'], 'Los números dicen las cantidades. El dibujo no está a escala.|The numbers tell the amounts. The drawing is not to scale.',
     'Aunque diga «más», no siempre sumamos. Acá buscamos la diferencia.|Even if it says “more,” we do not always add. Here we look for the difference.',
     'Compará 45 y 32 con dos barras. Explicá qué representa la parte sobrante.|Compare 45 and 32 with two bars. Explain the remaining part.',
-    [q('El lado izquierdo necesita 27 piedras y el derecho 19. ¿Cuántas más necesita el izquierdo?|The left side needs 27 stones and the right side needs 19. How many more does the left side need?','8|8','46|46','19 + 8 = 27. La diferencia es 8.|19 + 8 = 27. The difference is 8.'), q('¿Qué pregunta responde 27 + 19?|Which question does 27 + 19 answer?','Cuántas piedras se necesitan en total|How many stones are needed in all','Cuántas más necesita el izquierdo|How many more the left side needs','Sumar da el total de los dos lados, no la diferencia.|Adding gives the total for both sides, not the difference.')]),
+    [e('El lado izquierdo necesita 27 piedras y el derecho 19. ¿Cuántas más necesita el izquierdo?|The left side needs 27 stones and the right side needs 19. How many more does the left side need?',8,'19 + 8 = 27. La diferencia es 8.|19 + 8 = 27. The difference is 8.','piedras|stones'), c('¿Qué pregunta responde 27 + 19?|Which question does 27 + 19 answer?','Cuántas piedras se necesitan en total|How many stones are needed in all',['Cuántas más necesita el izquierdo|How many more the left side needs','Cuántas piedras sobran|How many stones are left over'],'Sumar da el total de los dos lados, no la diferencia.|Adding gives the total for both sides, not the difference.')]),
   l(4, 3, 'La parte que falta|The missing part',
     'Encontrar una parte desconocida o una cantidad inicial.|Find an unknown part or a starting quantity.',
     'Completá 7 + __ = 10.|Complete 7 + __ = 10.',
@@ -29,7 +30,7 @@ export const operationLessons = [
     ['50 = [32] + [?]','32 → +8 → 40 → +10 → 50'], 'Sabemos el total. Buscamos la parte que falta.|We know the total. We look for the missing part.',
     'Si sabemos el final y lo que llegó, restamos para hallar el comienzo.|If we know the end and what arrived, we subtract to find the start.',
     'Después de recibir 12 lápices hay 35. ¿Cuántos había antes? Mostrá la historia.|After receiving 12 pencils there are 35. How many were there before? Show the story.',
-    [q('La compuerta necesita 60 palos. Ya hay 46. ¿Cuántos faltan?|The gate needs 60 sticks. 46 are already in. How many are missing?','14|14','106|106','46 + 14 = 60.|46 + 14 = 60.'), q('¿Cómo comprobás que faltan 14 palos?|How do you check that 14 sticks are missing?','46 + 14 = 60|46 + 14 = 60','60 + 14 = 74|60 + 14 = 74','La parte que falta más la parte puesta forman el total.|The missing part plus the part in place makes the total.')]),
+    [e('La compuerta necesita 60 palos. Ya hay 46. ¿Cuántos faltan?|The gate needs 60 sticks. 46 are already in. How many are missing?',14,'46 + 14 = 60.|46 + 14 = 60.','palos|sticks'), c('La compuerta necesita 60 palos. Hay 46 y faltan 14. ¿Cómo lo comprobás?|The gate needs 60 sticks. There are 46, and 14 are missing. How do you check it?','46 + 14 = 60|46 + 14 = 60',['60 + 14 = 74|60 + 14 = 74','46 − 14 = 32|46 − 14 = 32'],'La parte que falta más la parte puesta forman el total.|The missing part plus the part in place makes the total.')]),
   l(5, 1, 'Sumas que convienen|Convenient sums',
     'Descomponer números para facilitar el cálculo mental.|Break numbers apart to make mental calculation easier.',
     'Decí dos números que formen diez.|Name two numbers that make ten.',
@@ -38,7 +39,7 @@ export const operationLessons = [
     ['34 + 25','(30 + 20) + (4 + 5)','50 + 9 = 59'], 'Dos caminos que usan todas las partes.|Two ways that use all the parts.',
     'Si separás un número, no te olvides de sus unidades.|If you split a number, do not forget its ones.',
     'Resolvé 43 + 26 de dos maneras y explicá cuál te resulta más cómoda.|Solve 43 + 26 in two ways and explain which feels easier.',
-    [q('Hay 52 gotas azules y 36 blancas. ¿Cuántas gotas hay?|There are 52 blue drops and 36 white ones. How many drops are there?','88|88','78|78','50 + 30 = 80 y 2 + 6 = 8. Son 88.|50 + 30 = 80 and 2 + 6 = 8. That is 88.'), q('¿Por qué 41 + 28 se puede hacer como 41 + 20 + 8?|Why can 41 + 28 be done as 41 + 20 + 8?','Porque 28 es 20 y 8|Because 28 is 20 and 8','Porque así da más|Because that gives more','Separamos 28 en 20 y 8. Juntos siguen siendo 28.|We split 28 into 20 and 8. Together they are still 28.')]),
+    [e('Hay 52 gotas azules y 36 blancas. ¿Cuántas gotas hay?|There are 52 blue drops and 36 white ones. How many drops are there?',88,'50 + 30 = 80 y 2 + 6 = 8. Son 88.|50 + 30 = 80 and 2 + 6 = 8. That is 88.','gotas|drops'), c('¿Por qué 41 + 28 se puede hacer como 41 + 20 + 8?|Why can 41 + 28 be done as 41 + 20 + 8?','Porque 28 es 20 y 8|Because 28 is 20 and 8',['Porque así da más|Because that gives more','Porque 28 es 2 y 8|Because 28 is 2 and 8'],'Separamos 28 en 20 y 8. Juntos siguen siendo 28.|We split 28 into 20 and 8. Together they are still 28.')]),
   l(5, 2, 'Cruzamos una decena|Crossing a ten',
     'Sumar y restar pasando por una decena completa.|Add and subtract through a full ten.',
     '¿Cuánto le falta a 28 para llegar a 30?|How many does 28 need to reach 30?',
@@ -47,7 +48,7 @@ export const operationLessons = [
     ['28 → +2 → 30 → +5 → 35','42 → −2 → 40 → −4 → 36'], 'Los saltos chicos juntos valen lo mismo que el salto grande.|The small jumps together equal the big jump.',
     'Si usaste 2 del 7, quedan 5, no 7.|If you used 2 of the 7, 5 are left, not 7.',
     'Resolvé 47 + 8 y 53 − 7 pasando por una decena.|Solve 47 + 8 and 53 − 7 by passing through a ten.',
-    [q('La vela tiene 36 estrellas. Pegamos 8 más. ¿Cuántas hay?|The sail has 36 stars. We stick on 8 more. How many are there?','44|44','34|34','36 + 4 = 40 y 40 + 4 = 44.|36 + 4 = 40 and 40 + 4 = 44.'), q('Había 51 estrellas. Usamos 6. ¿Por qué conviene hacer 51 − 1 − 5?|There were 51 stars. We used 6. Why is it handy to do 51 − 1 − 5?','Primero llegamos a 50|First we reach 50','Así restamos menos|That way we take away less','Quitamos 6 en dos pasos: 1 y 5. Pasamos por 50.|We take away 6 in two steps: 1 and 5. We pass through 50.')]),
+    [e('La vela tiene 36 estrellas. Pegamos 8 más. ¿Cuántas hay?|The sail has 36 stars. We stick on 8 more. How many are there?',44,'36 + 4 = 40 y 40 + 4 = 44.|36 + 4 = 40 and 40 + 4 = 44.','estrellas|stars'), c('Había 51 estrellas. Usamos 6. ¿Por qué conviene hacer 51 − 1 − 5?|There were 51 stars. We used 6. Why is it handy to do 51 − 1 − 5?','Primero llegamos a 50|First we reach 50',['Así restamos menos|That way we take away less','Porque 1 + 5 = 7|Because 1 + 5 = 7'],'Quitamos 6 en dos pasos: 1 y 5. Pasamos por 50.|We take away 6 in two steps: 1 and 5. We pass through 50.')]),
   l(5, 3, 'Comprobamos deshaciendo la cuenta|Checking by undoing the calculation',
     'Comprobar sumas y restas recuperando la cantidad inicial.|Check sums and differences by recovering the starting quantity.',
     'Explicá por qué 5 + 3 y 8 − 3 están relacionadas.|Explain why 5 + 3 and 8 − 3 are related.',
@@ -56,7 +57,7 @@ export const operationLessons = [
     ['63 − 27 = 36','36 + 27 = 63','46 + 27 = 73 ≠ 63'], 'Si sacaste 27, volvé a sumar 27. Tenés que llegar al número del comienzo.|If you took away 27, add 27 back. You should reach the starting number.',
     'Repetir la misma cuenta puede repetir el mismo error. Probá con la cuenta al revés.|Repeating the same calculation may repeat the same mistake. Try the reverse calculation.',
     'Calculá 48 + 17. Al resultado quitale 17. ¿Volvés a 48?|Calculate 48 + 17. Take 17 away from your answer. Are you back at 48?',
-    [q('En el agua dice 72 − 28 = 44. ¿Qué cuenta lo comprueba?|The water says 72 − 28 = 44. Which calculation checks it?','44 + 28 = 72|44 + 28 = 72','72 + 28 = 100|72 + 28 = 100','Lo que quedó más lo que sacamos da el número del comienzo.|What is left plus what we took away gives the starting number.'), q('En el agua dice 54 − 16 = 30. Pero 30 + 16 = 46. ¿Qué significa?|The water says 54 − 16 = 30. But 30 + 16 = 46. What does it mean?','Que 54 − 16 no es 30|That 54 − 16 is not 30','Que la suma está mal|That the addition is wrong','Para comprobar, tenemos que volver a 54. 46 no es 54.|To check, we must get back to 54. 46 is not 54.')]),
+    [c('En el agua dice 72 − 28 = 44. ¿Qué cuenta lo comprueba?|The water says 72 − 28 = 44. Which calculation checks it?','44 + 28 = 72|44 + 28 = 72',['72 + 28 = 100|72 + 28 = 100','44 − 28 = 16|44 − 28 = 16'],'Lo que quedó más lo que sacamos da el número del comienzo.|What is left plus what we took away gives the starting number.'), c('En el agua dice 54 − 16 = 30. Pero 30 + 16 = 46. ¿Qué significa?|The water says 54 − 16 = 30. But 30 + 16 = 46. What does it mean?','Que 54 − 16 no es 30|That 54 − 16 is not 30',['Que la suma está mal|That the addition is wrong','Que 54 − 16 es 46|That 54 − 16 is 46'],'Para comprobar, tenemos que volver a 54. 46 no es 54.|To check, we must get back to 54. 46 is not 54.')]),
   l(6, 1, 'El doble: dos partes iguales|Double: two equal parts',
     'Construir el doble como dos copias de una cantidad.|Build a double as two copies of a quantity.',
     'Juntá dos grupos de cuatro.|Join two groups of four.',
@@ -65,7 +66,7 @@ export const operationLessons = [
     ['[12] [12]','20 + 4 = 24'], 'Las dos partes tienen la misma cantidad.|Both parts have the same amount.',
     'El doble de 12 no es 14: no sumamos 2, repetimos 12.|Double 12 is not 14: we do not add 2, we repeat 12.',
     'Mostrá el doble de 15 y explicá cómo doblaste decenas y unidades.|Show double 15 and explain how you doubled tens and ones.',
-    [q('Un escudo tiene 16 luciérnagas. El reflejo tiene las mismas. ¿Cuántas hay en total?|A shield has 16 fireflies. The reflection has the same. How many are there in all?','32|32','26|26','16 + 16 = 32. Es el doble de 16.|16 + 16 = 32. That is double 16.'), q('Arriba hay 8 peces y en el reflejo hay 9. ¿Por qué 8 + 9 no es el doble de 8?|There are 8 fish above and 9 in the reflection. Why is 8 + 9 not double 8?','El doble de 8 es 8 + 8|Double 8 is 8 + 8','8 y 9 son casi iguales|8 and 9 are almost equal','En el doble, las dos partes son iguales. Ese reflejo es falso.|In a double, both parts are equal. That reflection is fake.')]),
+    [e('Un escudo tiene 16 luciérnagas. El reflejo tiene las mismas. ¿Cuántas hay en total?|A shield has 16 fireflies. The reflection has the same. How many are there in all?',32,'16 + 16 = 32. Es el doble de 16.|16 + 16 = 32. That is double 16.','luciérnagas|fireflies'), c('Arriba hay 8 peces y en el reflejo hay 9. ¿Por qué 8 + 9 no es el doble de 8?|There are 8 fish above and 9 in the reflection. Why is 8 + 9 not double 8?','El doble de 8 es 8 + 8|Double 8 is 8 + 8',['8 y 9 son casi iguales|8 and 9 are almost equal','El doble de 8 es 8 + 2|Double 8 is 8 + 2'],'En el doble, las dos partes son iguales. Ese reflejo es falso.|In a double, both parts are equal. That reflection is fake.')]),
   l(6, 2, 'La mitad: repartir en dos|Half: sharing into two',
     'Encontrar la mitad de una cantidad que se reparte en dos partes iguales.|Find half of a quantity that can be shared into two equal whole-number parts.',
     'Calculá el doble de ocho.|Calculate double eight.',
@@ -74,7 +75,7 @@ export const operationLessons = [
     ['18 → [9] [9]','9 + 9 = 18'], 'La mitad es una de dos partes iguales.|Half is one of two equal parts.',
     '10 y 8 suman 18, pero no son mitades: no son iguales.|10 and 8 make 18, but they are not halves: they are not equal.',
     'Repartí 24 objetos entre dos y comprobá que ambos grupos sean iguales.|Share 24 objects between two and check that both groups are equal.',
-    [q('Hay 30 piedras de luna para dos orillas. ¿Cuántas van a cada orilla?|There are 30 moon stones for two shores. How many go on each shore?','15|15','20|20','15 + 15 = 30. Las dos partes son iguales.|15 + 15 = 30. Both parts are equal.'), q('¿Por qué 7 y 13 no son las mitades de 20?|Why are 7 and 13 not halves of 20?','Las mitades son iguales: 10 y 10|Halves are equal: 10 and 10','Porque 7 + 13 no da 20|Because 7 + 13 does not make 20','7 + 13 da 20, pero las mitades tienen que ser iguales.|7 + 13 makes 20, but halves must be equal.')]),
+    [e('Hay 30 piedras de luna para dos orillas. ¿Cuántas van a cada orilla?|There are 30 moon stones for two shores. How many go on each shore?',15,'15 + 15 = 30. Las dos partes son iguales.|15 + 15 = 30. Both parts are equal.','piedras|stones'), c('¿Por qué 7 y 13 no son las mitades de 20?|Why are 7 and 13 not halves of 20?','Las mitades son iguales: 10 y 10|Halves are equal: 10 and 10',['Porque 7 + 13 no da 20|Because 7 + 13 does not make 20','Porque la mitad de 20 es 2|Because half of 20 is 2'],'7 + 13 da 20, pero las mitades tienen que ser iguales.|7 + 13 makes 20, but halves must be equal.')]),
   l(6, 3, 'Usamos dobles conocidos|Using known doubles',
     'Derivar cálculos nuevos de dobles y mitades conocidos.|Derive new calculations from known doubles and halves.',
     'Decí el doble de diez y la mitad de veinte.|State double ten and half twenty.',
@@ -83,5 +84,5 @@ export const operationLessons = [
     ['7 + 7 = 14','7 + 8 = 14 + 1 = 15','24 → [12] [12]'], 'Una cuenta que ya sabés te ayuda con otra.|A sum you already know helps with another.',
     'En 7 + 8 solo una parte creció 1. El total crece 1, no 2.|In 7 + 8 only one part grew by 1. The total grows by 1, not 2.',
     'Usá 9 + 9 para resolver 9 + 10 y explicá el cambio.|Use 9 + 9 to solve 9 + 10 and explain the change.',
-    [q('En una orilla hay 15 piedras y en la otra 16. Si 15 + 15 = 30, ¿cuántas hay en total?|One shore has 15 stones and the other has 16. If 15 + 15 = 30, how many are there in all?','31|31','30|30','Una parte creció 1: 30 + 1 = 31.|One part grew by 1: 30 + 1 = 31.'), q('El doble de 14 es 28. ¿Cuál es la mitad de 28?|Double 14 is 28. What is half of 28?','14|14','56|56','Dos partes de 14 forman 28. La mitad es 14.|Two parts of 14 make 28. Half is 14.')]),
+    [e('En una orilla hay 15 piedras y en la otra 16. Si 15 + 15 = 30, ¿cuántas hay en total?|One shore has 15 stones and the other has 16. If 15 + 15 = 30, how many are there in all?',31,'Una parte creció 1: 30 + 1 = 31.|One part grew by 1: 30 + 1 = 31.','piedras|stones'), e('El doble de 14 es 28. ¿Cuál es la mitad de 28?|Double 14 is 28. What is half of 28?',14,'Dos partes de 14 forman 28. La mitad es 14.|Two parts of 14 make 28. Half is 14.')]),
 ];

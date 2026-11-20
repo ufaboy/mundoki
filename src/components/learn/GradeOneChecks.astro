@@ -9,7 +9,9 @@ const es = locale === 'es-AR';
   {checks.map((check, index) => (
     <fieldset class="card-subtle stack-sm" data-answer={check.answer}>
       <legend>{index + 1}. {check.prompt[locale]}</legend>
-      {check.options.map((option, i) => <label class="g1-option"><input type="radio" name={`${id}-${index}`} value={i} required /> <span>{option[locale]}</span></label>)}
+      {check.input === 'number'
+        ? <label class="g1-entry"><span class="visually-hidden">{es ? 'Tu respuesta' : 'Your answer'}</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" name={`${id}-${index}`} required data-entry /> {check.unit && <span>{check.unit[locale]}</span>}</label>
+        : check.options.map((option, i) => <label class="g1-option"><input type="radio" name={`${id}-${index}`} value={i} required /> <span>{option[locale]}</span></label>)}
       <p class="g1-feedback" data-feedback hidden><strong data-result></strong> {check.explanation[locale]}</p>
     </fieldset>
   ))}

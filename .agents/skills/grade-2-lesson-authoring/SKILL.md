@@ -13,7 +13,10 @@ Use this skill together with `.agents/skills/lesson-authoring/SKILL.md` (core ru
 
 - The child is 7–8 and may still listen to the text read aloud. Grade 1 gave counting, numbers to 100, joining and taking away, and halves of small quantities. Grade 2 builds place value to 1,000, mental strategies, and first meanings of multiplication and division.
 - Keep the visible model first: boxes of 100, bags of 10, and loose gems; number lines; bars; equal groups. Then the number sentence.
-- Keep two answer options per challenge (`check()` in `src/content/lessonModel.ts`); the wrong option must show a typical error (digit value instead of place value, wrong operation, unequal parts).
+- No two-option challenges: a child can pass them by pressing both buttons. Build Grade 2 challenges with `src/content/grade2/checks.ts`:
+  - `entry(prompt, value, explanation, unit?)` when the answer is a number — the child types it on a number pad;
+  - `choice(prompt, correct, [wrong, wrong(, wrong)], explanation)` otherwise — 3–4 options, each wrong one a typical error (digit value instead of place value, wrong operation, unequal parts, adding the digits). The page reshuffles the options on every attempt.
+- Every challenge has a **generator** in `src/content/grade2/variants/` (one file per chapter, builders in `kit.ts`). The mission page renders the authored challenge plus four generated versions; after a wrong answer the buttons pause, the wizard “changes the numbers”, and the next version appears with its own hint open. A generator keeps the skill and the story object and changes the numbers; in “why” and “what does it count” questions it must also change **which** option is right (ask about another number, a true and a false case, another tool), so remembering a wrong button never helps. Each version brings its own `hint`, a typed answer that its `explanation` shows, and its own `reward` when the mission reward names the authored numbers. Versions must be solvable on their own, use the same numbers in both languages, and stay within 1,000; `gradeTwoSuite.ts` checks this over 400 seeds per generator. When you change an authored challenge, change its generator in the same edit.
 
 ## Plain language for 7–8-year-olds (mandatory)
 
@@ -48,6 +51,7 @@ Use this skill together with `.agents/skills/lesson-authoring/SKILL.md` (core ru
 
 - Lessons (worked example `story`, `steps`, `scene`, `misconception`, `checks`): `src/content/grade2/numbers.ts` (G02-01…03), `operations.ts` (G02-04…06), `groups.ts` (G02-07…08), `world.ts` (G02-09…13).
 - Hints, one per check: `src/content/grade2/hints.ts`.
+- Generators, one per check (versions shown after a wrong answer): `src/content/grade2/variants/`. Builders for authored checks `entry()`, `choice()`: `src/content/grade2/checks.ts`.
 - Missions (title, introduction, `rewards[i]` shown after `checks[i]`), chapters (place, friend), and `questSceneState()`: `src/content/grade2/wizardQuest.ts`. `QUEST_MISSIONS` order must stay aligned with the 36 lessons; each chapter is exactly 6 missions (12 knots).
 - Pages: `src/components/learn/QuestMap.astro` (grade map), `QuestLesson.astro` (mission page and epilogue), `QuestStage.astro` (scene), `src/scripts/wizardQuest.ts` (answers, hints, knots).
 - Package checks: `src/content/grade2/assessments.ts` — practice outside the story; any context; prompts must differ from lesson checks.

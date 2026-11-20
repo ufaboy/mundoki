@@ -1,10 +1,12 @@
 ---
-// Grade 2 mission page: story header, scene, worked example, two challenges,
+// Grade 2 mission page: story header, scene, worked example, two challenges
+// (each with generated versions shown after a wrong answer, see content/grade2/variants),
 // and the epilogue after the last mission. Story texts can name the chosen
 // hero ({name}), so they render through HeroText.
 import type { Locale } from '../../math/core/types';
 import { GRADE_TWO_LESSONS, GRADE_TWO_PROJECT } from '../../content/grade2';
 import { getGradeTwoHints } from '../../content/grade2/hints';
+import { gradeTwoVariants } from '../../content/grade2/variants';
 import { GRADE_TWO_ASSESSMENTS } from '../../content/grade2/assessments';
 import { QUEST_MISSIONS, QUEST_CHAPTERS } from '../../content/grade2/wizardQuest';
 import { buildGradeUrl, buildSchoolLessonUrl } from '../../i18n/routes';
@@ -18,6 +20,16 @@ const index = GRADE_TWO_LESSONS.findIndex(l => l.id === lessonId);
 const lesson = GRADE_TWO_LESSONS[index], mission = QUEST_MISSIONS[index];
 if (!lesson || mission.id !== lessonId) throw new Error(`Missing quest mission: ${lessonId}`);
 const hints = getGradeTwoHints(lessonId);
+// After a wrong answer the page shows the next version of the challenge: new numbers
+// (and, in "why" questions, another right answer) from content/grade2/variants.
+const VERSIONS = 4;
+const seed = Math.floor(Math.random() * 2 ** 31);
+// Mission 1 shows a place-value model of the price; these are the authored challenges' prices.
+const MAIN_MODELS = [461, 222];
+const versions = lesson.checks.map((check, i) => [
+ { ...check, hint: hints[i], reward: mission.rewards[i], model: MAIN_MODELS[i] },
+ ...gradeTwoVariants(lessonId, i, check.prompt['en-US'], VERSIONS, seed + i * 104729).map(v => ({ ...v, reward: v.reward ?? mission.rewards[i] })),
+]);
 const next = GRADE_TWO_LESSONS[index + 1];
 const chapter = QUEST_CHAPTERS.find(c => index >= c.start && index < c.end)!;
 const lastInPackage = !next || next.packageId !== lesson.packageId;
@@ -33,13 +45,21 @@ const epilogue = es
  <section class="road-challenge">
   <p>{es ? 'Ahora te toca. Leé la pregunta y probá.' : 'Now it’s your turn. Read the question and try it.'}</p>
   {lesson.packageId === 'G02-10' && <figure class="road-question-map"><figcaption>{es ? 'Plano para estos desafíos. ★: salida. ■: lugar bloqueado. 🦌 o 🏁: la meta. Un paso por casilla, sin diagonales.' : 'Map for these challenges. ★: start. ■: blocked square. 🦌 or 🏁: the goal. One square per step, no diagonal moves.'}</figcaption><table aria-label={es ? 'Plano del recorrido' : 'Route map'}><tbody>{lesson.scene.items.slice(0, 3).map(row => <tr>{row.split(' ').map(cell => <td>{cell}</td>)}</tr>)}</tbody></table></figure>}
-  {lesson.checks.map((check, i) => <div data-quest-question={i} data-answer={check.answer} hidden={i !== 0}><p class="road-eyebrow">{es ? 'DESAFÍO' : 'CHALLENGE'} {i + 1} / {lesson.checks.length}</p><h2 tabindex="-1" data-quest-question-title>{check.prompt[locale]}</h2>
-   {index === 0 && <div class="road-place-model"><p>{es ? 'Tocá una cifra para ver cuánto vale.' : 'Tap a digit to see its value.'}</p><div class="road-place-columns">{(i === 0 ? [4, 6, 1] : [2, 2, 2]).map((digit, j) => {
-    const unit = [100, 10, 1][j];
-    const label = (es ? ['Cajas de 100', 'Bolsitas de 10', 'Sueltas'] : ['Boxes of 100', 'Bags of 10', 'Loose'])[j];
-    return <button type="button" data-quest-place-value={`${digit} × ${unit} = ${digit * unit}`} aria-pressed="false" aria-label={`${label}: ${digit}`}><span>{label}</span><strong>{digit}</strong><span class="road-place-blocks" aria-hidden="true">{Array.from({ length: digit }, () => <i>{unit}</i>)}</span></button>;
-   })}</div><p class="road-place-value" data-quest-place-result role="status" aria-live="polite"></p></div>}
-   <div class="road-options" role="group" aria-label={check.prompt[locale]}>{check.options.map((option, j) => <button type="button" data-quest-answer={j}>{option[locale]}</button>)}</div><p class="road-hint" data-quest-hint hidden><span aria-hidden="true">🦊 </span>{hints[i][locale]}</p><p class="road-hint" data-quest-explanation hidden>{check.explanation[locale]}</p><div data-quest-reward-source hidden><HeroText text={mission.rewards[i][locale]} /></div></div>)}
+  {lesson.checks.map((check, i) => <div data-quest-question={i} hidden={i !== 0}><p class="road-eyebrow">{es ? 'DESAFÍO' : 'CHALLENGE'} {i + 1} / {lesson.checks.length}</p>
+   {versions[i].map((variant, k) => <div data-quest-variant={k} data-answer={variant.answer} data-input={variant.input ?? 'choice'} hidden={k !== 0}>
+    <h2 tabindex="-1" data-quest-question-title>{variant.prompt[locale]}</h2>
+    {index === 0 && <div class="road-place-model"><p>{es ? 'Tocá una cifra para ver cuánto vale.' : 'Tap a digit to see its value.'}</p><div class="road-place-columns">{String(variant.model ?? MAIN_MODELS[i]).split('').map(Number).map((digit, j) => {
+     const unit = [100, 10, 1][j];
+     const label = (es ? ['Cajas de 100', 'Bolsitas de 10', 'Sueltas'] : ['Boxes of 100', 'Bags of 10', 'Loose'])[j];
+     return <button type="button" data-quest-place-value={`${digit} × ${unit} = ${digit * unit}`} aria-pressed="false" aria-label={`${label}: ${digit}`}><span>{label}</span><strong>{digit}</strong><span class="road-place-blocks" aria-hidden="true">{Array.from({ length: digit }, () => <i>{unit}</i>)}</span></button>;
+    })}</div><p class="road-place-value" data-quest-place-result role="status" aria-live="polite"></p></div>}
+    {variant.input === 'number'
+     ? <form class="road-entry" data-quest-entry autocomplete="off"><label class="road-entry-field"><span class="visually-hidden">{es ? 'Tu respuesta' : 'Your answer'}</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" data-quest-entry-input aria-describedby={variant.unit ? `quest-unit-${i}-${k}` : undefined} />{variant.unit && <span id={`quest-unit-${i}-${k}`}>{variant.unit[locale]}</span>}</label>
+       <div class="road-keypad" aria-label={es ? 'Teclado de números' : 'Number pad'}>{['1','2','3','4','5','6','7','8','9'].map(d => <button type="button" data-quest-key={d}>{d}</button>)}<button type="button" data-quest-key="back" aria-label={es ? 'Borrar' : 'Delete'}>⌫</button><button type="button" data-quest-key="0">0</button><button type="submit" class="road-keypad-ok">{es ? 'Listo' : 'Done'}</button></div></form>
+     : <div class="road-options" role="group" aria-label={variant.prompt[locale]}>{variant.options.map((option, j) => <button type="button" data-quest-answer={j}>{option[locale]}</button>)}</div>}
+    <p class="road-hint" data-quest-hint hidden><span aria-hidden="true">🦊 </span>{variant.hint[locale]}</p><p class="road-hint" data-quest-explanation hidden>{variant.explanation[locale]}</p><div data-quest-reward-source hidden><HeroText text={variant.reward[locale]} /></div>
+   </div>)}
+  </div>)}
   <p class="road-feedback" data-quest-feedback role="status" aria-live="polite"></p>
   <div class="road-controls"><button type="button" class="road-secondary" data-quest-help>{es ? 'Una pista de Átomo' : 'A hint from Átomo'}</button><button type="button" class="road-secondary" data-quest-reset>{es ? 'Volver a jugar' : 'Play again'}</button><button type="button" class="road-primary" data-quest-next hidden>{es ? 'Siguiente desafío' : 'Next challenge'} →</button><a class="road-primary" data-quest-finish hidden href={next ? buildSchoolLessonUrl(locale, 'grade-2', next.id) : '#quest-epilogue'}>{next ? (es ? 'Siguiente misión' : 'Next mission') : (es ? 'Ver el final' : 'See the ending')} →</a></div>
  </section>

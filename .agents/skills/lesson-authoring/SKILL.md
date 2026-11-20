@@ -75,7 +75,7 @@ Then verify: the hint for each check points to the next action **on the story ob
 1. **Audit** a whole grade (or chapter): classify each lesson as connected / weak (themed but no decision) / disconnected, quoting the mission intro, each prompt, and each reward. Report this before large rewrites.
 2. **Arc first**: fix chapter beats where the math cannot be needed (see above).
 3. **Rewrite per lesson** with the story contract, editing curriculum lesson, hints, and mission together.
-4. Keep test invariants: one hint per check, hints differ from explanations, assessments keep prompts distinct from lesson checks, both locales present. Note that `check()` places the correct option by prompt length, so do not hard-code answer positions elsewhere.
+4. Keep test invariants: one hint per check, hints differ from explanations, assessments keep prompts distinct from lesson checks, both locales present. Note that `check()` places the correct option by prompt length, so do not hard-code answer positions elsewhere. Grade 2 uses its own builders (typed numbers, 3–4 options, generated versions): see the Grade 2 skill.
 5. Run `npm run lint` and `npm test`; read the rendered lesson page in both locales when possible.
 
 ## Review checklist

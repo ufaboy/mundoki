@@ -3,6 +3,13 @@
 All notable product and platform changes to **Mundoki** are documented in this file.
 Release notes describe user-facing and product impact — never include secrets, tokens, keys, credentials, or sensitive operational details.
 
+## [2.4.0] - 2026-11-20
+
+### Changed
+- Grade 2 challenges can no longer be passed by pressing every button in turn. Answers that are a number are now typed on a large number pad, and every other question offers three or four options built from typical mistakes, reshuffled on each attempt.
+- After a wrong answer in a Grade 2 mission, the buttons pause briefly, the wizard "changes the numbers", and a new version of the challenge appears with Átomo's hint already open. Each version keeps the same skill and story object but uses new numbers, and in "why" questions the right option changes too. A knot of the spell unties only for a correct answer.
+- The five-question checks at the end of each Grade 2 unit also use typed numbers and three or four options.
+
 ## [2.3.0] - 2026-11-18
 
 ### Added
